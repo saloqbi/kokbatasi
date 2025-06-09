@@ -1,4 +1,4 @@
-name: Run Vitest Tests
+name: CI - Lint & Test
 
 on:
   push:
@@ -7,22 +7,26 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  lint-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '18'
 
       - name: Install dependencies
-        working-directory: frontend
         run: npm install
+        working-directory: ./frontend
 
-      - name: Run tests
-        working-directory: frontend
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: ./frontend
+
+      - name: Run Vitest
         run: npm run test
+        working-directory: ./frontend
