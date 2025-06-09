@@ -1,0 +1,39 @@
+
+# ✅ عام
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ✅ Frontend
+frontend/.next/
+frontend/.vercel/
+frontend/.turbo/
+frontend/build/
+frontend/dist/
+frontend/coverage/
+frontend/.cache/
+
+# ✅ Backend
+backend/logs/
+backend/coverage/
+backend/tmp/
+
+# ✅ GitHub & CI/CD
+.github/
+.vitest/
+
+# ✅ أنظمة أخرى
+*.swp
+*.swo
+*.bak
+*.tmp
