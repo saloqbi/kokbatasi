@@ -28,9 +28,7 @@ backend/logs/
 backend/coverage/
 backend/tmp/
 
-# ✅ GitHub & CI/CD
-.github/
-.vitest/
+
 
 # ✅ أنظمة أخرى
 *.swp
