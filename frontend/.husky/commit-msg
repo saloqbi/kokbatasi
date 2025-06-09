@@ -1,0 +1,14 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "✅ Checking commit message format..."
+# مثال بسيط: التحقق أن الرسالة تبدأ بحرف كبير
+commit_msg_file=$1
+first_line=$(head -n1 "$commit_msg_file")
+
+if ! echo "$first_line" | grep -qE "^[A-Z]"; then
+  echo "❌ Commit message must start with a capital letter."
+  exit 1
+fi
+
+echo "✅ Commit message format passed."
