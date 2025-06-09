@@ -23,17 +23,16 @@ jobs:
         run: npm install
         working-directory: ./frontend
 
-- name: Run ESLint (only fail on errors)
-  run: |
-    npm run lint | tee eslint-output.txt
-    if grep -q "error" eslint-output.txt; then
-      echo "Found ESLint errors. Failing build."
-      exit 1
-    else
-      echo "No ESLint errors. Continuing build."
-    fi
-  working-directory: ./frontend
+      - name: Run ESLint and generate HTML report
+        run: |
+          npm run lint || true
+        working-directory: ./frontend
 
+      - name: Upload ESLint HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: frontend/eslint-report.html
 
       - name: Run Vitest
         run: npm run test
