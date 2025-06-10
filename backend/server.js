@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import signalsRoute from './routes/signals.js';
+import gannRoute from './routes/gann.js';
 
 dotenv.config();
 const app = express();
@@ -15,8 +16,9 @@ app.get('/', (req, res) => {
   res.send('🚀 Backend is live');
 });
 
-// Signals API
+// Routes
 app.use('/api/signals', signalsRoute);
+app.use('/api', gannRoute);
 
 // MongoDB connect
 const PORT = process.env.PORT || 5000;
