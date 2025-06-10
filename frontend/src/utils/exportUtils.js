@@ -1,0 +1,1 @@
+export function exportToPDF() { console.log('Exporting to PDF'); }

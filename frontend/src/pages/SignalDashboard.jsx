@@ -1,0 +1,1 @@
+export default function SignalDashboard() { return <div>Signal Dashboard</div>; }

@@ -1,0 +1,1 @@
+export function initWebSocket() { console.log('WebSocket Initialized'); }

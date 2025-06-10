@@ -1,0 +1,1 @@
+export default function EnhancedHome() { return <div>Welcome to Kokbatasi Enhanced</div>; }

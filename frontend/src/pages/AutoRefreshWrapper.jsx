@@ -1,0 +1,1 @@
+export default function AutoRefreshWrapper({ children }) { return <div>{children}</div>; }

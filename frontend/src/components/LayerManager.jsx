@@ -1,0 +1,1 @@
+export default function LayerManager() { return <div>Layer Manager Component</div>; }

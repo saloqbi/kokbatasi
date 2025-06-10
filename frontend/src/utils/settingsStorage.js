@@ -1,0 +1,1 @@
+export function saveSetting(key, value) { localStorage.setItem(key, value); }
