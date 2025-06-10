@@ -1,0 +1,7 @@
+<<<<<<< HEAD
+REACT_APP_API_URL=https://your-backend-service.onrender.com
+REACT_APP_SOCKET_URL=https://your-backend-service.onrender.com
+=======
+PORT=5000
+MONGODB_URI=mongodb+srv://<USERNAME>:<PASSWORD>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority
+>>>>>>> 030232a5c698bdc202416696c3ddb3a9782665ad

@@ -1,0 +1,1 @@
+// Navbar component with role-based navigation
