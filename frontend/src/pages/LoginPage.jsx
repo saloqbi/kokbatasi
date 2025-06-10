@@ -5,8 +5,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    // في الوقت الحالي نفترض النجاح مباشرة
-    // لاحقًا يمكنك ربطه بـ AuthContext أو API
+    // نحاكي تسجيل دخول ناجح
     navigate("/signals");
   };
 
