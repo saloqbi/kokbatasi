@@ -1,3 +1,4 @@
+
 // 📁 src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useContext } from 'react';
@@ -15,8 +16,8 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
-
         <Route
           path="/signals"
           element={
@@ -25,7 +26,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/admin-signals"
           element={
@@ -34,7 +34,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/settings"
           element={
@@ -43,7 +42,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/profile"
           element={
