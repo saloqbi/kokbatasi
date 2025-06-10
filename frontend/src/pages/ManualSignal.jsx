@@ -1,65 +1,28 @@
-
-import React, { useState } from "react";
-import RSIChart from "../components/RSIChart";
-import FibonacciTool from "../components/FibonacciTool";
-import GannTool from "../components/GannTool";
+import React, { useState } from 'react';
+import { postSignal } from '../api/api';
 
 const ManualSignal = () => {
-  const [input, setInput] = useState("");
-  const [tools, setTools] = useState([]);
+  const [symbol, setSymbol] = useState('');
+  const [action, setAction] = useState('');
+  const [price, setPrice] = useState('');
 
-  const extractTools = (text) => {
-    const lower = text.toLowerCase();
-    const results = [];
-
-    if (lower.includes("شراء") || lower.includes("buy")) results.push("📈 إشارة شراء");
-    if (lower.includes("بيع") || lower.includes("sell")) results.push("📉 إشارة بيع");
-    if (lower.includes("rsi")) results.push("📊 مؤشر RSI");
-    if (lower.includes("macd")) results.push("📊 مؤشر MACD");
-    if (lower.includes("فيبوناتشي") || lower.includes("fibonacci")) results.push("🌀 فيبوناتشي");
-    if (lower.includes("جان") || lower.includes("gann")) results.push("📐 أدوات Gann");
-
-    return results;
-  };
-
-  const handleSubmit = () => {
-    const detected = extractTools(input);
-    setTools(detected);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newSignal = { symbol, action, price };
+    await postSignal(newSignal);
+    alert('تم إرسال التوصية بنجاح');
+    setSymbol(''); setAction(''); setPrice('');
   };
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">📥 إدخال توصية يدوية</h1>
-
-      <textarea
-        className="w-full p-3 border rounded-xl h-40 resize-none"
-        placeholder="ألصق التوصية هنا..."
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      ></textarea>
-
-      <button
-        className="mt-4 px-6 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
-        onClick={handleSubmit}
-      >
-        🔄 تحميل التوصية
-      </button>
-
-      {tools.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">🛠️ الأدوات المُفعّلة:</h2>
-          <ul className="list-disc list-inside space-y-1">
-            {tools.map((tool, index) => (
-              <li key={index} className="text-lg">{tool}</li>
-            ))}
-          </ul>
-
-          {/* عرض الأدوات الفنية تلقائيًا */}
-          {tools.includes("📊 مؤشر RSI") && <RSIChart />}
-          {tools.includes("🌀 فيبوناتشي") && <FibonacciTool />}
-          {tools.includes("📐 أدوات Gann") && <GannTool />}
-        </div>
-      )}
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-2">✍️ إدخال توصية يدوية</h2>
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <input type="text" placeholder="الأصل (مثال: TASI)" value={symbol} onChange={(e) => setSymbol(e.target.value)} className="border p-2 w-full" />
+        <input type="text" placeholder="العملية (شراء/بيع)" value={action} onChange={(e) => setAction(e.target.value)} className="border p-2 w-full" />
+        <input type="number" placeholder="السعر" value={price} onChange={(e) => setPrice(e.target.value)} className="border p-2 w-full" />
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">إرسال</button>
+      </form>
     </div>
   );
 };

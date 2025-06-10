@@ -1,17 +1,20 @@
-// ملف إعدادات API موحد
+const API_BASE = import.meta.env.VITE_API_URL;
 
-const BASE_URL = "https://kokbatasi.onrender.com/api";
+export const getAllSignals = async () => {
+  const res = await fetch(`${API_BASE}/webhook/signals`);
+  return res.json();
+};
 
-// استعلام الإشارات
-export const getSignals = async () => {
-  try {
-    const response = await fetch(`${BASE_URL}/signals`);
-    if (!response.ok) {
-      throw new Error("فشل في جلب الإشارات");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("❌ خطأ في getSignals:", error.message);
-    return null;
-  }
+export const getSignalById = async (id) => {
+  const res = await fetch(`${API_BASE}/webhook/signals/${id}`);
+  return res.json();
+};
+
+export const postSignal = async (data) => {
+  const res = await fetch(`${API_BASE}/webhook/signals`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
 };
