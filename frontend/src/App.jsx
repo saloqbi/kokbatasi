@@ -4,10 +4,12 @@ import Home from './pages/Home';
 import ManualSignal from './pages/ManualSignal';
 import AllSignals from './pages/AllSignals';
 import SignalDetails from './pages/SignalDetails';
+import Navigation from './components/Navigation';
 
 export default function App() {
   return (
     <BrowserRouter>
+      <Navigation />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/manual-signal" element={<ManualSignal />} />
