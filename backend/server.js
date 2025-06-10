@@ -34,3 +34,6 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => {
     console.error('❌ MongoDB connection error:', err);
   });
+router.post('/webhook/signals', async (req, res) => {
+  // منطق الحفظ في MongoDB
+});
