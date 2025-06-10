@@ -1,11 +1,13 @@
 
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleLogin = () => {
-    // نحاكي تسجيل دخول ناجح
+    setUser({ name: "demoUser" }); // تعيين مستخدم وهمي لتجاوز الحماية
     navigate("/signals");
   };
 
