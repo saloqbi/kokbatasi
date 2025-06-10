@@ -1,17 +1,15 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import ThemeToggle from './ThemeToggle';
+import { Link } from "react-router-dom";
 
-export default function Navbar() {
+const Navbar = () => {
   return (
-    <nav className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-      <div className="text-xl font-bold">
-        <Link to="/">🌟 كوكبة تاسي</Link>
-      </div>
+    <nav className="bg-gray-800 text-white px-6 py-3 flex justify-between items-center">
+      <h1 className="text-xl font-bold">🔮 كوكبة تاسي</h1>
       <div className="space-x-4">
-        <Link to="/signals" className="hover:underline">الإشارات</Link>
-        <ThemeToggle />
+        <Link to="/" className="hover:underline">🏠 الرئيسية</Link>
+        <Link to="/all-signals" className="hover:underline">📜 كل التوصيات السابقة</Link>
       </div>
     </nav>
   );
-}
+};
+
+export default Navbar;

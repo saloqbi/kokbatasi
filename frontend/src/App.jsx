@@ -1,58 +1,23 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import AllSignalsPage from "./pages/AllSignalsPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import MACDChart from "./components/MACDChart";
 
-// 📁 src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useContext } from 'react';
-import { AuthContext } from './context/AuthContext';
-import LoginPage from './pages/LoginPage';
-import SignalsPage from './pages/SignalsPage';
-import AdminSignals from './pages/AdminSignals';
-import Settings from './pages/Settings';
-import UserProfile from './pages/UserProfile';
-import ProtectedRoute from './routes/ProtectedRoute';
-
-function App() {
-  const { currentUser } = useContext(AuthContext);
-
+const App = () => {
   return (
     <Router>
+      <Navbar />
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/signals"
-          element={
-            <ProtectedRoute allowedRoles={["admin", "user"]}>
-              <SignalsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin-signals"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminSignals />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute allowedRoles={["admin", "user"]}>
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute allowedRoles={["admin", "user"]}>
-              <UserProfile />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/" element={<h1 className="p-4 text-xl">🏠 الصفحة الرئيسية</h1>} />
+        <Route path="/all-signals" element={<AllSignalsPage />} />
+        <Route path="/analysis" element={<MACDChart />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
+      <Footer />
     </Router>
   );
-}
+};
 
 export default App;
