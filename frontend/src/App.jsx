@@ -1,23 +1,20 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import AllSignals from "./pages/AllSignals";
-import ManualSignal from "./pages/ManualSignal";
-import SignalDetails from "./pages/SignalDetails";
-import Navigation from "./components/Navigation";
 
-const App = () => {
-  return (
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AllSignals from './pages/AllSignals';
+import SignalDetails from './pages/SignalDetails';
+import { SignalProvider } from './context/SignalContext';
+
+const App = () => (
+  <SignalProvider>
     <Router>
-      <Navigation />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signals" element={<AllSignals />} />
-        <Route path="/manual-signal" element={<ManualSignal />} />
+        <Route path="/" element={<AllSignals />} />
         <Route path="/signals/:id" element={<SignalDetails />} />
+	<Route path="/analysis" element={<AnalysisPage />} />
       </Routes>
     </Router>
-  );
-};
+  </SignalProvider>
+);
 
 export default App;

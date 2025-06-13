@@ -1,0 +1,6 @@
+
+FROM node:18
+WORKDIR /app
+COPY backend /app
+RUN cd /app && npm install
+CMD ["node", "index.js"]

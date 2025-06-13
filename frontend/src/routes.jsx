@@ -1,13 +1,14 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import NewHome from "./pages/NewHome";
-import SignalDetails from "./pages/SignalDetails";
 
-export default function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<NewHome />} />
-      <Route path="/signal/:id" element={<SignalDetails />} />
-    </Routes>
-  );
-}
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import AllSignals from './pages/AllSignals';
+import SignalDetails from './pages/SignalDetails';
+
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<AllSignals />} />
+    <Route path="/signals/:id" element={<SignalDetails />} />
+  </Routes>
+);
+
+export default AppRoutes;
