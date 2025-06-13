@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { SignalContext } from "../context/SignalContext";
 import axios from "axios";
-import useSignalWebSocket from "../websocket/useSignalWebSocket"; // ✅ إضافة hook WebSocket
+import useSignalWebSocket from "../websocket/useSignalWebSocket";
 
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
@@ -23,7 +23,6 @@ const AllSignalsPage = () => {
     fetchSignals();
   }, []);
 
-  // ✅ استقبال الإشارات الجديدة تلقائياً من WebSocket
   useSignalWebSocket((newSignal) => {
     setSignals((prev) => [newSignal, ...prev]);
   });
@@ -33,16 +32,25 @@ const AllSignalsPage = () => {
     navigate("/analysis");
   };
 
+  const generateRandomSignals = async () => {
+    try {
+      const res = await axios.post("/api/signals/random");
+      console.log("✅ Generated:", res.data);
+    } catch (err) {
+      console.error("❌ Error generating random signals:", err);
+    }
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">📜 كل التوصيات السابقة</h2>
-        <Link
-          to="/"
-          className="text-sm text-blue-600 underline hover:text-blue-800"
+        <button
+          onClick={generateRandomSignals}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
         >
-          ⬅️ العودة للصفحة الرئيسية
-        </Link>
+          🔄 توليد توصيات عشوائية
+        </button>
       </div>
       <table className="w-full table-auto border border-gray-300">
         <thead>

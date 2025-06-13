@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "Kokbatasi - Generate Random Signals",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Generate Random Signals",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/signals/random",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "api",
+            "signals",
+            "random"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+
+import React from 'react';
+import GenerateRandomSignalsButton from '../components/GenerateRandomSignalsButton';
+
 const AdminDashboard = () => {
   return (
     <div className="p-6">
@@ -11,6 +15,10 @@ const AdminDashboard = () => {
           <h3 className="text-lg font-semibold mb-2">👥 عدد المستخدمين</h3>
           <p className="text-3xl font-bold text-green-600">58</p>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <GenerateRandomSignalsButton />
       </div>
     </div>
   );
