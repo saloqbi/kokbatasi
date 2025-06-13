@@ -15,7 +15,7 @@ const AllSignalsPage = () => {
   useEffect(() => {
     const fetchSignals = async () => {
       try {
-        const res = await axios.get("/api/signals");
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/signals`);
         setSignals(res.data);
       } catch (err) {
         console.error("Error fetching signals:", err);
@@ -36,7 +36,7 @@ const AllSignalsPage = () => {
 
   const generateRandomSignals = async () => {
     try {
-      const res = await axios.post("/api/signals/random");
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE}/api/signals/random`);
       console.log("✅ Generated:", res.data);
     } catch (err) {
       console.error("❌ Error generating random signals:", err);

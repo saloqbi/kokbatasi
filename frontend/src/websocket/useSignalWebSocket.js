@@ -5,7 +5,7 @@ export default function useSignalWebSocket(onNewSignal) {
 
   useEffect(() => {
     const socketUrl = import.meta.env.VITE_API_BASE.replace(/^http/, 'ws');
-    ws.current = new WebSocket(`${socketUrl}`);
+    ws.current = new WebSocket(socketUrl);
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
