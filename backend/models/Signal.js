@@ -1,17 +1,32 @@
-const mongoose = require('mongoose');
 
-const signalSchema = new mongoose.Schema(
-  {
-    symbol: String,
-    price: Number,
+import mongoose from 'mongoose';
+
+const signalSchema = new mongoose.Schema({
+  symbol: {
     type: String,
-    date: String,
-    data: {
-      type: Array,
-      default: [],
-    },
+    required: true,
   },
-  { timestamps: true }
-);
+  price: {
+    type: Number,
+    required: true,
+  },
+  type: {
+    type: String,
+    enum: ['Buy', 'Sell'],
+    required: true,
+  },
+  date: {
+    type: String,
+    required: true,
+  },
+  data: {
+    type: Array,
+    default: [],
+  },
+}, {
+  timestamps: true
+});
 
-module.exports = mongoose.model('Signal', signalSchema);
+const Signal = mongoose.model('Signal', signalSchema);
+
+export default Signal;
