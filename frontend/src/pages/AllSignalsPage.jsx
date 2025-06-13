@@ -1,7 +1,9 @@
+
 import { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { SignalContext } from "../context/SignalContext";
 import axios from "axios";
+import useSignalWebSocket from "../websocket/useSignalWebSocket"; // ✅ إضافة hook WebSocket
 
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
@@ -20,6 +22,11 @@ const AllSignalsPage = () => {
 
     fetchSignals();
   }, []);
+
+  // ✅ استقبال الإشارات الجديدة تلقائياً من WebSocket
+  useSignalWebSocket((newSignal) => {
+    setSignals((prev) => [newSignal, ...prev]);
+  });
 
   const handleSelect = (signal) => {
     setSelectedSignal(signal);
