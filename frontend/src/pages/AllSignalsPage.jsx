@@ -1,88 +1,91 @@
 
-import { useState, useEffect, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { SignalContext } from "../context/SignalContext";
-import axios from "axios";
-import useSignalWebSocket from "../websocket/useSignalWebSocket";
-
-
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
-  const { setSelectedSignal } = useContext(SignalContext);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    const fetchSignals = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/signals`);
-        setSignals(res.data);
-      } catch (err) {
-        console.error("Error fetching signals:", err);
-      }
-    };
-
-    fetchSignals();
-  }, []);
-
-  useSignalWebSocket((newSignal) => {
-    setSignals((prev) => [newSignal, ...prev]);
-  });
-
-  const handleSelect = (signal) => {
-    setSelectedSignal(signal);
-    navigate("/analysis");
+  const fetchSignals = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/signals`);
+      setSignals(res.data);
+    } catch (err) {
+      setError('فشل في جلب البيانات');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const generateRandomSignals = async () => {
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE}/api/signals/random`);
-      console.log("✅ Generated:", res.data);
+      await axios.post(`${import.meta.env.VITE_API_BASE}/api/signals/random`);
+      fetchSignals(); // تحديث القائمة بعد التوليد
     } catch (err) {
-      console.error("❌ Error generating random signals:", err);
+      console.error('فشل في توليد التوصيات:', err);
     }
   };
 
+  useEffect(() => {
+    fetchSignals();
+  }, []);
+
+  const filteredSignals = signals.filter(signal =>
+    signal.symbol.toLowerCase().includes(filter.toLowerCase()) ||
+    signal.type.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">📜 كل التوصيات السابقة</h2>
+      <h2 className="text-xl font-bold mb-4">📡 جميع التوصيات</h2>
+
+      <div className="mb-4 flex items-center gap-4">
+        <input
+          type="text"
+          placeholder="🔍 فلترة حسب الرمز أو التوصية"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="border p-2 rounded w-full max-w-md"
+        />
         <button
           onClick={generateRandomSignals}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          🔄 توليد توصيات عشوائية
+          🎲 توليد توصيات عشوائية
         </button>
       </div>
-      <table className="w-full table-auto border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">🕒 التاريخ</th>
-            <th className="p-2 border">📈 الأصل</th>
-            <th className="p-2 border">🎯 السعر</th>
-            <th className="p-2 border">📊 نوع التوصية</th>
-            <th className="p-2 border">🔎 عرض التفاصيل</th>
-          </tr>
-        </thead>
-        <tbody>
-          {signals.map((signal, index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="p-2 border">{signal.date}</td>
-              <td className="p-2 border">{signal.symbol}</td>
-              <td className="p-2 border">{signal.price}</td>
-              <td className="p-2 border">{signal.type}</td>
-              <td className="p-2 border text-center">
-                <button
-                  onClick={() => handleSelect(signal)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                >
-                  📊 عرض التحليل
-                </button>
-              </td>
+
+      {loading ? (
+        <p>⏳ جاري التحميل...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : (
+        <table className="w-full border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border p-2">🆔</th>
+              <th className="border p-2">الرمز</th>
+              <th className="border p-2">السعر</th>
+              <th className="border p-2">النوع</th>
+              <th className="border p-2">التاريخ</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredSignals.map((signal, index) => (
+              <tr key={signal._id || index}>
+                <td className="border p-2">{index + 1}</td>
+                <td className="border p-2">{signal.symbol}</td>
+                <td className="border p-2">{signal.price}</td>
+                <td className="border p-2">{signal.type}</td>
+                <td className="border p-2">{signal.date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
