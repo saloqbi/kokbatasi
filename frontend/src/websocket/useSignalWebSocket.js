@@ -1,11 +1,11 @@
-
 import { useEffect, useRef } from 'react';
 
 export default function useSignalWebSocket(onNewSignal) {
   const ws = useRef(null);
 
   useEffect(() => {
-    ws.current = new WebSocket('ws://localhost:5000');
+    const socketUrl = import.meta.env.VITE_API_BASE.replace(/^http/, 'ws');
+    ws.current = new WebSocket(`${socketUrl}`);
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);

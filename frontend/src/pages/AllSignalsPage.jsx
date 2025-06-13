@@ -5,6 +5,8 @@ import { SignalContext } from "../context/SignalContext";
 import axios from "axios";
 import useSignalWebSocket from "../websocket/useSignalWebSocket";
 
+
+
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
   const { setSelectedSignal } = useContext(SignalContext);

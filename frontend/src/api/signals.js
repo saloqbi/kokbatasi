@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/signals';
+const API_URL = `${import.meta.env.VITE_API_BASE}/api/signals`;
 
 export const getSignals = async () => {
   const res = await axios.get(API_URL);
