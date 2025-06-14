@@ -4,8 +4,8 @@ const API_URL = `${import.meta.env.VITE_API_BASE}/api/signals`; // ✅ هذا ه
 
 export const getSignals = async () => {
   try {
-    const res = await axios.get(`${API_URL}/api/signals`);
-    return res.data; // 👈 تأكد أن هذا هو array
+    const res = await axios.get(API_URL); // 🛠️ إزالة التكرار
+    return res.data;
   } catch (error) {
     console.error("❌ خطأ في getSignals:", error);
     return [];
