@@ -27,6 +27,6 @@ const signalSchema = new mongoose.Schema({
   timestamps: true
 });
 
-const Signal = mongoose.model('Signal', signalSchema);
+const signal = mongoose.model('signal', signalSchema);
 
-export default Signal;
+module.exports = mongoose.model('signal', signalSchema);
