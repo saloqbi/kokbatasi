@@ -8,11 +8,6 @@ export const getSignals = async () => {
 };
 
 export const createSignal = async (signal) => {
-  const res = await axios.post(API_URL, signal);
-  return res.data;
-};
-
-export const createSignal = async (signal) => {
   try {
     const res = await axios.post(API_URL, signal);
     return res.data;
