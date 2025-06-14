@@ -1,5 +1,6 @@
+// backend/models/signal.js
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const signalSchema = new mongoose.Schema({
   symbol: {
@@ -12,7 +13,7 @@ const signalSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['Buy', 'Sell'],
+    enum: ['buy', 'sell'],
     required: true,
   },
   date: {
@@ -22,11 +23,9 @@ const signalSchema = new mongoose.Schema({
   data: {
     type: Array,
     default: [],
-  },
-}, {
-  timestamps: true
+  }
 });
 
-const signal = mongoose.model('signal', signalSchema);
+const Signal = mongoose.model('Signal', signalSchema);
 
-module.exports = mongoose.model('signal', signalSchema);
+module.exports = Signal;
