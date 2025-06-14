@@ -24,4 +24,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+// 📄 عرض إشارة واحدة حسب ID
+router.get('/:id', async (req, res) => {
+  try {
+    const signal = await Signal.findById(req.params.id);
+    if (!signal) return res.status(404).json({ error: 'الإشارة غير موجودة' });
+    res.json(signal);
+  } catch (error) {
+    res.status(500).json({ error: 'خطأ في جلب الإشارة الواحدة' });
+  }
+});
+
+
 module.exports = router;
