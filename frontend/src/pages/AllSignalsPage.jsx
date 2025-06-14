@@ -8,7 +8,7 @@ const AllSignalsPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSignals = async () => {
+    const fetchData = async () => {
       try {
         const data = await getSignals();
         setSignals(data);
@@ -20,20 +20,20 @@ const AllSignalsPage = () => {
       }
     };
 
-    fetchSignals(); // ✅ استدعاء async داخل useEffect
+    fetchData(); // ✅ استدعاء الدالة async من داخل useEffect
   }, []);
 
   if (loading) {
-    return <div>جاري التحميل...</div>;
+    return <div>⏳ جاري تحميل التوصيات...</div>;
   }
 
   if (signals.length === 0) {
-    return <div>لا توجد توصيات حالياً.</div>;
+    return <div>📭 لا توجد توصيات حالياً.</div>;
   }
 
   return (
-    <div>
-      <h1>📡 جميع التوصيات</h1>
+    <div style={{ padding: "1rem" }}>
+      <h1 style={{ marginBottom: "1rem" }}>📡 جميع التوصيات</h1>
       <ul>
         {signals.map((signal) => (
           <li key={signal._id}>
