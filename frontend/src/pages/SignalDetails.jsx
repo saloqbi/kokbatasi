@@ -8,7 +8,7 @@ const SignalDetails = () => {
 
   useEffect(() => {
     const fetchSignal = async () => {
-      const res = await fetch(`http://localhost:5000/api/signals`);
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/signals`);
       const data = await res.json();
       const match = data.find(sig => sig._id === id);
       setSignal(match);
