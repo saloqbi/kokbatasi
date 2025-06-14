@@ -1,3 +1,4 @@
+// frontend/src/App.jsx
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -13,6 +14,7 @@ const App = () => (
     <Router>
       <Routes>
         <Route path="/" element={<AllSignals />} />
+        <Route path="/signals" element={<AllSignals />} /> {/* ✅ المسار الجديد */}
         <Route path="/signals/:id" element={<SignalDetails />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
@@ -21,4 +23,4 @@ const App = () => (
   </SignalProvider>
 );
 
-export default App;
+expor
