@@ -1,34 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { getSignals } from '../api/signals';
+import React, { useEffect, useState } from "react";
+import { getSignals } from "../api/signals";
+import { Link } from "react-router-dom";
 
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSignals = async () => {
       try {
-        const data = await getSignals();
-        setSignals(data);
+        const response = await getSignals();
+        setSignals(response.data); // ✅ هذا هو التعديل المهم
       } catch (error) {
-        console.error('حدث خطأ أثناء جلب الإشارات:', error);
+        console.error("Failed to fetch signals:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchData();
+    fetchSignals();
   }, []);
 
   return (
-    <div style={{ direction: 'rtl', padding: '20px' }}>
+    <div style={{ padding: "20px" }}>
       <h1>📡 جميع التوصيات</h1>
-      <ul>
-        {signals.map((signal) => (
-          <li key={signal._id}>
-            <strong>📌 العنوان:</strong> {signal.title} <br />
-            <strong>📈 التوصية:</strong> {signal.recommendation} <br />
-            <strong>🕒 التاريخ:</strong> {new Date(signal.createdAt).toLocaleString()}
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <p>جاري تحميل التوصيات...</p>
+      ) : (
+        <ul>
+          {signals.map((signal) => (
+            <li key={signal._id}>
+              <Link to={`/signals/${signal._id}`}>
+                {signal.title} - {signal.recommendation} -{" "}
+                {new Date(signal.createdAt).toLocaleDateString("ar-EG")}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

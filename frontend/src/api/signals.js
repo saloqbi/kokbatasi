@@ -4,7 +4,7 @@ const API_URL = `${import.meta.env.VITE_API_BASE}/api/signals`; // ✅ هذا ه
 
 export const getSignals = async () => {
   const res = await axios.get(API_URL);
-  return res.data;
+  return res.data; // يجب أن يكون { data: [...] }
 };
 
 export const createSignal = async (signal) => {
