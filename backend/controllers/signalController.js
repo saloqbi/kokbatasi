@@ -3,12 +3,13 @@ const Signal = require('../models/signal');
 // ✅ Get all signals
 const getSignals = async (req, res) => {
   try {
-    const signals = await Signal.find().sort({ createdAt: -1 });
-    console.log('✅ Signals fetched:', signals.length); // للتأكيد
+    console.log("🔍 Fetching signals...");
+    const signals = await Signal.find();
+    console.log("✅ Signals fetched:", signals);
     res.json(signals);
   } catch (error) {
-    console.error('❌ Error fetching signals:', error.message);
-    res.status(500).json({ message: 'Failed to fetch signals' });
+    console.error("❌ Failed to fetch signals:", error.message);
+    res.status(500).json({ message: "Failed to fetch signals" });
   }
 };
 
@@ -24,5 +25,6 @@ const createSignal = async (req, res) => {
     res.status(500).json({ message: 'Failed to create signal' });
   }
 };
+
 
 module.exports = { getSignals, createSignal };
