@@ -1,24 +1,23 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import AllSignals from './pages/AllSignals';
-import SignalDetails from './pages/SignalDetails';
+import AllSignalsPage from './pages/AllSignalsPage';
 import AdminDashboard from './pages/AdminDashboard';
-import { SignalProvider } from './context/SignalContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import LoginPage from './pages/LoginPage';
+import SignalDetailsPage from './pages/SignalDetailsPage';
+import ManualSignalPage from './pages/ManualSignalPage';
 
-const App = () => (
-  <SignalProvider>
+function App() {
+  return (
     <Router>
       <Routes>
-        <Route path="/" element={<AllSignals />} />
-        <Route path="/signals" element={<AllSignals />} /> {/* ✅ المسار الإضافي */}
-        <Route path="/signals/:id" element={<SignalDetails />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/" element={<AllSignalsPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/signals/:id" element={<SignalDetailsPage />} />
+        <Route path="/manual-signal" element={<ManualSignalPage />} />
       </Routes>
-      <ToastContainer />
     </Router>
-  </SignalProvider>
-);
+  );
+}
 
-export default App; // ✅ التصدير الافتراضي الضروري
+export default App;
