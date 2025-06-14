@@ -1,20 +1,24 @@
 
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AllSignalsPage from "./pages/AllSignalsPage";
-import SignalDetailsPage from "./pages/SignalDetailsPage";
-import ManualSignalPage from "./pages/ManualSignalPage";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AllSignals from './pages/AllSignals';
+import SignalDetails from './pages/SignalDetails';
+import AdminDashboard from './pages/AdminDashboard';
+import { SignalProvider } from './context/SignalContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-function App() {
-  return (
+const App = () => (
+  <SignalProvider>
     <Router>
       <Routes>
-        <Route path="/" element={<AllSignalsPage />} />
-        <Route path="/signals/:id" element={<SignalDetailsPage />} />
-        <Route path="/manual-signal" element={<ManualSignalPage />} />
+        <Route path="/" element={<AllSignals />} />
+        <Route path="/signals/:id" element={<SignalDetails />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
+      <ToastContainer />
     </Router>
-  );
-}
+  </SignalProvider>
+);
 
 export default App;

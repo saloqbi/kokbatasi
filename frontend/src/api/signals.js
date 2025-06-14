@@ -1,33 +1,23 @@
-// frontend/src/api/signals.js
+import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_URL = `${import.meta.env.VITE_API_BASE}/api/signals`; // ✅ هذا هو المسار الصحيح
 
-// 📥 جلب جميع الإشارات
 export const getSignals = async () => {
-  const response = await fetch(`${API_URL}/api/signals`);
-  if (!response.ok) throw new Error("فشل في جلب الإشارات");
-  return await response.json();
+  try {
+    const res = await axios.get(API_URL); // 🛠️ إزالة التكرار
+    return res.data;
+  } catch (error) {
+    console.error("❌ خطأ في getSignals:", error);
+    return [];
+  }
 };
 
-// ➕ إرسال إشارة جديدة
-export const createSignal = async (signalData) => {
-  const response = await fetch(`${API_URL}/api/signals`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(signalData),
-  });
-  if (!response.ok) throw new Error("فشل في إنشاء الإشارة");
-  return await response.json();
+export const createSignal = async (signal) => {
+  try {
+    const res = await axios.post(API_URL, signal);
+    return res.data;
+  } catch (error) {
+    console.error('❌ Error creating signal:', error);
+    return null;
+  }
 };
-
-// 📄 جلب تفاصيل إشارة حسب ID
-export const getSignalById = async (id) => {
-  const response = await fetch(`${API_URL}/api/signals/${id}`);
-  if (!response.ok) throw new Error("فشل في جلب تفاصيل الإشارة");
-  return await response.json();
-};
-
-// 🗑️ حذف إشارة
-export const deleteSignal = async (id)
