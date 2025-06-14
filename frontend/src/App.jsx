@@ -1,5 +1,3 @@
-// frontend/src/App.jsx
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AllSignals from './pages/AllSignals';
@@ -14,7 +12,7 @@ const App = () => (
     <Router>
       <Routes>
         <Route path="/" element={<AllSignals />} />
-        <Route path="/signals" element={<AllSignals />} /> {/* ✅ المسار الجديد */}
+        <Route path="/signals" element={<AllSignals />} /> {/* ✅ المسار الإضافي */}
         <Route path="/signals/:id" element={<SignalDetails />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
@@ -23,4 +21,4 @@ const App = () => (
   </SignalProvider>
 );
 
-expor
+export default App; // ✅ التصدير الافتراضي الضروري
