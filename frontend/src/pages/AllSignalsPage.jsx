@@ -9,7 +9,7 @@ const AllSignalsPage = () => {
 
   const fetchSignals = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/signals`);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE}/webhook/signals`);
       setSignals(res.data);
     } catch (err) {
       setError('فشل في جلب البيانات');
@@ -19,22 +19,13 @@ const AllSignalsPage = () => {
     }
   };
 
-  const generateRandomSignals = async () => {
-    try {
-      await axios.post(`${import.meta.env.VITE_API_BASE}/api/signals/random`);
-      fetchSignals(); // تحديث القائمة بعد التوليد
-    } catch (err) {
-      console.error('فشل في توليد التوصيات:', err);
-    }
-  };
-
   useEffect(() => {
     fetchSignals();
   }, []);
 
   const filteredSignals = signals.filter(signal =>
-    signal.symbol.toLowerCase().includes(filter.toLowerCase()) ||
-    signal.type.toLowerCase().includes(filter.toLowerCase())
+    signal.title?.toLowerCase().includes(filter.toLowerCase()) ||
+    signal.recommendation?.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
@@ -44,17 +35,11 @@ const AllSignalsPage = () => {
       <div className="mb-4 flex items-center gap-4">
         <input
           type="text"
-          placeholder="🔍 فلترة حسب الرمز أو التوصية"
+          placeholder="🔍 فلترة حسب العنوان أو التوصية"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="border p-2 rounded w-full max-w-md"
         />
-        <button
-          onClick={generateRandomSignals}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          🎲 توليد توصيات عشوائية
-        </button>
       </div>
 
       {loading ? (
@@ -65,21 +50,21 @@ const AllSignalsPage = () => {
         <table className="w-full border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border p-2">🆔</th>
-              <th className="border p-2">الرمز</th>
-              <th className="border p-2">السعر</th>
-              <th className="border p-2">النوع</th>
-              <th className="border p-2">التاريخ</th>
+              <th className="border p-2">#</th>
+              <th className="border p-2">📌 العنوان</th>
+              <th className="border p-2">📊 التوصية</th>
+              <th className="border p-2">🕒 التاريخ</th>
             </tr>
           </thead>
           <tbody>
             {filteredSignals.map((signal, index) => (
               <tr key={signal._id || index}>
                 <td className="border p-2">{index + 1}</td>
-                <td className="border p-2">{signal.symbol}</td>
-                <td className="border p-2">{signal.price}</td>
-                <td className="border p-2">{signal.type}</td>
-                <td className="border p-2">{signal.date}</td>
+                <td className="border p-2">{signal.title || '-'}</td>
+                <td className="border p-2">{signal.recommendation || '-'}</td>
+                <td className="border p-2">
+                  {new Date(signal.createdAt).toLocaleString('ar-EG')}
+                </td>
               </tr>
             ))}
           </tbody>
