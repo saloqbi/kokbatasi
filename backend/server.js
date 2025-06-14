@@ -1,9 +1,10 @@
 const express = require('express');
-require('dotenv').config(); // ⬅️ أضف هذا السطر هنا
+require('dotenv').config();
 const mongoose = require('mongoose');
 const http = require('http');
 const cors = require('cors');
 const socketIo = require('socket.io');
+
 const signalRoutes = require('./routes/signals');
 
 const app = express();
@@ -11,15 +12,17 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: '*',
-  }
+  },
 });
 
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/signals', signalRoutes);
+// ✅ استخدم نفس الراوت لخدمتين مختلفتين
+app.use('/api/signals', signalRoutes);       // الواجهة الأمامية
+app.use('/webhook/signals', signalRoutes);   // استقبال Webhook
 
-// MongoDB connection
+// ✅ اتصال MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -29,10 +32,9 @@ mongoose.connect(process.env.MONGO_URI, {
   console.error('❌ MongoDB connection error:', err);
 });
 
-// WebSocket
+// ✅ WebSocket
 io.on('connection', (socket) => {
   console.log('🟢 WebSocket client connected');
-
   socket.on('disconnect', () => {
     console.log('🔴 WebSocket client disconnected');
   });
