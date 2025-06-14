@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { getSignals } from '../api/signals';
-import { Link } from 'react-router-dom';
+
+import React, { useEffect, useState } from "react";
+import { getSignals } from "../api/signals";
+import { toast } from "react-toastify";
 
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
@@ -10,40 +11,36 @@ const AllSignalsPage = () => {
     const fetchData = async () => {
       try {
         const data = await getSignals();
-        console.log("📦 الإشارات المستلمة:", data);
-        if (Array.isArray(data)) {
-          setSignals(data);
-        } else {
-          console.warn("⚠️ البيانات غير مصفوفة:", data);
-        }
+        setSignals(data);
       } catch (error) {
-        console.error("❌ فشل جلب الإشارات:", error);
+        console.error("فشل في جلب الإشارات:", error);
+        toast.error("حدث خطأ أثناء تحميل التوصيات.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchData(); // ✅ استدعاء الدالة async من داخل useEffect
   }, []);
 
-  if (loading) return <p className="p-6">⏳ جارٍ تحميل التوصيات...</p>;
+  if (loading) {
+    return <div>⏳ جاري تحميل التوصيات...</div>;
+  }
+
+  if (signals.length === 0) {
+    return <div>📭 لا توجد توصيات حالياً.</div>;
+  }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">📡 جميع التوصيات</h1>
-      {signals.length === 0 ? (
-        <p>⚠️ لا توجد إشارات حالياً.</p>
-      ) : (
-        <ul className="list-disc ml-6">
-          {signals.map((signal) => (
-            <li key={signal._id}>
-              <Link to={`/signals/${signal._id}`} className="text-purple-600 underline">
-                📌 العنوان: {signal.title || 'غير متوفر'} - 💡 التوصية: {signal.recommendation || 'غير متوفرة'}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div style={{ padding: "1rem" }}>
+      <h1 style={{ marginBottom: "1rem" }}>📡 جميع التوصيات</h1>
+      <ul>
+        {signals.map((signal) => (
+          <li key={signal._id}>
+            <strong>{signal.symbol}</strong> — {signal.action} @ {signal.price}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
