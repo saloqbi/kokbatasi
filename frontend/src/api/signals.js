@@ -3,9 +3,13 @@ import axios from 'axios';
 const API_URL = `${import.meta.env.VITE_API_BASE}/api/signals`; // ✅ هذا هو المسار الصحيح
 
 export const getSignals = async () => {
-  const res = await axios.get(API_URL);
-  console.log("📦 الإشارات المستلمة:", res.data); // ✅ أضف هذا السطر
-  return res.data;
+  try {
+    const res = await axios.get(`${API_URL}/api/signals`);
+    return res.data; // 👈 تأكد أن هذا هو array
+  } catch (error) {
+    console.error("❌ خطأ في getSignals:", error);
+    return [];
+  }
 };
 
 export const createSignal = async (signal) => {

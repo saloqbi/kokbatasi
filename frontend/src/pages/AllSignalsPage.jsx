@@ -14,12 +14,10 @@ const AllSignalsPage = () => {
         if (Array.isArray(data)) {
           setSignals(data);
         } else {
-          console.error("❌ البيانات غير متوقعة:", data);
-          setSignals([]);
+          console.warn("⚠️ البيانات غير مصفوفة:", data);
         }
       } catch (error) {
-        console.error("❌ خطأ أثناء جلب الإشارات:", error);
-        setSignals([]);
+        console.error("❌ فشل جلب الإشارات:", error);
       } finally {
         setLoading(false);
       }
@@ -28,14 +26,13 @@ const AllSignalsPage = () => {
     fetchData();
   }, []);
 
+  if (loading) return <p className="p-6">⏳ جارٍ تحميل التوصيات...</p>;
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">📡 جميع التوصيات</h1>
-
-      {loading ? (
-        <p>🔄 جاري التحميل...</p>
-      ) : signals.length === 0 ? (
-        <p>⚠️ لا توجد إشارات متاحة حالياً.</p>
+      {signals.length === 0 ? (
+        <p>⚠️ لا توجد إشارات حالياً.</p>
       ) : (
         <ul className="list-disc ml-6">
           {signals.map((signal) => (
