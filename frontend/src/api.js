@@ -1,7 +1,7 @@
-import axios from "axios";
+const API_BASE = import.meta.env.VITE_API_URL;
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
-});
-
-export default api;
+export const fetchSignals = async () => {
+  const res = await fetch(`${API_BASE}/api/signals`);
+  const data = await res.json();
+  return data;
+};
