@@ -1,41 +1,31 @@
-
 import React, { useEffect, useState } from 'react';
-import { fetchSignals } from '../api/signals';
+import { getSignals } from '../api/signals';
 
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadSignals = async () => {
+    const fetchData = async () => {
       try {
-        const data = await fetchSignals();
-        console.log("📦 Received signals:", data);
+        const data = await getSignals();
         setSignals(data);
       } catch (error) {
-        console.error("❌ Failed to load signals:", error);
-      } finally {
-        setLoading(false);
+        console.error('حدث خطأ أثناء جلب الإشارات:', error);
       }
     };
 
-    loadSignals();
+    fetchData();
   }, []);
 
-  if (loading) {
-    return <div>جاري تحميل التوصيات...</div>;
-  }
-
   return (
-    <div>
+    <div style={{ direction: 'rtl', padding: '20px' }}>
       <h1>📡 جميع التوصيات</h1>
       <ul>
-        {signals.map((signal, index) => (
-          <li key={index}>
-            <strong>📌 ID:</strong> {signal._id || '-'}<br />
-            <strong>📋 Title:</strong> {signal.title || '-'}<br />
-            <strong>💡 Recommendation:</strong> {signal.recommendation || '-'}<br />
-            <strong>🕓 Created At:</strong> {signal.createdAt || '-'}
+        {signals.map((signal) => (
+          <li key={signal._id}>
+            <strong>📌 العنوان:</strong> {signal.title} <br />
+            <strong>📈 التوصية:</strong> {signal.recommendation} <br />
+            <strong>🕒 التاريخ:</strong> {new Date(signal.createdAt).toLocaleString()}
           </li>
         ))}
       </ul>
