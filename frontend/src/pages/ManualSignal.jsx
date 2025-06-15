@@ -7,7 +7,7 @@ const ManualSignal = () => {
     title: "",
     recommendation: "buy",
     price: "",
-    data: [{ time: "", price: "" }],
+    data: [{ time: "", open: "", high: "", low: "", close: "" }],
   });
   const [error, setError] = useState("");
 
@@ -22,7 +22,10 @@ const ManualSignal = () => {
   };
 
   const addDataPoint = () => {
-    setForm({ ...form, data: [...form.data, { time: "", price: "" }] });
+    setForm({
+      ...form,
+      data: [...form.data, { time: "", open: "", high: "", low: "", close: "" }],
+    });
   };
 
   const removeDataPoint = (index) => {
@@ -62,7 +65,7 @@ const ManualSignal = () => {
   return (
     <div className="max-w-xl mx-auto p-6 bg-white dark:bg-gray-900 shadow rounded-xl">
       <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-        ➕ إضافة توصية يدوية
+        ➕ إضافة توصية مع بيانات شموع
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -88,29 +91,52 @@ const ManualSignal = () => {
         <input
           type="number"
           name="price"
-          placeholder="السعر"
+          placeholder="السعر الرئيسي"
           value={form.price}
           onChange={handleChange}
           className="w-full p-3 rounded border dark:bg-gray-800 dark:text-white"
         />
 
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">📊 بيانات السعر للرسم</h3>
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
+            📊 بيانات الشموع (Candlestick Data)
+          </h3>
           {form.data.map((point, index) => (
-            <div key={index} className="flex items-center gap-2 mb-2">
+            <div key={index} className="grid grid-cols-5 gap-2 items-center mb-2">
               <input
                 type="text"
-                placeholder="الوقت (مثل 10:00)"
+                placeholder="الوقت"
                 value={point.time}
                 onChange={(e) => handleDataChange(index, "time", e.target.value)}
-                className="flex-1 p-2 border rounded dark:bg-gray-800 dark:text-white"
+                className="p-2 border rounded dark:bg-gray-800 dark:text-white"
               />
               <input
                 type="number"
-                placeholder="السعر"
-                value={point.price}
-                onChange={(e) => handleDataChange(index, "price", e.target.value)}
-                className="flex-1 p-2 border rounded dark:bg-gray-800 dark:text-white"
+                placeholder="Open"
+                value={point.open}
+                onChange={(e) => handleDataChange(index, "open", e.target.value)}
+                className="p-2 border rounded dark:bg-gray-800 dark:text-white"
+              />
+              <input
+                type="number"
+                placeholder="High"
+                value={point.high}
+                onChange={(e) => handleDataChange(index, "high", e.target.value)}
+                className="p-2 border rounded dark:bg-gray-800 dark:text-white"
+              />
+              <input
+                type="number"
+                placeholder="Low"
+                value={point.low}
+                onChange={(e) => handleDataChange(index, "low", e.target.value)}
+                className="p-2 border rounded dark:bg-gray-800 dark:text-white"
+              />
+              <input
+                type="number"
+                placeholder="Close"
+                value={point.close}
+                onChange={(e) => handleDataChange(index, "close", e.target.value)}
+                className="p-2 border rounded dark:bg-gray-800 dark:text-white"
               />
               <button
                 type="button"
