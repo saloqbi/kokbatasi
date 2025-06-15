@@ -1,48 +1,50 @@
-
 import React, { useEffect, useState } from "react";
-import { getSignals } from "../api/signals";
-import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
-const AllSignalsPage = () => {
+function AllSignalsPage() {
   const [signals, setSignals] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchSignals() {
       try {
-        const data = await getSignals();
-        setSignals(data);
-      } catch (error) {
-        console.error("فشل في جلب الإشارات:", error);
-        toast.error("حدث خطأ أثناء تحميل التوصيات.");
-      } finally {
-        setLoading(false);
-      }
-    };
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/api/signals`);
+        const data = await response.json();
+        console.log("📡 الإشارات المستلمة:", data);
 
-    fetchData(); // ✅ استدعاء الدالة async من داخل useEffect
+        if (Array.isArray(data)) {
+          setSignals(data);
+        } else if (Array.isArray(data.data)) {
+          setSignals(data.data);
+        } else {
+          setSignals([]);
+        }
+      } catch (error) {
+        console.error("❌ خطأ في جلب الإشارات:", error);
+        setSignals([]);
+      }
+    }
+
+    fetchSignals();
   }, []);
 
-  if (loading) {
-    return <div>⏳ جاري تحميل التوصيات...</div>;
-  }
-
-  if (signals.length === 0) {
-    return <div>📭 لا توجد توصيات حالياً.</div>;
-  }
-
   return (
-    <div style={{ padding: "1rem" }}>
-      <h1 style={{ marginBottom: "1rem" }}>📡 جميع التوصيات</h1>
-      <ul>
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-4">📡 جميع التوصيات</h1>
+      <ul className="list-disc pl-5 space-y-2">
+        {signals.length === 0 && <li>لا توجد إشارات متاحة حالياً.</li>}
         {signals.map((signal) => (
           <li key={signal._id}>
-            <strong>{signal.symbol}</strong> — {signal.action} @ {signal.price}
+            <Link
+              to={`/signals/${signal._id}`}
+              className="text-purple-700 underline hover:text-purple-900"
+            >
+              📝 {signal.title || "بدون عنوان"} - 💡 {signal.recommendation || "لا توجد توصية"}
+            </Link>
           </li>
         ))}
       </ul>
     </div>
   );
-};
+}
 
 export default AllSignalsPage;
