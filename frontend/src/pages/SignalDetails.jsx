@@ -52,6 +52,31 @@ const SignalDetails = () => {
     return result;
   };
 
+  const detectSupportResistance = (data, tolerance = 1.5) => {
+    const levels = [];
+    const closePrices = data.map((d) => Number(d.close || d.price)).filter(Boolean);
+
+    for (let i = 2; i < closePrices.length - 2; i++) {
+      const prev = closePrices[i - 1];
+      const curr = closePrices[i];
+      const next = closePrices[i + 1];
+
+      // دعم: قاع
+      if (curr < prev && curr < next) {
+        const exists = levels.some((lvl) => Math.abs(lvl - curr) < tolerance);
+        if (!exists) levels.push(curr);
+      }
+
+      // مقاومة: قمة
+      if (curr > prev && curr > next) {
+        const exists = levels.some((lvl) => Math.abs(lvl - curr) < tolerance);
+        if (!exists) levels.push(curr);
+      }
+    }
+
+    return levels.sort((a, b) => b - a);
+  };
+
   const chartData =
     Array.isArray(signal.data) && signal.data.length > 0
       ? calculateSMA(signal.data)
@@ -140,11 +165,22 @@ const SignalDetails = () => {
         </div>
       )}
 
-      {/* 🔮 تبويب: التحليل الفني (مستقبلاً) */}
+      {/* 🔮 تبويب: التحليل الفني */}
       {activeTab === "التحليل الفني" && (
-        <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg text-yellow-800 dark:text-yellow-100 text-center">
-          🧠 سيتم قريبًا إضافة التحليل الفني الذكي باستخدام الذكاء الاصطناعي<br />
-          يشمل دعم/مقاومة، نماذج فنية، إشارات AI لحظية.
+        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-gray-800 dark:text-white space-y-3">
+          <h4 className="text-lg font-bold mb-2">📊 مستويات الدعم والمقاومة</h4>
+          {chartData.length === 0 ? (
+            <p>لا توجد بيانات كافية للتحليل.</p>
+          ) : (
+            <ul className="list-disc pl-5 text-sm">
+              {detectSupportResistance(chartData).map((level, idx) => (
+                <li key={idx}>SAR {level.toFixed(2)}</li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-4 text-yellow-600 dark:text-yellow-400 text-sm">
+            🧠 قريبًا: سيتم إضافة اكتشاف النماذج الفنية (رأس وكتفين، مثلثات...) بالذكاء الاصطناعي.
+          </p>
         </div>
       )}
     </div>
