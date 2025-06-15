@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 
 const SignalDetails = () => {
@@ -35,14 +36,23 @@ const SignalDetails = () => {
     return <div className="text-center text-gray-500 p-10">...جاري التحميل</div>;
   }
 
+  // ✅ حساب المتوسط المتحرك (SMA) من البيانات
+  const calculateSMA = (data, period = 3) => {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+      const start = Math.max(0, i - period + 1);
+      const slice = data.slice(start, i + 1);
+      const sum = slice.reduce((acc, point) => acc + Number(point.price), 0);
+      const avg = sum / slice.length;
+      result.push({ ...data[i], sma: avg });
+    }
+    return result;
+  };
+
   const chartData =
     Array.isArray(signal.data) && signal.data.length > 0
-      ? signal.data
-      : [
-          { time: "09:00", price: signal.price - 10 },
-          { time: "10:00", price: signal.price - 5 },
-          { time: "11:00", price: signal.price },
-        ];
+      ? calculateSMA(signal.data)
+      : [];
 
   const getIcon = (rec) => {
     if (rec === "buy") return "📈";
@@ -76,9 +86,9 @@ const SignalDetails = () => {
         📅 التاريخ: {new Date(signal.createdAt).toLocaleString("ar-EG")}
       </div>
 
-      {/* 🟢 الرسم البياني */}
+      {/* ✅ الرسم البياني مع SMA */}
       <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
-        الرسم البياني للسعر
+        الرسم البياني مع متوسط متحرك
       </h3>
       <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
         <ResponsiveContainer width="100%" height={250}>
@@ -87,12 +97,23 @@ const SignalDetails = () => {
             <XAxis dataKey="time" />
             <YAxis domain={["auto", "auto"]} />
             <Tooltip formatter={(value) => `SAR ${value}`} />
+            <Legend />
             <Line
               type="monotone"
               dataKey="price"
+              name="السعر"
               stroke="#3b82f6"
               strokeWidth={2}
               dot={{ r: 3 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="sma"
+              name="SMA متوسط متحرك"
+              stroke="#f59e0b"
+              strokeWidth={2}
+              strokeDasharray="5 3"
+              dot={false}
             />
           </LineChart>
         </ResponsiveContainer>
