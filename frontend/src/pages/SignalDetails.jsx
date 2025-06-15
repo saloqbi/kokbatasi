@@ -44,7 +44,6 @@ const SignalDetails = () => {
     return "🔍";
   };
 
-  // حساب SMA بسيط
   const calculateSMA = (data, period = 3) => {
     const result = [];
     for (let i = 0; i < data.length; i++) {
@@ -57,15 +56,28 @@ const SignalDetails = () => {
     return result;
   };
 
+  const formatArabicDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("ar-EG", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   const chartData = hasChartData ? calculateSMA(signal.data) : [];
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 shadow rounded-2xl">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center gap-2">
-        {getIcon(signal.recommendation)} {signal.title || "عنوان غير متوفر"}
+    <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 shadow rounded-2xl text-right">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center justify-end gap-2">
+        {signal.title || "عنوان غير متوفر"} {getIcon(signal.recommendation)}
       </h1>
 
-      <div className="flex space-x-2 rtl:space-x-reverse mb-6">
+      <div className="flex flex-wrap justify-end gap-2 mb-6">
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -85,7 +97,7 @@ const SignalDetails = () => {
         <div className="space-y-2 text-gray-700 dark:text-white">
           <p>💬 <b>نوع التوصية:</b> {signal.recommendation}</p>
           <p>💰 <b>السعر:</b> {signal.price || "غير متوفر"}</p>
-          <p>🕒 <b>الوقت:</b> {new Date(signal.createdAt).toLocaleString("ar-EG")}</p>
+          <p>🕒 <b>الوقت:</b> {formatArabicDate(signal.createdAt)}</p>
           <button
             onClick={() => navigate(-1)}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
