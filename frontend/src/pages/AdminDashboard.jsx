@@ -6,7 +6,6 @@ const AdminDashboard = () => {
   const [signals, setSignals] = useState([]);
   const navigate = useNavigate();
 
-  // تحقق من تسجيل دخول المشرف
   useEffect(() => {
     const isAdmin = localStorage.getItem("isAdmin");
     if (isAdmin !== "true") {
@@ -14,7 +13,6 @@ const AdminDashboard = () => {
     }
   }, [navigate]);
 
-  // جلب التوصيات من السيرفر
   const fetchSignals = async () => {
     try {
       const response = await fetch(
@@ -29,9 +27,10 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchSignals();
+    const interval = setInterval(fetchSignals, 10000);
+    return () => clearInterval(interval);
   }, []);
 
-  // حذف توصية
   const handleDelete = async (id) => {
     const confirmed = window.confirm("هل أنت متأكد من حذف هذه التوصية؟");
     if (!confirmed) return;
@@ -51,7 +50,6 @@ const AdminDashboard = () => {
     <div className="p-6 max-w-6xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">🧑‍⚖️ لوحة تحكم المشرف</h2>
 
-      {/* الإحصائيات */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         <div className="bg-white p-4 shadow rounded-xl">
           <h3 className="text-lg font-semibold mb-2">📊 عدد التوصيات</h3>
@@ -63,7 +61,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* زر إضافة توصية */}
       <Link
         to="/manual-signal"
         className="inline-block mb-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -71,12 +68,10 @@ const AdminDashboard = () => {
         ➕ إضافة توصية يدوية
       </Link>
 
-      {/* زر توليد عشوائي */}
       <div className="mb-8">
         <GenerateRandomSignalsButton />
       </div>
 
-      {/* قائمة التوصيات */}
       <div className="bg-white shadow rounded-xl p-4">
         <h3 className="text-lg font-bold mb-4">📋 التوصيات الحالية</h3>
         {signals.length === 0 ? (

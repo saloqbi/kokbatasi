@@ -12,14 +12,15 @@ const AllSignalsPage = () => {
           import.meta.env.VITE_REACT_APP_API_URL + "/api/signals"
         );
         const data = await response.json();
-        console.log("📡 الإشارات المستلمة:", data);
         setSignals(data);
       } catch (error) {
         console.error("❌ فشل في جلب الإشارات:", error);
       }
     };
 
-    fetchSignals();
+    fetchSignals(); // أول تحميل
+    const interval = setInterval(fetchSignals, 10000); // تحديث كل 10 ثوانٍ
+    return () => clearInterval(interval);
   }, []);
 
   const filteredSignals =
