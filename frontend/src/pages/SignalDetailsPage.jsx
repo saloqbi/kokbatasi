@@ -1,40 +1,53 @@
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL || "http://localhost:5000";
-
-function SignalDetailsPage() {
+const SignalDetailsPage = () => {
   const { id } = useParams();
   const [signal, setSignal] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSignal = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/signals/${id}`);
-        const data = await response.json();
-        setSignal(data);
+        const response = await fetch(
+          `https://kokbatasi.onrender.com/api/signals/${id}`
+        );
+        const result = await response.json();
+        setSignal(result);
       } catch (error) {
-        console.error("خطأ في جلب تفاصيل التوصية:", error);
+        console.error("Error fetching signal details:", error);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchSignal();
   }, [id]);
 
-  if (!signal) {
-    return <div>جاري تحميل التفاصيل...</div>;
-  }
+  if (loading) return <div>جاري التحميل...</div>;
+  if (!signal) return <div>تعذر تحميل بيانات الإشارة.</div>;
+
+  const { title, recommendation, createdAt, data } = signal;
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-2">تفاصيل التوصية</h1>
-      <p><strong>المعرف:</strong> {signal._id}</p>
-      <p><strong>الأصل:</strong> {signal.symbol}</p>
-      <p><strong>الإجراء:</strong> {signal.action}</p>
-      <p><strong>السعر:</strong> {signal.price}</p>
-      <p><strong>التاريخ:</strong> {new Date(signal.createdAt).toLocaleString()}</p>
+      <h1 className="text-2xl font-bold mb-4">تفاصيل الإشارة</h1>
+      <p><strong>العنوان:</strong> {title}</p>
+      <p><strong>التوصية:</strong> {recommendation}</p>
+      <p><strong>تاريخ الإنشاء:</strong> {new Date(createdAt).toLocaleString()}</p>
+
+      <h2 className="text-xl font-semibold mt-6 mb-2">بيانات الإشارة:</h2>
+      {Array.isArray(data) && data.length > 0 ? (
+        <ul className="list-disc pl-6">
+          {data.map((item, index) => (
+            <li key={index}>{JSON.stringify(item)}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>لا توجد بيانات إضافية.</p>
+      )}
     </div>
   );
-}
+};
 
 export default SignalDetailsPage;
