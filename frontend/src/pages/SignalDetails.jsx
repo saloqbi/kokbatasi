@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+// SignalDetails.jsx ✅ النسخة النهائية الكاملة
+
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   ResponsiveContainer,
@@ -7,8 +9,8 @@ import {
   XAxis,
   YAxis,
   ComposedChart,
-  Line,
   ReferenceLine,
+  Line,
   Rectangle,
   Legend,
   Customized,
@@ -18,7 +20,6 @@ const tabs = ["المعلومات", "الرسم البياني", "المتوسط
 
 const SignalDetails = () => {
   const { id } = useParams();
-  const chartRef = useRef();
   const [signal, setSignal] = useState(null);
   const [activeTab, setActiveTab] = useState("المعلومات");
   const [manualLines, setManualLines] = useState([]);
@@ -81,7 +82,9 @@ const SignalDetails = () => {
   const calculateSMA = (data, period = 3) => {
     return data.map((d, i) => {
       if (i < period - 1) return { ...d, sma: null };
-      const avg = data.slice(i - period + 1, i + 1).reduce((sum, val) => sum + val.close, 0) / period;
+      const avg = data
+        .slice(i - period + 1, i + 1)
+        .reduce((sum, val) => sum + val.close, 0) / period;
       return { ...d, sma: parseFloat(avg.toFixed(2)) };
     });
   };
@@ -91,7 +94,7 @@ const SignalDetails = () => {
     const yMap = Object.values(yAxisMap)[0];
     const xScale = xMap.scale;
     const yScale = yMap.scale;
-    const width = 6;
+    const candleWidth = 8;
 
     return (
       <g>
@@ -108,9 +111,9 @@ const SignalDetails = () => {
             <g key={index}>
               <line x1={x} x2={x} y1={highY} y2={lowY} stroke={color} />
               <rect
-                x={x - width / 2}
+                x={x - candleWidth / 2}
                 y={Math.min(openY, closeY)}
-                width={width}
+                width={candleWidth}
                 height={Math.abs(closeY - openY)}
                 fill={color}
               />
@@ -121,7 +124,7 @@ const SignalDetails = () => {
     );
   };
 
-  if (!signal) return <div className="text-center p-10">جاري تحميل التوصية...</div>;
+  if (!signal) return <div className="text-center p-10">...جاري التحميل</div>;
 
   const smaData = calculateSMA(signal.data);
   const minLow = Math.min(...signal.data.map(d => d.low));
@@ -129,27 +132,23 @@ const SignalDetails = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-4 text-right">
-      <h1 className="text-2xl font-bold mb-4">{signal.title || "عنوان غير متوفر"}</h1>
+      <h1 className="text-2xl font-bold mb-6">{signal.title || "عنوان غير متوفر"}</h1>
 
-      <div className="flex flex-wrap gap-2 justify-end mb-6">
+      <div className="flex space-x-2 rtl:space-x-reverse mb-6">
         {tabs.map((tab) => (
           <button
             key={tab}
-            className={`px-4 py-1 rounded ${activeTab === tab ? "bg-blue-600 text-white" : "bg-gray-200"}`}
             onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 rounded ${
+              activeTab === tab
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
+            }`}
           >
             {tab}
           </button>
         ))}
       </div>
-
-      {activeTab === "المعلومات" && (
-        <div className="space-y-2 text-right">
-          <p>📌 نوع التوصية: <strong>{signal.recommendation}</strong></p>
-          <p>💰 السعر: <strong>{signal.price}</strong></p>
-          <p>📅 التاريخ: <strong>{new Date(signal.createdAt).toLocaleString("ar-EG")}</strong></p>
-        </div>
-      )}
 
       {activeTab === "الرسم البياني" && (
         <>
@@ -226,7 +225,7 @@ const SignalDetails = () => {
           <h4 className="font-bold text-lg">📊 تحليل فني</h4>
           <p>✅ عدد الخطوط: {manualLines.length}</p>
           <p>✅ عدد مناطق الدعم/المقاومة: {manualZones.length}</p>
-          <ul className="list-disc pl-5">
+          <ul className="list-disc pl-5 text-sm">
             <li>نمط رأس وكتفين</li>
             <li>نمط قاع مزدوج</li>
             <li>مناطق تداول ضيقة</li>
