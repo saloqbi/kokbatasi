@@ -6,7 +6,6 @@ const MONGO_URI = "mongodb+srv://admin:admin123@kokbatasi-db.0ltpmeg.mongodb.net
 mongoose.connect(MONGO_URI)
   .then(async () => {
     await Signal.create({
-      _id: "664dc95e362d3b1d6f69d8cc",
       symbol: "BTCUSDT",
       action: "buy",
       lines: [],
