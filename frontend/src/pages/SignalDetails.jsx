@@ -56,6 +56,12 @@ const SignalDetails = () => {
         تفاصيل التوصية: {signal.symbol || "?"} ({signal.action || "?"})
       </h2>
 
+      {/* عرض التوصية بالكامل للتصحيح */}
+      <div className="bg-gray-100 p-3 text-sm rounded border">
+        <strong>🛠 محتوى التوصية (Debug):</strong>
+        <pre>{JSON.stringify(signal, null, 2)}</pre>
+      </div>
+
       <Tabs
         tabs={[
           { key: "candles", label: "الشموع اليابانية" },
@@ -67,8 +73,12 @@ const SignalDetails = () => {
       />
 
       <div className="border rounded-xl p-3 shadow bg-white">
-        {selectedTab === "candles" && signal && (
-          <CandlestickChart symbol={signal.symbol} />
+        {selectedTab === "candles" && (
+          signal.symbol ? (
+            <CandlestickChart symbol={signal.symbol} />
+          ) : (
+            <div className="text-red-600">⚠️ لا يوجد رمز (symbol) لهذه التوصية.</div>
+          )
         )}
 
         {selectedTab === "analysis" && (
