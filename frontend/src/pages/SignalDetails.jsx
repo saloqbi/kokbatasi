@@ -9,14 +9,16 @@ import {
   ComposedChart,
   Line,
   ReferenceLine,
-  Legend,
   Rectangle,
+  Legend,
+  Customized,
 } from "recharts";
 
 const tabs = ["المعلومات", "الرسم البياني", "المتوسط المتحرك", "الشموع اليابانية", "التحليل الفني"];
 
 const SignalDetails = () => {
   const { id } = useParams();
+  const chartRef = useRef();
   const [signal, setSignal] = useState(null);
   const [activeTab, setActiveTab] = useState("المعلومات");
   const [manualLines, setManualLines] = useState([]);
@@ -79,11 +81,44 @@ const SignalDetails = () => {
   const calculateSMA = (data, period = 3) => {
     return data.map((d, i) => {
       if (i < period - 1) return { ...d, sma: null };
-      const avg = data
-        .slice(i - period + 1, i + 1)
-        .reduce((sum, val) => sum + val.close, 0) / period;
+      const avg = data.slice(i - period + 1, i + 1).reduce((sum, val) => sum + val.close, 0) / period;
       return { ...d, sma: parseFloat(avg.toFixed(2)) };
     });
+  };
+
+  const renderCandleSticks = ({ xAxisMap, yAxisMap, offset, data }) => {
+    const xMap = Object.values(xAxisMap)[0];
+    const yMap = Object.values(yAxisMap)[0];
+    const xScale = xMap.scale;
+    const yScale = yMap.scale;
+    const width = 6;
+
+    return (
+      <g>
+        {data.map((d, index) => {
+          const x = xScale(d.time);
+          const openY = yScale(d.open);
+          const closeY = yScale(d.close);
+          const highY = yScale(d.high);
+          const lowY = yScale(d.low);
+          const up = d.close >= d.open;
+          const color = up ? "#4ade80" : "#f87171";
+
+          return (
+            <g key={index}>
+              <line x1={x} x2={x} y1={highY} y2={lowY} stroke={color} />
+              <rect
+                x={x - width / 2}
+                y={Math.min(openY, closeY)}
+                width={width}
+                height={Math.abs(closeY - openY)}
+                fill={color}
+              />
+            </g>
+          );
+        })}
+      </g>
+    );
   };
 
   if (!signal) return <div className="text-center p-10">جاري تحميل التوصية...</div>;
@@ -96,7 +131,7 @@ const SignalDetails = () => {
     <div className="max-w-5xl mx-auto p-4 text-right">
       <h1 className="text-2xl font-bold mb-4">{signal.title || "عنوان غير متوفر"}</h1>
 
-      <div className="flex gap-2 justify-end mb-4">
+      <div className="flex flex-wrap gap-2 justify-end mb-6">
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -181,8 +216,7 @@ const SignalDetails = () => {
             <YAxis domain={[minLow * 0.98, maxHigh * 1.02]} />
             <Tooltip />
             <Legend />
-            <Line dataKey="open" stroke="#4ade80" dot={false} />
-            <Line dataKey="close" stroke="#f87171" dot={false} />
+            <Customized component={(props) => renderCandleSticks({ ...props, data: signal.data })} />
           </ComposedChart>
         </ResponsiveContainer>
       )}
