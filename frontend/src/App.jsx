@@ -14,6 +14,7 @@ const App = () => (
       <Routes>
         <Route path="/" element={<AllSignals />} />
         <Route path="/signals/:id" element={<SignalDetails />} />
+	<Route path="/signals" element={<AllSignalsPage />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
       <ToastContainer />
