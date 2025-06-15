@@ -1,20 +1,38 @@
 const mongoose = require("mongoose");
 
-const signalSchema = new mongoose.Schema({
-  title: String,
-  recommendation: String,
-  price: Number,
-  data: [
-    {
-      time: String,
-      open: Number,
-      high: Number,
-      low: Number,
-      close: Number,
+const SignalSchema = new mongoose.Schema(
+  {
+    symbol: {
+      type: String,
+      required: true,
     },
-  ],
-  lines: [{ y: Number }],
-  zones: [{ from: Number, to: Number }]
-}, { timestamps: true });
+    action: {
+      type: String,
+      enum: ["buy", "sell", "neutral"],
+      required: true,
+    },
+    lines: [
+      {
+        x1: Number,
+        y1: Number,
+        x2: Number,
+        y2: Number,
+      },
+    ],
+    zones: [
+      {
+        x: Number,
+        y: Number,
+        width: Number,
+        height: Number,
+      },
+    ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { collection: "signals" }
+);
 
-module.exports = mongoose.model("Signal", signalSchema);
+module.exports = mongoose.model("Signal", SignalSchema);
