@@ -61,13 +61,11 @@ const SignalDetails = () => {
       const curr = closePrices[i];
       const next = closePrices[i + 1];
 
-      // دعم: قاع
       if (curr < prev && curr < next) {
         const exists = levels.some((lvl) => Math.abs(lvl - curr) < tolerance);
         if (!exists) levels.push(curr);
       }
 
-      // مقاومة: قمة
       if (curr > prev && curr > next) {
         const exists = levels.some((lvl) => Math.abs(lvl - curr) < tolerance);
         if (!exists) levels.push(curr);
@@ -75,6 +73,27 @@ const SignalDetails = () => {
     }
 
     return levels.sort((a, b) => b - a);
+  };
+
+  const detectHeadAndShoulders = (data) => {
+    const prices = data.map((d) => Number(d.close || d.price));
+    for (let i = 2; i < prices.length - 2; i++) {
+      const left = prices[i - 2];
+      const shoulderL = prices[i - 1];
+      const head = prices[i];
+      const shoulderR = prices[i + 1];
+      const right = prices[i + 2];
+
+      const isPattern =
+        shoulderL < head &&
+        shoulderR < head &&
+        Math.abs(shoulderL - shoulderR) < 2 &&
+        left < shoulderL &&
+        right < shoulderR;
+
+      if (isPattern) return true;
+    }
+    return false;
   };
 
   const chartData =
@@ -88,13 +107,14 @@ const SignalDetails = () => {
     return "🔍";
   };
 
+  const hasPattern = detectHeadAndShoulders(chartData);
+
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 shadow rounded-2xl">
       <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center gap-2">
         {getIcon(signal.recommendation)} {signal.title || "عنوان غير متوفر"}
       </h1>
 
-      {/* 🧭 التبويبات */}
       <div className="flex space-x-2 rtl:space-x-reverse mb-6">
         {tabs.map((tab) => (
           <button
@@ -167,8 +187,8 @@ const SignalDetails = () => {
 
       {/* 🔮 تبويب: التحليل الفني */}
       {activeTab === "التحليل الفني" && (
-        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-gray-800 dark:text-white space-y-3">
-          <h4 className="text-lg font-bold mb-2">📊 مستويات الدعم والمقاومة</h4>
+        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-gray-800 dark:text-white space-y-4">
+          <h4 className="text-lg font-bold">📊 مستويات الدعم والمقاومة</h4>
           {chartData.length === 0 ? (
             <p>لا توجد بيانات كافية للتحليل.</p>
           ) : (
@@ -178,9 +198,15 @@ const SignalDetails = () => {
               ))}
             </ul>
           )}
-          <p className="mt-4 text-yellow-600 dark:text-yellow-400 text-sm">
-            🧠 قريبًا: سيتم إضافة اكتشاف النماذج الفنية (رأس وكتفين، مثلثات...) بالذكاء الاصطناعي.
-          </p>
+
+          <h4 className="text-lg font-bold mt-4">🧠 نماذج فنية</h4>
+          {hasPattern ? (
+            <p className="text-green-600 dark:text-green-400">
+              ✅ تم اكتشاف نمط <b>رأس وكتفين</b> في هذه التوصية.
+            </p>
+          ) : (
+            <p className="text-gray-500">لم يتم رصد نماذج فنية واضحة.</p>
+          )}
         </div>
       )}
     </div>
