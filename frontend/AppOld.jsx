@@ -11,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<AllSignals />} />
         <Route path="/signals" element={<AllSignals />} /> {/* ✅ تم إضافته هنا */}
+	<Route path="/signals" element={<AllSignalsPage />} />
         <Route path="/signals/:id" element={<SignalDetails />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
