@@ -1,6 +1,7 @@
+
 const express = require("express");
 const router = express.Router();
-const Signal = require("../models/signal");
+const Signal = require("../models/Signal");
 
 // ✅ جلب توصية واحدة
 router.get("/:id", async (req, res) => {
@@ -40,6 +41,22 @@ router.put("/:id/zones", async (req, res) => {
     res.json(signal);
   } catch (err) {
     res.status(500).json({ message: "خطأ في حفظ المناطق" });
+  }
+});
+
+// ✅ مسار مؤقت لإدخال توصية تجريبية
+router.post("/seed", async (req, res) => {
+  try {
+    const newSignal = await Signal.create({
+      _id: "664dc95e362d3b1d6f69d8cc",
+      symbol: "BTCUSDT",
+      action: "buy",
+      lines: [],
+      zones: []
+    });
+    res.json({ message: "✅ توصية تجريبية أُضيفت", newSignal });
+  } catch (err) {
+    res.status(500).json({ message: "❌ فشل الإضافة", error: err.message });
   }
 });
 
