@@ -138,6 +138,7 @@ const SignalDetails = () => {
           <button
             key={tab}
             className={`px-4 py-1 rounded ${activeTab === tab ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+            onClick={() => setActiveTab(tab)}
           >
             {tab}
           </button>
