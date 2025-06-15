@@ -37,11 +37,12 @@ const CandlestickChart = ({ symbol }) => {
     svg.attr("width", width).attr("height", height);
 
     svg.append("g")
-      .attr("transform", \`translate(0,\${height - margin.bottom})\`)
+      .attr("transform", "translate(0," + (height - margin.bottom) + ")")
       .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%d")));
 
     svg.append("g")
-      .attr("transform", \`translate(\${margin.left},0)\`)
+      .attr("transform", "translate(" + margin.left + ",0)")
+
       .call(d3.axisLeft(y));
 
     svg.selectAll(".candle")
