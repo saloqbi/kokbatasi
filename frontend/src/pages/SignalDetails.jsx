@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import CandleChart from "../components/CandleChart";
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -36,13 +37,13 @@ const SignalDetails = () => {
     return <div className="text-center text-gray-500 p-10">...جاري التحميل</div>;
   }
 
-  // ✅ حساب المتوسط المتحرك (SMA) من البيانات
+  // ✅ حساب المتوسط المتحرك (SMA)
   const calculateSMA = (data, period = 3) => {
     const result = [];
     for (let i = 0; i < data.length; i++) {
       const start = Math.max(0, i - period + 1);
       const slice = data.slice(start, i + 1);
-      const sum = slice.reduce((acc, point) => acc + Number(point.price), 0);
+      const sum = slice.reduce((acc, d) => acc + Number(d.close || d.price), 0);
       const avg = sum / slice.length;
       result.push({ ...data[i], sma: avg });
     }
@@ -53,6 +54,8 @@ const SignalDetails = () => {
     Array.isArray(signal.data) && signal.data.length > 0
       ? calculateSMA(signal.data)
       : [];
+
+  const hasCandleData = Array.isArray(signal.data) && signal.data[0]?.open;
 
   const getIcon = (rec) => {
     if (rec === "buy") return "📈";
@@ -86,38 +89,54 @@ const SignalDetails = () => {
         📅 التاريخ: {new Date(signal.createdAt).toLocaleString("ar-EG")}
       </div>
 
-      {/* ✅ الرسم البياني مع SMA */}
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
-        الرسم البياني مع متوسط متحرك
-      </h3>
-      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-        <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="time" />
-            <YAxis domain={["auto", "auto"]} />
-            <Tooltip formatter={(value) => `SAR ${value}`} />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="price"
-              name="السعر"
-              stroke="#3b82f6"
-              strokeWidth={2}
-              dot={{ r: 3 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="sma"
-              name="SMA متوسط متحرك"
-              stroke="#f59e0b"
-              strokeWidth={2}
-              strokeDasharray="5 3"
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      {/* 🕯️ الشموع اليابانية */}
+      {hasCandleData && (
+        <>
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
+            🕯️ الرسم البياني بالشموع اليابانية
+          </h3>
+          <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-6">
+            <CandleChart data={signal.data} />
+          </div>
+        </>
+      )}
+
+      {/* 📈 السعر + المتوسط المتحرك */}
+      {chartData.length > 0 && (
+        <>
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
+            📊 السعر مع المتوسط المتحرك
+          </h3>
+          <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={["auto", "auto"]} />
+                <Tooltip formatter={(v) => `SAR ${v}`} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="close"
+                  name="سعر الإغلاق"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sma"
+                  name="SMA متوسط متحرك"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  strokeDasharray="5 3"
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </>
+      )}
 
       <div className="mt-6">
         <button
