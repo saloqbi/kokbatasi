@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Signal = require("../models/Signal");
+const Signal = require("../models/signal");
 
 // ✅ جلب توصية واحدة
 router.get("/:id", async (req, res) => {
