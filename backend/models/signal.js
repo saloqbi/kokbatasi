@@ -1,31 +1,23 @@
-// backend/models/signal.js
-
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const signalSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  recommendation: {
-    type: String,
-    enum: ['buy', 'sell'],
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  data: {
-    type: Array,
-    default: [],
-  }
-});
+  title: String,
+  recommendation: String,
+  price: Number,
+  data: [
+    {
+      time: String,
+      open: Number,
+      high: Number,
+      low: Number,
+      close: Number,
+    },
+  ],
+  lines: [
+    {
+      y: Number,
+    },
+  ],
+}, { timestamps: true });
 
-const Signal = mongoose.model('Signal', signalSchema);
-
-module.exports = Signal;
+module.exports = mongoose.model("Signal", signalSchema);
