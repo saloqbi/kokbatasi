@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import CandleChart from "../components/CandleChart";
 
-const tabs = ["المعلومات", "المتوسط المتحرك", "الشموع اليابانية"];
+const tabs = ["المعلومات", "المتوسط المتحرك", "الشموع اليابانية", "التحليل الفني"];
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -137,6 +137,14 @@ const SignalDetails = () => {
       {activeTab === "الشموع اليابانية" && hasCandleData && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
           <CandleChart data={signal.data} />
+        </div>
+      )}
+
+      {/* 🔮 تبويب: التحليل الفني (مستقبلاً) */}
+      {activeTab === "التحليل الفني" && (
+        <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg text-yellow-800 dark:text-yellow-100 text-center">
+          🧠 سيتم قريبًا إضافة التحليل الفني الذكي باستخدام الذكاء الاصطناعي<br />
+          يشمل دعم/مقاومة، نماذج فنية، إشارات AI لحظية.
         </div>
       )}
     </div>
