@@ -12,7 +12,12 @@ import {
 } from "recharts";
 import CandleChart from "../components/CandleChart";
 
-const tabs = ["المعلومات", "المتوسط المتحرك", "الشموع اليابانية", "التحليل الفني"];
+const tabs = [
+  "المعلومات",
+  "المتوسط المتحرك",
+  "الشموع اليابانية",
+  "التحليل الفني"
+];
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -96,6 +101,43 @@ const SignalDetails = () => {
     return false;
   };
 
+  const detectDoubleBottom = (data, tolerance = 1.5) => {
+    const prices = data.map((d) => Number(d.close || d.price));
+    for (let i = 2; i < prices.length - 2; i++) {
+      const p1 = prices[i - 2];
+      const p2 = prices[i];
+      const p3 = prices[i + 2];
+      const r1 = prices[i - 1];
+      const r2 = prices[i + 1];
+
+      const isDoubleBottom =
+        Math.abs(p1 - p3) < tolerance &&
+        p2 > p1 &&
+        r1 > p1 &&
+        r2 > p1;
+
+      if (isDoubleBottom) return true;
+    }
+    return false;
+  };
+
+  const detectTrianglePattern = (data, tolerance = 1.5) => {
+    const closes = data.map((d) => Number(d.close || d.price));
+    let supportCount = 0;
+    let resistanceCount = 0;
+
+    for (let i = 2; i < closes.length - 2; i++) {
+      const prev = closes[i - 1];
+      const curr = closes[i];
+      const next = closes[i + 1];
+
+      if (curr < prev && curr < next) supportCount++;
+      if (curr > prev && curr > next) resistanceCount++;
+    }
+
+    return supportCount >= 2 && resistanceCount >= 2;
+  };
+
   const chartData =
     Array.isArray(signal.data) && signal.data.length > 0
       ? calculateSMA(signal.data)
@@ -108,6 +150,8 @@ const SignalDetails = () => {
   };
 
   const hasPattern = detectHeadAndShoulders(chartData);
+  const hasDoubleBottom = detectDoubleBottom(chartData);
+  const hasTriangle = detectTrianglePattern(chartData);
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 shadow rounded-2xl">
@@ -131,7 +175,6 @@ const SignalDetails = () => {
         ))}
       </div>
 
-      {/* 📋 تبويب: المعلومات */}
       {activeTab === "المعلومات" && (
         <div className="space-y-2 text-gray-700 dark:text-white">
           <p>💬 <b>نوع التوصية:</b> {signal.recommendation}</p>
@@ -146,7 +189,6 @@ const SignalDetails = () => {
         </div>
       )}
 
-      {/* 📈 تبويب: المتوسط المتحرك */}
       {activeTab === "المتوسط المتحرك" && chartData.length > 0 && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
           <ResponsiveContainer width="100%" height={250}>
@@ -178,14 +220,12 @@ const SignalDetails = () => {
         </div>
       )}
 
-      {/* 🕯️ تبويب: الشموع اليابانية */}
       {activeTab === "الشموع اليابانية" && hasCandleData && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
           <CandleChart data={signal.data} />
         </div>
       )}
 
-      {/* 🔮 تبويب: التحليل الفني */}
       {activeTab === "التحليل الفني" && (
         <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-gray-800 dark:text-white space-y-4">
           <h4 className="text-lg font-bold">📊 مستويات الدعم والمقاومة</h4>
@@ -200,13 +240,14 @@ const SignalDetails = () => {
           )}
 
           <h4 className="text-lg font-bold mt-4">🧠 نماذج فنية</h4>
-          {hasPattern ? (
-            <p className="text-green-600 dark:text-green-400">
-              ✅ تم اكتشاف نمط <b>رأس وكتفين</b> في هذه التوصية.
-            </p>
-          ) : (
-            <p className="text-gray-500">لم يتم رصد نماذج فنية واضحة.</p>
-          )}
+          <ul className="list-disc pl-5 text-sm">
+            {hasPattern && <li>✅ تم اكتشاف <b>نمط رأس وكتفين</b></li>}
+            {hasDoubleBottom && <li>✅ تم اكتشاف <b>نمط قاع مزدوج</b></li>}
+            {hasTriangle && <li>✅ تم اكتشاف <b>نمط مثلث صاعد / هابط</b></li>}
+            {!hasPattern && !hasDoubleBottom && !hasTriangle && (
+              <li>لم يتم رصد نماذج فنية واضحة</li>
+            )}
+          </ul>
         </div>
       )}
     </div>
