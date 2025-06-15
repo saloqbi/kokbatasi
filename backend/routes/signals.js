@@ -44,7 +44,7 @@ router.put("/:id/zones", async (req, res) => {
   }
 });
 
-// ✅ مسار لإدخال توصية تجريبية مع طباعة err.message
+// ✅ إدخال توصية تجريبية مع عرض الخطأ الكامل
 router.post("/seed", async (req, res) => {
   try {
     const newSignal = await Signal.create({
@@ -59,7 +59,7 @@ router.post("/seed", async (req, res) => {
     console.error("❌ خطأ في /seed:", err);
     res.status(500).json({
       message: "Server error",
-      error: err?.message || "⚠️ لا يوجد تفاصيل في الخطأ"
+      fullError: JSON.stringify(err, Object.getOwnPropertyNames(err))
     });
   }
 });
