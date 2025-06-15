@@ -3,22 +3,22 @@
 const mongoose = require('mongoose');
 
 const signalSchema = new mongoose.Schema({
-  symbol: {
+  title: {
     type: String,
+    required: true,
+  },
+  recommendation: {
+    type: String,
+    enum: ['buy', 'sell'],
     required: true,
   },
   price: {
     type: Number,
     required: true,
   },
-  type: {
-    type: String,
-    enum: ['buy', 'sell'],
-    required: true,
-  },
-  date: {
-    type: String,
-    required: true,
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
   data: {
     type: Array,
