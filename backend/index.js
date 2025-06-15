@@ -1,28 +1,23 @@
-
 const express = require("express");
-const dotenv = require("dotenv");
-const connectDB = require("./config/db");
-
-dotenv.config();
-
 const app = express();
+const mongoose = require("mongoose");
+const cors = require("cors");
+const signalsRoutes = require("./routes/signals");
+
+app.use(cors());
 app.use(express.json());
 
-connectDB();
+mongoose.connect(process.env.MONGO_URI || "mongodb+srv://admin:admin123@kokbatasi-db.0ltpmeg.mongodb.net/kokbatasi-db?retryWrites=true&w=majority&appName=kokbatasi-db", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
-console.log("✅ بدء تحميل index.js");
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+db.once("open", () => {
+  console.log("✅ MongoDB connected");
+});
 
-// ✅ تأكد من ربط مسار signals
-try {
-  const signalRoutes = require("./routes/signals");
-  app.use("/api/signals", signalRoutes);
-  console.log("✅ تم ربط /api/signals بنجاح");
-} catch (err) {
-  console.error("❌ فشل في ربط /api/signals:", err);
-}
+app.use("/api/signals", signalsRoutes);
 
-// ✅ تأكيد تشغيل الخادم
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
-);
+module.exports = app;
