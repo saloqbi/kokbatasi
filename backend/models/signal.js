@@ -13,11 +13,8 @@ const signalSchema = new mongoose.Schema({
       close: Number,
     },
   ],
-  lines: [
-    {
-      y: Number,
-    },
-  ],
+  lines: [{ y: Number }],
+  zones: [{ from: Number, to: Number }]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Signal", signalSchema);
