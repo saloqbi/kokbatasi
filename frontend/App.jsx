@@ -1,21 +1,21 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import ManualSignal from './pages/ManualSignal';
-import AllSignals from './pages/AllSignals';
-import SignalDetails from './pages/SignalDetails';
-import Navigation from './components/Navigation';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-export default function App() {
+import AllSignals from "./pages/AllSignalsPage";
+import SignalDetails from "./pages/SignalDetailsPage";
+import AdminDashboard from "./pages/AdminDashboard";
+
+function App() {
   return (
-    <BrowserRouter>
-      <Navigation />
+    <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/manual-signal" element={<ManualSignal />} />
-        <Route path="/signals" element={<AllSignals />} />
+        <Route path="/" element={<AllSignals />} />
+        <Route path="/signals" element={<AllSignals />} /> {/* ✅ تم إضافته هنا */}
         <Route path="/signals/:id" element={<SignalDetails />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
+
+export default App;
