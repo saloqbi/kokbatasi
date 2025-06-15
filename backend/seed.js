@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Signal = require("./models/Signal");
+const Signal = require("./models/signal");
 
 const MONGO_URI = "mongodb+srv://admin:admin123@kokbatasi-db.0ltpmeg.mongodb.net/kokbatasi?retryWrites=true&w=majority&appName=kokbatasi-db";
 
