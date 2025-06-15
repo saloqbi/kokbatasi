@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AllSignals from './pages/AllSignals';
+import AllSignalsPage from './pages/AllSignalsPage'; // ✅ استيراد الصفحة المحسّنة
 import SignalDetails from './pages/SignalDetails';
 import AdminDashboard from './pages/AdminDashboard';
 import { SignalProvider } from './context/SignalContext';
@@ -13,8 +13,8 @@ const App = () => (
     <Router>
       <Routes>
         <Route path="/" element={<AllSignals />} />
+        <Route path="/signals" element={<AllSignalsPage />} /> {/* ✅ التوجيه الصحيح */}
         <Route path="/signals/:id" element={<SignalDetails />} />
-	<Route path="/signals" element={<AllSignalsPage />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
       <ToastContainer />
