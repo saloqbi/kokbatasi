@@ -1,4 +1,3 @@
-// ✅ النسخة النهائية من SignalDetails.jsx تشمل رسم الخطوط والمناطق والدعم الكامل
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -79,43 +78,19 @@ const SignalDetails = () => {
     }
   };
 
+  const calculateSMA = (data, period = 3) => {
+    return data.map((d, i) => {
+      if (i < period - 1) return { ...d, sma: null };
+      const avg = (
+        data.slice(i - period + 1, i + 1).reduce((sum, item) => sum + item.close, 0) / period
+      ).toFixed(2);
+      return { ...d, sma: parseFloat(avg) };
+    });
+  };
+
   if (!signal) return <div className="text-center">...جاري التحميل</div>;
 
-  const renderChart = () => (
-    <ResponsiveContainer width="100%" height={300}>
-      <ComposedChart data={signal.data} onClick={handleChartClick}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="time" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line dataKey="close" stroke="#0ea5e9" />
-        <Bar dataKey="low" fill="#a5b4fc" />
-        <Bar dataKey="high" fill="#818cf8" />
-
-        {manualLines.map((line, i) => (
-          <ReferenceLine
-            key={i}
-            y={line.y}
-            stroke="#ef4444"
-            strokeDasharray="3 3"
-            label={{
-              value: `خط ${i + 1}`,
-              position: "right",
-              fill: "#ef4444",
-            }}
-          />
-        ))}
-
-        {manualZones.map((zone, i) => (
-          <React.Fragment key={i}>
-            <ReferenceLine y={zone.from} stroke="#a78bfa" strokeDasharray="3 3" />
-            <ReferenceLine y={zone.to} stroke="#a78bfa" strokeDasharray="3 3" />
-          </React.Fragment>
-        ))}
-      </ComposedChart>
-    </ResponsiveContainer>
-  );
+  const dataWithSMA = calculateSMA(signal.data);
 
   return (
     <div className="max-w-4xl mx-auto p-4 text-right">
@@ -149,8 +124,75 @@ const SignalDetails = () => {
               📦 رسم منطقة
             </button>
           </div>
-          <div>{renderChart()}</div>
+          <ResponsiveContainer width="100%" height={300}>
+            <ComposedChart data={signal.data} onClick={handleChartClick}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line dataKey="close" stroke="#0ea5e9" />
+
+              {manualLines.map((line, i) => (
+                <ReferenceLine
+                  key={i}
+                  y={line.y}
+                  stroke="#ef4444"
+                  strokeDasharray="3 3"
+                  label={{ value: `خط ${i + 1}`, position: "right", fill: "#ef4444" }}
+                />
+              ))}
+
+              {manualZones.map((zone, i) => (
+                <React.Fragment key={i}>
+                  <ReferenceLine y={zone.from} stroke="#a78bfa" strokeDasharray="3 3" />
+                  <ReferenceLine y={zone.to} stroke="#a78bfa" strokeDasharray="3 3" />
+                </React.Fragment>
+              ))}
+            </ComposedChart>
+          </ResponsiveContainer>
         </>
+      )}
+
+      {activeTab === "المتوسط المتحرك" && (
+        <ResponsiveContainer width="100%" height={300}>
+          <ComposedChart data={dataWithSMA}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="time" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line dataKey="close" stroke="#0ea5e9" />
+            <Line dataKey="sma" stroke="#f59e0b" dot={false} />
+          </ComposedChart>
+        </ResponsiveContainer>
+      )}
+
+      {activeTab === "الشموع اليابانية" && (
+        <ResponsiveContainer width="100%" height={300}>
+          <ComposedChart data={signal.data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="time" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="high" fill="#facc15" />
+            <Bar dataKey="low" fill="#4ade80" />
+          </ComposedChart>
+        </ResponsiveContainer>
+      )}
+
+      {activeTab === "التحليل الفني" && (
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-gray-800 dark:text-white space-y-4">
+          <h4 className="text-lg font-bold">📊 دعم ومقاومة</h4>
+          <p>✅ عدد الخطوط اليدوية: {manualLines.length}</p>
+          <p>✅ عدد المناطق: {manualZones.length}</p>
+          <h4 className="text-lg font-bold mt-4">📈 نماذج فنية مكتشفة (يدويًا)</h4>
+          <ul className="list-disc pl-5 text-sm">
+            <li>نمط رأس وكتفين (تحليل يدوي)</li>
+            <li>نمط مثلث أو قاع مزدوج</li>
+          </ul>
+        </div>
       )}
     </div>
   );
