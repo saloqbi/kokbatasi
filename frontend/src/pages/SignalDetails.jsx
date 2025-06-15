@@ -1,7 +1,7 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import Chart from "../components/Chart";
 import CandlestickChart from "../components/CandlestickChart";
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import DrawingTools from "../components/DrawingTools";
@@ -20,7 +20,7 @@ const SignalDetails = () => {
         const res = await axios.get(`/api/signals/${id}`);
         setSignal(res.data);
       } catch (err) {
-        console.error("خطأ في تحميل البيانات:", err);
+        console.error("فشل في تحميل التوصية:", err);
       }
     };
 
@@ -30,7 +30,7 @@ const SignalDetails = () => {
         setLines(res.data.lines || []);
         setZones(res.data.zones || []);
       } catch (err) {
-        console.error("خطأ في تحميل الرسومات:", err);
+        console.error("فشل في تحميل الرسومات:", err);
       }
     };
 
@@ -53,7 +53,7 @@ const SignalDetails = () => {
   return (
     <div className="p-4 space-y-4">
       <h2 className="text-xl font-bold text-center">
-        تفاصيل التوصية: {signal.symbol} ({signal.action})
+        تفاصيل التوصية: {signal.symbol || "?"} ({signal.action || "?"})
       </h2>
 
       <Tabs
@@ -67,7 +67,7 @@ const SignalDetails = () => {
       />
 
       <div className="border rounded-xl p-3 shadow bg-white">
-        {selectedTab === "candles" && (
+        {selectedTab === "candles" && signal && (
           <CandlestickChart symbol={signal.symbol} />
         )}
 
