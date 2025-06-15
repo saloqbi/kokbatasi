@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import GenerateRandomSignalsButton from "../components/GenerateRandomSignalsButton";
 
 const AdminDashboard = () => {
   const [signals, setSignals] = useState([]);
   const navigate = useNavigate();
 
-  // تحقق من الصلاحية
+  // تحقق من تسجيل دخول المشرف
   useEffect(() => {
     const isAdmin = localStorage.getItem("isAdmin");
     if (isAdmin !== "true") {
@@ -14,7 +14,7 @@ const AdminDashboard = () => {
     }
   }, [navigate]);
 
-  // جلب التوصيات
+  // جلب التوصيات من السيرفر
   const fetchSignals = async () => {
     try {
       const response = await fetch(
@@ -43,7 +43,7 @@ const AdminDashboard = () => {
       );
       setSignals(signals.filter((s) => s._id !== id));
     } catch (error) {
-      alert("حدث خطأ أثناء الحذف");
+      alert("❌ حدث خطأ أثناء الحذف");
     }
   };
 
@@ -51,6 +51,7 @@ const AdminDashboard = () => {
     <div className="p-6 max-w-6xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">🧑‍⚖️ لوحة تحكم المشرف</h2>
 
+      {/* الإحصائيات */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         <div className="bg-white p-4 shadow rounded-xl">
           <h3 className="text-lg font-semibold mb-2">📊 عدد التوصيات</h3>
@@ -58,32 +59,51 @@ const AdminDashboard = () => {
         </div>
         <div className="bg-white p-4 shadow rounded-xl">
           <h3 className="text-lg font-semibold mb-2">👥 عدد المستخدمين</h3>
-          <p className="text-3xl font-bold text-green-600">—</p> {/* placeholder */}
+          <p className="text-3xl font-bold text-green-600">—</p>
         </div>
       </div>
 
+      {/* زر إضافة توصية */}
+      <Link
+        to="/manual-signal"
+        className="inline-block mb-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        ➕ إضافة توصية يدوية
+      </Link>
+
+      {/* زر توليد عشوائي */}
       <div className="mb-8">
         <GenerateRandomSignalsButton />
       </div>
 
+      {/* قائمة التوصيات */}
       <div className="bg-white shadow rounded-xl p-4">
         <h3 className="text-lg font-bold mb-4">📋 التوصيات الحالية</h3>
-        <ul className="space-y-2">
-          {signals.map((signal) => (
-            <li key={signal._id} className="flex justify-between items-center border-b pb-2">
-              <span>
-                <span className="font-semibold">{signal.title}</span> -{" "}
-                <span className="text-sm text-gray-500">{signal.recommendation}</span>
-              </span>
-              <button
-                onClick={() => handleDelete(signal._id)}
-                className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded"
+        {signals.length === 0 ? (
+          <p className="text-gray-500">لا توجد توصيات حالياً.</p>
+        ) : (
+          <ul className="space-y-2">
+            {signals.map((signal) => (
+              <li
+                key={signal._id}
+                className="flex justify-between items-center border-b pb-2"
               >
-                حذف
-              </button>
-            </li>
-          ))}
-        </ul>
+                <span>
+                  <span className="font-semibold">{signal.title}</span> -{" "}
+                  <span className="text-sm text-gray-500">
+                    {signal.recommendation}
+                  </span>
+                </span>
+                <button
+                  onClick={() => handleDelete(signal._id)}
+                  className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded"
+                >
+                  حذف
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import AllSignalsPage from './pages/AllSignalsPage'; // ✅ استيراد ال�
 import SignalDetails from './pages/SignalDetails';
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from './pages/AdminDashboard';
+import ManualSignal from "./pages/ManualSignal";
 import { SignalProvider } from './context/SignalContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,6 +19,8 @@ const App = () => (
         <Route path="/signals/:id" element={<SignalDetails />} />
 	<Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+	<Route path="/manual-signal" element={<ManualSignal />} />
+
       </Routes>
       <ToastContainer />
     </Router>
