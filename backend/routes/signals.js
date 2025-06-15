@@ -45,15 +45,14 @@ router.put("/:id/zones", async (req, res) => {
 });
 
 // ✅ إدخال توصية تجريبية مع عرض الخطأ الكامل
-router.post("/seed", async (req, res) => {
+router.get("/seed", async (req, res) => {
   try {
     const newSignal = await Signal.create({
-      _id: "664dc95e362d3b1d6f69d8cc",
-      symbol: "BTCUSDT",
-      action: "buy",
-      lines: [],
-      zones: []
-    });
+  symbol: "BTCUSDT",
+  action: "buy",
+  lines: [],
+  zones: []
+});
     res.json({ message: "✅ توصية تجريبية أُضيفت", newSignal });
   } catch (err) {
     console.error("❌ خطأ في /seed:", err);
