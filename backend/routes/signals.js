@@ -44,16 +44,19 @@ router.put("/:id/zones", async (req, res) => {
   }
 });
 
-// ✅ إدخال توصية تجريبية مع عرض الخطأ الكامل
+// ✅ إدخال توصية تجريبية بدون _id + GET + طباعة تأكيد
 router.get("/seed", async (req, res) => {
+  console.log("📌 تم الوصول لمسار /seed");
+
   try {
     const newSignal = await Signal.create({
-  symbol: "BTCUSDT",
-  action: "buy",
-  lines: [],
-  zones: []
-});
-    res.json({ message: "✅ توصية تجريبية أُضيفت", newSignal });
+      symbol: "BTCUSDT",
+      action: "buy",
+      lines: [],
+      zones: []
+    });
+    console.log("✅ تم إدخال التوصية:", newSignal);
+    res.json({ message: "✅ توصية أُضيفت", newSignal });
   } catch (err) {
     console.error("❌ خطأ في /seed:", err);
     res.status(500).json({
