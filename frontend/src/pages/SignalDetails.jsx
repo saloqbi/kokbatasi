@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 
 const SignalDetails = () => {
@@ -25,16 +31,18 @@ const SignalDetails = () => {
     fetchSignal();
   }, [id]);
 
-  if (!signal) return <div className="text-center text-gray-500 p-10">...جاري التحميل</div>;
+  if (!signal) {
+    return <div className="text-center text-gray-500 p-10">...جاري التحميل</div>;
+  }
 
-  // بيانات تجريبية للرسم (يمكن لاحقًا جلبها من backend أو من signal.data)
-  const chartData = [
-    { time: "09:00", price: signal.price - 10 },
-    { time: "10:00", price: signal.price - 5 },
-    { time: "11:00", price: signal.price },
-    { time: "12:00", price: signal.price + 8 },
-    { time: "13:00", price: signal.price + 4 },
-  ];
+  const chartData =
+    Array.isArray(signal.data) && signal.data.length > 0
+      ? signal.data
+      : [
+          { time: "09:00", price: signal.price - 10 },
+          { time: "10:00", price: signal.price - 5 },
+          { time: "11:00", price: signal.price },
+        ];
 
   const getIcon = (rec) => {
     if (rec === "buy") return "📈";
@@ -78,7 +86,7 @@ const SignalDetails = () => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="time" />
             <YAxis domain={["auto", "auto"]} />
-            <Tooltip />
+            <Tooltip formatter={(value) => `SAR ${value}`} />
             <Line
               type="monotone"
               dataKey="price"

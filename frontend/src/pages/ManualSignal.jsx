@@ -7,6 +7,7 @@ const ManualSignal = () => {
     title: "",
     recommendation: "buy",
     price: "",
+    data: [{ time: "", price: "" }],
   });
   const [error, setError] = useState("");
 
@@ -14,11 +15,26 @@ const ManualSignal = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleDataChange = (index, key, value) => {
+    const newData = [...form.data];
+    newData[index][key] = value;
+    setForm({ ...form, data: newData });
+  };
+
+  const addDataPoint = () => {
+    setForm({ ...form, data: [...form.data, { time: "", price: "" }] });
+  };
+
+  const removeDataPoint = (index) => {
+    const newData = form.data.filter((_, i) => i !== index);
+    setForm({ ...form, data: newData });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.title || !form.recommendation || !form.price) {
-      setError("جميع الحقول مطلوبة");
+      setError("جميع الحقول الأساسية مطلوبة");
       return;
     }
 
@@ -77,6 +93,42 @@ const ManualSignal = () => {
           onChange={handleChange}
           className="w-full p-3 rounded border dark:bg-gray-800 dark:text-white"
         />
+
+        <div>
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">📊 بيانات السعر للرسم</h3>
+          {form.data.map((point, index) => (
+            <div key={index} className="flex items-center gap-2 mb-2">
+              <input
+                type="text"
+                placeholder="الوقت (مثل 10:00)"
+                value={point.time}
+                onChange={(e) => handleDataChange(index, "time", e.target.value)}
+                className="flex-1 p-2 border rounded dark:bg-gray-800 dark:text-white"
+              />
+              <input
+                type="number"
+                placeholder="السعر"
+                value={point.price}
+                onChange={(e) => handleDataChange(index, "price", e.target.value)}
+                className="flex-1 p-2 border rounded dark:bg-gray-800 dark:text-white"
+              />
+              <button
+                type="button"
+                onClick={() => removeDataPoint(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                ❌
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addDataPoint}
+            className="text-sm text-blue-600 hover:underline mt-1"
+          >
+            + إضافة نقطة جديدة
+          </button>
+        </div>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
