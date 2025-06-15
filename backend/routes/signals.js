@@ -3,6 +3,8 @@ const express = require("express");
 const router = express.Router();
 const Signal = require("../models/signal");
 
+console.log("✅ ملف signals.js تم تحميله بنجاح");
+
 // ✅ جلب توصية واحدة
 router.get("/:id", async (req, res) => {
   try {
@@ -14,37 +16,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ✅ حفظ الخطوط
-router.put("/:id/lines", async (req, res) => {
-  try {
-    const { lines } = req.body;
-    const signal = await Signal.findByIdAndUpdate(
-      req.params.id,
-      { lines },
-      { new: true }
-    );
-    res.json(signal);
-  } catch (err) {
-    res.status(500).json({ message: "خطأ في حفظ الخطوط" });
-  }
-});
-
-// ✅ حفظ المناطق
-router.put("/:id/zones", async (req, res) => {
-  try {
-    const { zones } = req.body;
-    const signal = await Signal.findByIdAndUpdate(
-      req.params.id,
-      { zones },
-      { new: true }
-    );
-    res.json(signal);
-  } catch (err) {
-    res.status(500).json({ message: "خطأ في حفظ المناطق" });
-  }
-});
-
-// ✅ إدخال توصية تجريبية بدون _id + GET + طباعة تأكيد
+// ✅ seed
 router.get("/seed", async (req, res) => {
   console.log("📌 تم الوصول لمسار /seed");
 
