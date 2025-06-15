@@ -12,10 +12,13 @@ import {
 } from "recharts";
 import CandleChart from "../components/CandleChart";
 
+const tabs = ["المعلومات", "المتوسط المتحرك", "الشموع اليابانية"];
+
 const SignalDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [signal, setSignal] = useState(null);
+  const [activeTab, setActiveTab] = useState("المعلومات");
 
   useEffect(() => {
     const fetchSignal = async () => {
@@ -33,11 +36,10 @@ const SignalDetails = () => {
     fetchSignal();
   }, [id]);
 
-  if (!signal) {
-    return <div className="text-center text-gray-500 p-10">...جاري التحميل</div>;
-  }
+  if (!signal) return <div className="text-center text-gray-500 p-10">...جاري التحميل</div>;
 
-  // ✅ حساب المتوسط المتحرك (SMA)
+  const hasCandleData = Array.isArray(signal.data) && signal.data[0]?.open;
+
   const calculateSMA = (data, period = 3) => {
     const result = [];
     for (let i = 0; i < data.length; i++) {
@@ -55,8 +57,6 @@ const SignalDetails = () => {
       ? calculateSMA(signal.data)
       : [];
 
-  const hasCandleData = Array.isArray(signal.data) && signal.data[0]?.open;
-
   const getIcon = (rec) => {
     if (rec === "buy") return "📈";
     if (rec === "sell") return "📉";
@@ -65,87 +65,80 @@ const SignalDetails = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 shadow rounded-2xl">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white flex items-center gap-2">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center gap-2">
         {getIcon(signal.recommendation)} {signal.title || "عنوان غير متوفر"}
       </h1>
 
-      <div className="mb-4">
-        <span
-          className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${
-            signal.recommendation === "buy"
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {signal.recommendation}
-        </span>
+      {/* 🧭 التبويبات */}
+      <div className="flex space-x-2 rtl:space-x-reverse mb-6">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 rounded ${
+              activeTab === tab
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
-      <div className="text-gray-700 dark:text-gray-200 mb-2">
-        💰 السعر: {signal.price || "غير متوفر"}
-      </div>
-
-      <div className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-        📅 التاريخ: {new Date(signal.createdAt).toLocaleString("ar-EG")}
-      </div>
-
-      {/* 🕯️ الشموع اليابانية */}
-      {hasCandleData && (
-        <>
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
-            🕯️ الرسم البياني بالشموع اليابانية
-          </h3>
-          <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-6">
-            <CandleChart data={signal.data} />
-          </div>
-        </>
+      {/* 📋 تبويب: المعلومات */}
+      {activeTab === "المعلومات" && (
+        <div className="space-y-2 text-gray-700 dark:text-white">
+          <p>💬 <b>نوع التوصية:</b> {signal.recommendation}</p>
+          <p>💰 <b>السعر:</b> {signal.price || "غير متوفر"}</p>
+          <p>🕒 <b>الوقت:</b> {new Date(signal.createdAt).toLocaleString("ar-EG")}</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            ← رجوع
+          </button>
+        </div>
       )}
 
-      {/* 📈 السعر + المتوسط المتحرك */}
-      {chartData.length > 0 && (
-        <>
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
-            📊 السعر مع المتوسط المتحرك
-          </h3>
-          <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis domain={["auto", "auto"]} />
-                <Tooltip formatter={(v) => `SAR ${v}`} />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="close"
-                  name="سعر الإغلاق"
-                  stroke="#3b82f6"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="sma"
-                  name="SMA متوسط متحرك"
-                  stroke="#f59e0b"
-                  strokeWidth={2}
-                  strokeDasharray="5 3"
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </>
+      {/* 📈 تبويب: المتوسط المتحرك */}
+      {activeTab === "المتوسط المتحرك" && chartData.length > 0 && (
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis domain={["auto", "auto"]} />
+              <Tooltip formatter={(v) => `SAR ${v}`} />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="close"
+                name="سعر الإغلاق"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={{ r: 3 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="sma"
+                name="SMA متوسط متحرك"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                strokeDasharray="5 3"
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       )}
 
-      <div className="mt-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
-          ← رجوع
-        </button>
-      </div>
+      {/* 🕯️ تبويب: الشموع اليابانية */}
+      {activeTab === "الشموع اليابانية" && hasCandleData && (
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+          <CandleChart data={signal.data} />
+        </div>
+      )}
     </div>
   );
 };
