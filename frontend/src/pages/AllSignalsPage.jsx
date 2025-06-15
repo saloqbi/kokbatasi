@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     const fetchSignals = async () => {
@@ -21,26 +22,22 @@ const AllSignalsPage = () => {
     fetchSignals();
   }, []);
 
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
-        <span role="img" aria-label="satellite">📡</span> جميع التوصيات
-      </h1>
-      <ul className="list-disc pl-5 space-y-2">
-        {signals.map((signal) => (
-          <li key={signal._id}>
-            <Link
-              to={`/signals/${signal._id}`}
-              className="text-blue-700 hover:underline"
-            >
-              {signal.title || "عنوان غير متوفر"} - 💡{" "}
-              {signal.recommendation || "توصية غير متوفرة"}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+  const filteredSignals =
+    filter === "all"
+      ? signals
+      : signals.filter((signal) => signal.recommendation?.toLowerCase() === filter);
 
-export default AllSignalsPage;
+  return (
+    <div className="p-4 max-w-6xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <span role="img" aria-label="satellite">📡</span> جميع التوصيات
+        </h1>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="border rounded px-3 py-1 text-sm"
+        >
+          <option value="all">الكل</option>
+          <option value="buy">شراء</option>
+          <option value="sell">بيع</option>
