@@ -9,8 +9,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-  ReferenceLine,
-  Label,
 } from "recharts";
 
 const tabs = ["المعلومات", "المتوسط المتحرك", "الرسم البياني", "التحليل الفني"];
@@ -45,6 +43,21 @@ const SignalDetails = () => {
     if (rec === "sell") return "📉";
     return "🔍";
   };
+
+  // حساب SMA بسيط
+  const calculateSMA = (data, period = 3) => {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+      const start = Math.max(0, i - period + 1);
+      const slice = data.slice(start, i + 1);
+      const sum = slice.reduce((acc, d) => acc + Number(d.close || d.price), 0);
+      const avg = sum / slice.length;
+      result.push({ ...data[i], sma: avg });
+    }
+    return result;
+  };
+
+  const chartData = hasChartData ? calculateSMA(signal.data) : [];
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 shadow rounded-2xl">
@@ -82,6 +95,36 @@ const SignalDetails = () => {
         </div>
       )}
 
+      {activeTab === "المتوسط المتحرك" && chartData.length > 0 && (
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis domain={["auto", "auto"]} />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="close"
+                name="سعر الإغلاق"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={{ r: 2 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="sma"
+                name="SMA متوسط متحرك"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
       {activeTab === "الرسم البياني" && hasChartData && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
           <ResponsiveContainer width="100%" height={250}>
@@ -95,9 +138,9 @@ const SignalDetails = () => {
                 type="monotone"
                 dataKey="close"
                 name="سعر الإغلاق"
-                stroke="#3b82f6"
+                stroke="#10b981"
                 strokeWidth={2}
-                dot={{ r: 2 }}
+                dot={{ r: 1 }}
               />
             </LineChart>
           </ResponsiveContainer>
