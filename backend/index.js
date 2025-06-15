@@ -10,21 +10,19 @@ app.use(express.json());
 
 connectDB();
 
+console.log("✅ بدء تحميل index.js");
 
-console.log("✅ يتم تحميل الخادم الآن");
-
+// ✅ تأكد من ربط مسار signals
 try {
   const signalRoutes = require("./routes/signals");
   app.use("/api/signals", signalRoutes);
-  console.log("✅ تم ربط مسار /api/signals");
-} catch (e) {
-  console.error("❌ فشل في تحميل مسار signals:", e.message);
+  console.log("✅ تم ربط /api/signals بنجاح");
+} catch (err) {
+  console.error("❌ فشل في ربط /api/signals:", err);
 }
 
-
-// ✅ هذا السطر هو الأهم
-app.use("/api/signals", require("./routes/signals")); 
-
-
+// ✅ تأكيد تشغيل الخادم
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
+);
