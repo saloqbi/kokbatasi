@@ -13,7 +13,7 @@ const SignalDetailsPage = () => {
           `https://kokbatasi.onrender.com/api/signals/${id}`
         );
         const result = await response.json();
-        setSignal(result.data);
+        setSignal(result); // نعيّن كامل الكائن
       } catch (error) {
         console.error("Error fetching signal details:", error);
       } finally {
