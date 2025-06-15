@@ -1,4 +1,6 @@
 console.log("✅ بدأ تشغيل server.js");
+console.log("📁 المسار الحالي:", __dirname);
+
 const express = require('express');
 require('dotenv').config();
 const mongoose = require('mongoose');
