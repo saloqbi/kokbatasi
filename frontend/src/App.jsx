@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AllSignals from './pages/AllSignals';
 import AllSignalsPage from './pages/AllSignalsPage'; // ✅ استيراد الصفحة المحسّنة
 import SignalDetails from './pages/SignalDetails';
+import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from './pages/AdminDashboard';
 import { SignalProvider } from './context/SignalContext';
 import { ToastContainer } from 'react-toastify';
@@ -15,6 +16,7 @@ const App = () => (
         <Route path="/" element={<AllSignals />} />
         <Route path="/signals" element={<AllSignalsPage />} /> {/* ✅ التوجيه الصحيح */}
         <Route path="/signals/:id" element={<SignalDetails />} />
+	<Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
       <ToastContainer />
