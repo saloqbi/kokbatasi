@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  ComposedChart,
+  Bar,
+  Line,
   Legend,
+  Cell
 } from "recharts";
 
-const tabs = ["المعلومات", "المتوسط المتحرك", "الرسم البياني", "التحليل الفني"];
+const tabs = ["المعلومات", "المتوسط المتحرك", "الرسم البياني", "الشموع اليابانية", "التحليل الفني"];
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -37,6 +39,7 @@ const SignalDetails = () => {
   if (!signal) return <div className="text-center text-gray-500 p-10">...جاري التحميل</div>;
 
   const hasChartData = Array.isArray(signal.data) && signal.data.length > 0;
+  const hasCandleData = hasChartData && signal.data[0]?.open !== undefined;
 
   const getIcon = (rec) => {
     if (rec === "buy") return "📈";
@@ -116,22 +119,8 @@ const SignalDetails = () => {
               <YAxis domain={["auto", "auto"]} />
               <Tooltip />
               <Legend />
-              <Line
-                type="monotone"
-                dataKey="close"
-                name="سعر الإغلاق"
-                stroke="#3b82f6"
-                strokeWidth={2}
-                dot={{ r: 2 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="sma"
-                name="SMA متوسط متحرك"
-                stroke="#f59e0b"
-                strokeWidth={2}
-                dot={false}
-              />
+              <Line type="monotone" dataKey="close" name="سعر الإغلاق" stroke="#3b82f6" strokeWidth={2} dot={{ r: 2 }} />
+              <Line type="monotone" dataKey="sma" name="SMA متوسط متحرك" stroke="#f59e0b" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -146,15 +135,23 @@ const SignalDetails = () => {
               <YAxis domain={["auto", "auto"]} />
               <Tooltip />
               <Legend />
-              <Line
-                type="monotone"
-                dataKey="close"
-                name="سعر الإغلاق"
-                stroke="#10b981"
-                strokeWidth={2}
-                dot={{ r: 1 }}
-              />
+              <Line type="monotone" dataKey="close" name="سعر الإغلاق" stroke="#10b981" strokeWidth={2} dot={{ r: 1 }} />
             </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {activeTab === "الشموع اليابانية" && hasCandleData && (
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+          <ResponsiveContainer width="100%" height={250}>
+            <ComposedChart data={signal.data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis domain={["auto", "auto"]} />
+              <Tooltip />
+              <Bar dataKey="high" fill="#8884d8" />
+              <Bar dataKey="low" fill="#82ca9d" />
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
       )}
