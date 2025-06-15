@@ -4,43 +4,57 @@ import * as d3 from "d3";
 
 const CandlestickChart = ({ symbol }) => {
   const ref = useRef();
-  const API_KEY = "32V0QSYPVZZYK9GR"; // مفتاح Alpha Vantage
+  const API_KEY = "32V0QSYPVZZYK9GR"; // Alpha Vantage API Key
 
   useEffect(() => {
+    if (!symbol) {
+      console.warn("⛔ الرمز غير متوفر (symbol is undefined)");
+      return;
+    }
+
     const fetchData = async () => {
       let candles = [];
 
-      if (symbol.endsWith("USDT")) {
-        // Binance API
-        const binanceSymbol = symbol.toUpperCase();
-        const url = `https://api.binance.com/api/v3/klines?symbol=${binanceSymbol}&interval=1d&limit=30`;
-        const res = await fetch(url);
-        const rawData = await res.json();
+      try {
+        if (symbol.endsWith("USDT")) {
+          // Binance API
+          const binanceSymbol = symbol.toUpperCase();
+          const url = `https://api.binance.com/api/v3/klines?symbol=${binanceSymbol}&interval=1d&limit=30`;
+          const res = await fetch(url);
+          const rawData = await res.json();
 
-        candles = rawData.map(d => ({
-          date: new Date(d[0]),
-          open: +d[1],
-          high: +d[2],
-          low: +d[3],
-          close: +d[4],
-        }));
-      } else {
-        // Alpha Vantage API
-        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
-        const res = await fetch(url);
-        const json = await res.json();
-        const data = json["Time Series (Daily)"];
+          candles = rawData.map(d => ({
+            date: new Date(d[0]),
+            open: +d[1],
+            high: +d[2],
+            low: +d[3],
+            close: +d[4],
+          }));
+        } else {
+          // Alpha Vantage API
+          const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
+          const res = await fetch(url);
+          const json = await res.json();
+          const data = json["Time Series (Daily)"];
 
-        candles = Object.entries(data).slice(0, 30).map(([dateStr, values]) => ({
-          date: new Date(dateStr),
-          open: +values["1. open"],
-          high: +values["2. high"],
-          low: +values["3. low"],
-          close: +values["4. close"],
-        })).reverse();
+          if (!data) {
+            console.warn("⛔ لم يتم العثور على بيانات الشموع لـ Alpha Vantage");
+            return;
+          }
+
+          candles = Object.entries(data).slice(0, 30).map(([dateStr, values]) => ({
+            date: new Date(dateStr),
+            open: +values["1. open"],
+            high: +values["2. high"],
+            low: +values["3. low"],
+            close: +values["4. close"],
+          })).reverse();
+        }
+
+        drawCandles(candles);
+      } catch (error) {
+        console.error("⚠️ فشل في تحميل بيانات الشموع:", error);
       }
-
-      drawCandles(candles);
     };
 
     const drawCandles = (candles) => {
