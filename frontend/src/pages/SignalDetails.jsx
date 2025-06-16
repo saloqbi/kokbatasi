@@ -1,4 +1,4 @@
-// ⚠️ نسخة نهائية محدثة - تشمل Fractal + Elliott Waves Auto + دعم type/action
+// ✅ SignalDetails.jsx - نسخة نهائية مدمجة بالتعديلات الأخيرة
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -62,20 +62,17 @@ const SignalDetails = () => {
         const signalRes = await axios.get(`/api/signals/${id}`);
         const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
 
-        // ✅ دعم type كبديل لـ action إن لم يكن موجود
+        if (!signalData) throw new Error("❌ التوصية غير موجودة أو غير صالحة.");
         signalData.action = signalData.action || signalData.type?.toLowerCase();
 
-        if (!signalData || !signalData.symbol) {
-          throw new Error("❌ لا يوجد رمز صالح للتوصية.");
-        }
+        if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
 
         try {
           const candlesRes = await axios.get(
             `https://kokbatasi.onrender.com/api/candles/${signalData.symbol}`
           );
           signalData.data = candlesRes.data?.data || [];
-        } catch (err) {
-          console.warn("⚠️ فشل جلب بيانات الشموع، استخدام بيانات تجريبية.");
+        } catch {
           signalData.data = fallbackMock;
         }
 
