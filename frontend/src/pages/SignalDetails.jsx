@@ -21,14 +21,13 @@ const SignalDetails = () => {
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
-  // ✅ fallback فيه قمة وقاع لظهور الفراكتلات
   const fallbackMock = [
     { time: "2025-06-10", open: 100, high: 105, low: 95, close: 100 },
     { time: "2025-06-11", open: 101, high: 106, low: 96, close: 102 },
-    { time: "2025-06-12", open: 102, high: 120, low: 100, close: 105 }, // قمة
+    { time: "2025-06-12", open: 102, high: 120, low: 100, close: 105 },
     { time: "2025-06-13", open: 104, high: 107, low: 99, close: 101 },
     { time: "2025-06-14", open: 100, high: 103, low: 94, close: 98 },
-    { time: "2025-06-15", open: 98, high: 101, low: 90, close: 92 },   // قاع
+    { time: "2025-06-15", open: 98, high: 101, low: 90, close: 92 },
     { time: "2025-06-16", open: 93, high: 97, low: 91, close: 96 },
   ];
 
@@ -73,8 +72,15 @@ const SignalDetails = () => {
 
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
 
-        // ✅ إجبار استخدام fallbackMock للتجربة
-        signalData.data = fallbackMock;
+        // ✅ جلب بيانات الشموع من MongoDB أو fallback
+        if (!signalData.data || signalData.data.length === 0) {
+          try {
+            const candlesRes = await axios.get(`${apiBase}/api/candles/${signalData.symbol}`);
+            signalData.data = candlesRes.data?.data || fallbackMock;
+          } catch {
+            signalData.data = fallbackMock;
+          }
+        }
 
         const fractalDetected = detectFractals(signalData.data);
         const waveDetected = detectElliottWaves(fractalDetected);
