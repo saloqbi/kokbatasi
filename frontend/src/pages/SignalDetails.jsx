@@ -1,4 +1,4 @@
-// ✅ SignalDetails.jsx - نسخة نهائية مدمجة بالتعديلات الأخيرة
+// ✅ SignalDetails.jsx - النسخة النهائية تربط مباشرة بـ backend عبر env
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -19,6 +19,8 @@ const SignalDetails = () => {
   const [waves, setWaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
   const fallbackMock = [
     { time: "2025-06-15", open: 100, high: 110, low: 95, close: 105 },
@@ -59,7 +61,7 @@ const SignalDetails = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const signalRes = await axios.get(`/api/signals/${id}`);
+        const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
         const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
 
         if (!signalData) throw new Error("❌ التوصية غير موجودة أو غير صالحة.");
@@ -68,9 +70,7 @@ const SignalDetails = () => {
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
 
         try {
-          const candlesRes = await axios.get(
-            `https://kokbatasi.onrender.com/api/candles/${signalData.symbol}`
-          );
+          const candlesRes = await axios.get(`${apiBase}/api/candles/${signalData.symbol}`);
           signalData.data = candlesRes.data?.data || [];
         } catch {
           signalData.data = fallbackMock;
@@ -98,7 +98,7 @@ const SignalDetails = () => {
   useEffect(() => {
     if (!signal) return;
     const timeout = setTimeout(() => {
-      axios.put(`/api/signals/${id}/drawings`, {
+      axios.put(`${apiBase}/api/signals/${id}/drawings`, {
         lines,
         zones,
         fractals,
@@ -169,3 +169,4 @@ const SignalDetails = () => {
 };
 
 export default SignalDetails;
+
