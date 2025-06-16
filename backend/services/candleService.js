@@ -1,23 +1,10 @@
-// backend/services/candleService.js
 const axios = require("axios");
 
 const ALPHA_API_KEY = process.env.ALPHA_API_KEY;
-const BINANCE_BASE = "https://api.binance.com/api/v3/klines";
 const ALPHA_BASE = "https://www.alphavantage.co/query";
+const BINANCE_BASE = "https://api.binance.com/api/v3/klines";
 
-// Helper to convert Binance response
-function parseBinance(data) {
-  return data.map(([time, open, high, low, close]) => ({
-    time: new Date(time).toISOString(),
-    open: parseFloat(open),
-    high: parseFloat(high),
-    low: parseFloat(low),
-    close: parseFloat(close),
-    volume: 0  // Binance data here lacks volume in the current call, can be extended
-  }));
-}
-
-// Helper to convert Alpha Vantage response
+// ✅ Helper: Convert Alpha Vantage data
 function parseAlpha(data) {
   const timeSeries = data["Time Series (5min)"] || data["Time Series (1min)"] || {};
   return Object.entries(timeSeries).map(([time, ohlc]) => ({
@@ -26,14 +13,26 @@ function parseAlpha(data) {
     high: parseFloat(ohlc["2. high"]),
     low: parseFloat(ohlc["3. low"]),
     close: parseFloat(ohlc["4. close"]),
-    volume: parseFloat(ohlc["5. volume"] || "0") // ✅ إضافة الحجم
+    volume: parseFloat(ohlc["5. volume"] || "0")
   })).reverse();
 }
 
-// Main fetcher function
+// ✅ Helper: Convert Binance data
+function parseBinance(data) {
+  return data.map(([time, open, high, low, close, , , , , volume]) => ({
+    time: new Date(time).toISOString(),
+    open: parseFloat(open),
+    high: parseFloat(high),
+    low: parseFloat(low),
+    close: parseFloat(close),
+    volume: parseFloat(volume || "0")
+  }));
+}
+
+// ✅ Main fetcher
 async function fetchCandles(symbol) {
+  // Try Alpha Vantage first
   try {
-    // Try Alpha Vantage
     const alphaRes = await axios.get(ALPHA_BASE, {
       params: {
         function: "TIME_SERIES_INTRADAY",
@@ -44,7 +43,8 @@ async function fetchCandles(symbol) {
       },
     });
 
-    console.log("🔍 Alpha response keys:", Object.keys(alphaRes.data));
+    console.log("✅ Alpha response keys:", Object.keys(alphaRes.data));
+    console.log("✅ Alpha Time Series count:", Object.keys(alphaRes.data["Time Series (5min)"] || {}).length);
 
     if (
       alphaRes.data &&
@@ -52,12 +52,14 @@ async function fetchCandles(symbol) {
       Object.keys(alphaRes.data["Time Series (5min)"]).length > 0
     ) {
       return { source: "alpha", data: parseAlpha(alphaRes.data) };
+    } else {
+      throw new Error("Alpha response missing time series");
     }
   } catch (err) {
     console.warn("⚠️ Alpha Vantage failed:", err.message);
   }
 
-  // Try Binance fallback
+  // Fallback to Binance
   try {
     const binanceSymbol = symbol.toLowerCase() + "usdt";
     const binanceRes = await axios.get(BINANCE_BASE, {
@@ -67,6 +69,8 @@ async function fetchCandles(symbol) {
         limit: 100,
       },
     });
+
+    console.log("✅ Binance data received:", binanceRes.data.length, "candles");
     return { source: "binance", data: parseBinance(binanceRes.data) };
   } catch (err) {
     console.error("❌ Binance fetch error:", err.message);
@@ -75,4 +79,3 @@ async function fetchCandles(symbol) {
 }
 
 module.exports = { fetchCandles };
-
