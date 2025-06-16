@@ -17,7 +17,7 @@ const DrawingTools = ({
   const height = 400;
   const padding = 40;
 
-  const allPrices = [...fractals.map((p) => p.price), ...waves.map((w) => w.price)];
+  const allPrices = [...fractals.map(p => p.price), ...waves.map(w => w.price)];
   const minPrice = Math.min(...allPrices, 90);
   const maxPrice = Math.max(...allPrices, 120);
 
@@ -34,6 +34,7 @@ const DrawingTools = ({
       viewBox={`0 0 ${width} ${height}`}
       className="mt-6 border rounded bg-gray-50 cursor-crosshair"
     >
+      {/* خطوط */}
       {lines.map((line, idx) => (
         <line
           key={idx}
@@ -46,6 +47,7 @@ const DrawingTools = ({
         />
       ))}
 
+      {/* مناطق الدعم والمقاومة */}
       {zones.map((zone, idx) => (
         <rect
           key={idx}
@@ -58,6 +60,7 @@ const DrawingTools = ({
         />
       ))}
 
+      {/* Fractals */}
       {fractals.map((p, idx) => {
         const x = p.index * 80 + padding;
         const y = priceToY(p.price);
@@ -75,6 +78,7 @@ const DrawingTools = ({
         );
       })}
 
+      {/* Elliott Waves */}
       {waves.length >= 2 &&
         waves.map((wave, i) => {
           if (i === waves.length - 1) return null;
@@ -96,10 +100,12 @@ const DrawingTools = ({
           );
         })}
 
+      {/* Gann Box */}
       {activeTool === "gann-box" && (
         <rect x={150} y={100} width={200} height={150} fill="purple" opacity="0.1" stroke="purple" />
       )}
 
+      {/* Gann Grid */}
       {activeTool === "gann-grid" && (
         Array.from({ length: 5 }).map((_, i) => (
           <g key={i}>
@@ -109,6 +115,7 @@ const DrawingTools = ({
         ))
       )}
 
+      {/* Gann Fan */}
       {activeTool === "gann-fan" && (
         <g>
           {[1, 2, 3].map((ratio, i) => (
@@ -120,6 +127,61 @@ const DrawingTools = ({
               y2={300 - 100 / ratio}
               stroke="brown"
               strokeWidth="1.5"
+            />
+          ))}
+        </g>
+      )}
+
+      {/* Fibonacci Retracement */}
+      {activeTool === "fib-retracement" && (
+        <g>
+          {[0, 0.236, 0.382, 0.5, 0.618, 0.786, 1].map((level, idx) => {
+            const y = 100 + (1 - level) * 200;
+            return (
+              <line
+                key={idx}
+                x1={150}
+                y1={y}
+                x2={350}
+                y2={y}
+                stroke="gold"
+                strokeWidth="1"
+              />
+            );
+          })}
+        </g>
+      )}
+
+      {/* Fibonacci Fan */}
+      {activeTool === "fib-fan" && (
+        <g>
+          {[0.382, 0.5, 0.618].map((ratio, idx) => (
+            <line
+              key={idx}
+              x1={150}
+              y1={300}
+              x2={350}
+              y2={300 - 200 * ratio}
+              stroke="green"
+              strokeWidth="1"
+            />
+          ))}
+        </g>
+      )}
+
+      {/* Fibonacci Time Zones */}
+      {activeTool === "fib-zones" && (
+        <g>
+          {[0, 1, 2, 3, 5, 8, 13].map((fib, idx) => (
+            <line
+              key={idx}
+              x1={150 + fib * 20}
+              y1={0}
+              x2={150 + fib * 20}
+              y2={400}
+              stroke="blue"
+              strokeWidth="1"
+              strokeDasharray="3 2"
             />
           ))}
         </g>
