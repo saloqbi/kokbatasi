@@ -5,7 +5,7 @@ const ToolSelector = () => {
   const { activeTool, setActiveTool } = useContext(ToolContext);
 
   const tools = [
-    { key: 'line', label: '📏 خط الاتجاه' },
+    { key: 'trendline', label: '📏 خط الاتجاه' }, // ✅ التصحيح هنا
     { key: 'zone', label: '📦 منطقة دعم/مقاومة' },
     { key: 'gann-box', label: '🟪 Gann Box' },
     { key: 'gann-grid', label: '🟫 Gann Grid' },
