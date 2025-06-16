@@ -23,7 +23,7 @@ const createSignal = async (req, res) => {
   }
 };
 
-// ✅ توليد توصيات عشوائية (نسخة مدمجة ومحدثة)
+// ✅ توليد توصيات عشوائية (نسخة مدمجة + استجابة خطأ واضحة)
 const generateRandomSignals = async (req, res) => {
   try {
     const randomSignals = [];
@@ -44,10 +44,17 @@ const generateRandomSignals = async (req, res) => {
       randomSignals.push(randomSignal);
     }
 
-    res.status(201).json({ message: "✅ Random signals generated", data: randomSignals });
+    res.status(201).json({
+      message: "✅ Random signals generated",
+      data: randomSignals
+    });
   } catch (error) {
     console.error("❌ Error generating signals:", error.message, error.stack);
-    res.status(500).json({ message: "❌ Failed to generate random signals", error: error.message });
+    res.status(500).json({
+      message: "❌ Failed to generate random signals",
+      error: error.message,
+      stack: error.stack // ✅ طباعة كاملة في الاستجابة
+    });
   }
 };
 
