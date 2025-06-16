@@ -6,7 +6,8 @@ const getSignals = async (req, res) => {
     const signals = await Signal.find();
     res.json(signals);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch signals" });
+    console.error("❌ Error fetching signals:", error.message, error.stack);
+    res.status(500).json({ message: "Failed to fetch signals", error: error.message });
   }
 };
 
@@ -17,21 +18,22 @@ const createSignal = async (req, res) => {
     await newSignal.save();
     res.status(201).json(newSignal);
   } catch (error) {
-    res.status(500).json({ message: "Failed to create signal" });
+    console.error("❌ Error creating signal:", error.message, error.stack);
+    res.status(500).json({ message: "Failed to create signal", error: error.message });
   }
 };
 
-// ✅ توليد توصيات عشوائية (بعد التصحيح)
+// ✅ توليد توصيات عشوائية (نسخة مدمجة ومحدثة)
 const generateRandomSignals = async (req, res) => {
   try {
     const randomSignals = [];
-    const actions = ['buy', 'sell']; // يجب أن تتطابق مع enum في model
+    const actions = ['buy', 'sell'];
     const symbols = ['BTC', 'ETH', 'SP500', 'AAPL', 'TASI'];
 
     for (let i = 0; i < 5; i++) {
       const randomSignal = new Signal({
         symbol: symbols[Math.floor(Math.random() * symbols.length)],
-        action: actions[Math.floor(Math.random() * actions.length)], // ✅ الحقل الصحيح
+        action: actions[Math.floor(Math.random() * actions.length)],
         price: parseFloat((Math.random() * 500).toFixed(2)),
         lines: [],
         zones: [],
@@ -44,12 +46,12 @@ const generateRandomSignals = async (req, res) => {
 
     res.status(201).json({ message: "✅ Random signals generated", data: randomSignals });
   } catch (error) {
-    console.error("❌ Error generating signals:", error);
-    res.status(500).json({ message: "❌ Failed to generate random signals" });
+    console.error("❌ Error generating signals:", error.message, error.stack);
+    res.status(500).json({ message: "❌ Failed to generate random signals", error: error.message });
   }
 };
 
-// ✅ تحديث أدوات الرسم (خطوط، مناطق، فراكتل، موجات إليوت)
+// ✅ تحديث أدوات الرسم
 const updateSignalDrawings = async (req, res) => {
   try {
     const { lines, zones, fractals, waves } = req.body;
@@ -61,7 +63,8 @@ const updateSignalDrawings = async (req, res) => {
     if (!signal) return res.status(404).json({ message: "Signal not found" });
     res.json(signal);
   } catch (error) {
-    res.status(500).json({ message: "Failed to update signal drawings" });
+    console.error("❌ Error updating drawings:", error.message, error.stack);
+    res.status(500).json({ message: "Failed to update signal drawings", error: error.message });
   }
 };
 
