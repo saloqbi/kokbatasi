@@ -7,6 +7,10 @@ const Tabs = ({ tabs, selected, onChange }) => {
     } else {
       console.error("❌ onChange is not a function:", onChange);
     }
+console.log("🔍 handleClick tab =", tab);
+console.log("🔍 typeof onChange =", typeof onChange);
+console.log("🔍 selected =", selected);
+
   };
 
   return (
