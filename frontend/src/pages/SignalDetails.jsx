@@ -1,4 +1,3 @@
-// ✅ SignalDetails.jsx - النسخة النهائية تربط مباشرة بـ backend عبر env
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -69,11 +68,16 @@ const SignalDetails = () => {
 
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
 
-        try {
-          const candlesRes = await axios.get(`${apiBase}/api/candles/${signalData.symbol}`);
-          signalData.data = candlesRes.data?.data || [];
-        } catch {
-          signalData.data = fallbackMock;
+        // ✅ استخدم البيانات الموجودة إن توفرت
+        if (signalData.data?.length > 0) {
+          console.log("📊 Using embedded signal data");
+        } else {
+          try {
+            const candlesRes = await axios.get(`${apiBase}/api/candles/${signalData.symbol}`);
+            signalData.data = candlesRes.data?.data || fallbackMock;
+          } catch {
+            signalData.data = fallbackMock;
+          }
         }
 
         const fractalDetected = detectFractals(signalData.data);
@@ -169,4 +173,3 @@ const SignalDetails = () => {
 };
 
 export default SignalDetails;
-
