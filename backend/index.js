@@ -19,5 +19,8 @@ db.once("open", () => {
 });
 
 app.use("/api/signals", signalsRoutes);
+const candleRoutes = require('./routes/candles');
+app.use('/api/candles', candleRoutes);
+
 
 module.exports = app;
