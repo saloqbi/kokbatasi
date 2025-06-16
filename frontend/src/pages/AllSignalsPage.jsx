@@ -27,12 +27,17 @@ const AllSignalsPage = () => {
   const filteredSignals =
     filter === "all"
       ? signals
-      : signals.filter((signal) => signal.recommendation?.toLowerCase() === filter);
+      : signals.filter((signal) => {
+          const rec = signal.recommendation?.toLowerCase();
+          if (filter === "buy") return rec === "buy" || rec === "شراء";
+          if (filter === "sell") return rec === "sell" || rec === "بيع";
+          return true;
+        });
 
   const getIcon = (rec) => {
     const type = rec?.toLowerCase();
-    if (type === "buy") return "⬆️";
-    if (type === "sell") return "⬇️";
+    if (type === "buy" || type === "شراء") return "⬆️";
+    if (type === "sell" || type === "بيع") return "⬇️";
     return "🔍";
   };
 
@@ -55,7 +60,7 @@ const AllSignalsPage = () => {
 
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredSignals
-          .filter((signal) => signal.symbol) // ✅ لا تعرض إلا من لديه symbol
+          .filter((signal) => signal.symbol)
           .map((signal) => (
             <Link
               key={signal._id}
@@ -68,9 +73,9 @@ const AllSignalsPage = () => {
                 </h2>
                 <span
                   className={`text-xs font-bold px-2 py-1 rounded-full ${
-                    signal.recommendation?.toLowerCase() === "buy"
+                    signal.recommendation?.toLowerCase() === "buy" || signal.recommendation?.toLowerCase() === "شراء"
                       ? "bg-green-100 text-green-700"
-                      : signal.recommendation?.toLowerCase() === "sell"
+                      : signal.recommendation?.toLowerCase() === "sell" || signal.recommendation?.toLowerCase() === "بيع"
                       ? "bg-red-100 text-red-700"
                       : "bg-gray-200 text-gray-800"
                   }`}
