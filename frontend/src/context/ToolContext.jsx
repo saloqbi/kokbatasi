@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext } from 'react';
 
 const ToolContext = createContext();
@@ -30,3 +29,4 @@ export const ToolProvider = ({ children }) => {
 };
 
 export const useToolContext = () => useContext(ToolContext);
+export { ToolContext }; // ✅ هذا هو السطر الذي كان ناقصًا
