@@ -1,28 +1,43 @@
-
-import React from 'react';
-import TrendlineTool from './TrendlineTool';
-import FibonacciTool from './FibonacciTool';
-import GannTool from './GannTool';
-import FractalTool from './FractalTool';
-import ElliottWaveTool from './ElliottWaveTool';
-import ICTTool from './ICTTool';
-import SupportResistanceTool from './SupportResistanceTool';
-import ChannelTool from './ChannelTool';
-import WyckoffTool from './WyckoffTool';
+import React, { useContext } from 'react';
+import { ToolContext } from '../context/ToolContext';
 
 const ToolSelector = () => {
+  const { activeTool, setActiveTool } = useContext(ToolContext);
+
+  const tools = [
+    { key: 'line', label: '📏 خط الاتجاه' },
+    { key: 'zone', label: '📦 منطقة دعم/مقاومة' },
+    { key: 'gann-box', label: '🟪 Gann Box' },
+    { key: 'gann-grid', label: '🟫 Gann Grid' },
+    { key: 'gann-fan', label: '🟤 Gann Fan' },
+    { key: 'fib-retracement', label: '🟡 Fibonacci Retracement' },
+    { key: 'fib-fan', label: '🟢 Fibonacci Fan' },
+    { key: 'fib-zones', label: '🔵 Fibonacci Time Zones' },
+    { key: 'fractal', label: '🌀 Fractal Tool' },
+    { key: 'elliott', label: '🌊 Elliott Waves' },
+    { key: 'ict', label: '🔍 ICT Tool' },
+    { key: 'channel', label: '📊 Channel Tool' },
+    { key: 'wyckoff', label: '📚 Wyckoff Tool' },
+  ];
+
   return (
     <div className="p-4 border rounded mt-4">
       <h3 className="text-lg font-semibold mb-2">🧰 أدوات التحليل الفني:</h3>
-      <TrendlineTool />
-      <FibonacciTool />
-      <GannTool />
-      <FractalTool />
-      <ElliottWaveTool />
-      <ICTTool />
-      <SupportResistanceTool />
-      <ChannelTool />
-      <WyckoffTool />
+      <div className="flex flex-wrap gap-2">
+        {tools.map((tool) => (
+          <button
+            key={tool.key}
+            onClick={() => setActiveTool(tool.key)}
+            className={`px-3 py-1 rounded border text-sm ${
+              activeTool === tool.key
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-800'
+            }`}
+          >
+            {tool.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

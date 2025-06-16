@@ -34,18 +34,17 @@ const DrawingTools = ({
       viewBox={`0 0 ${width} ${height}`}
       className="mt-6 border rounded bg-gray-50 cursor-crosshair"
     >
-      {/* خطوط */}
-      {lines.map((line, idx) => (
+      {/* خطوط الاتجاه (Trendline ثابتة حالياً) */}
+      {activeTool === "trendline" && (
         <line
-          key={idx}
-          x1={line.x1}
-          y1={line.y1}
-          x2={line.x2}
-          y2={line.y2}
+          x1={100}
+          y1={100}
+          x2={300}
+          y2={200}
           stroke="blue"
           strokeWidth="2"
         />
-      ))}
+      )}
 
       {/* مناطق الدعم والمقاومة */}
       {zones.map((zone, idx) => (
@@ -132,56 +131,28 @@ const DrawingTools = ({
         </g>
       )}
 
-      {/* Fibonacci Retracement */}
-      {activeTool === "fib-retracement" && (
+      {/* Gann Circle */}
+      {activeTool === "gann-circle" && (
         <g>
-          {[0, 0.236, 0.382, 0.5, 0.618, 0.786, 1].map((level, idx) => {
-            const y = 100 + (1 - level) * 200;
-            return (
-              <line
-                key={idx}
-                x1={150}
-                y1={y}
-                x2={350}
-                y2={y}
-                stroke="gold"
-                strokeWidth="1"
-              />
-            );
-          })}
-        </g>
-      )}
-
-      {/* Fibonacci Fan */}
-      {activeTool === "fib-fan" && (
-        <g>
-          {[0.382, 0.5, 0.618].map((ratio, idx) => (
-            <line
-              key={idx}
-              x1={150}
-              y1={300}
-              x2={350}
-              y2={300 - 200 * ratio}
-              stroke="green"
-              strokeWidth="1"
-            />
+          {[40, 80, 120, 160].map((r, i) => (
+            <circle key={i} cx={400} cy={200} r={r} stroke="purple" strokeWidth="1.5" fill="none" strokeDasharray="4 2" />
           ))}
         </g>
       )}
 
-      {/* Fibonacci Time Zones */}
-      {activeTool === "fib-zones" && (
-        <g>
-          {[0, 1, 2, 3, 5, 8, 13].map((fib, idx) => (
-            <line
-              key={idx}
-              x1={150 + fib * 20}
-              y1={0}
-              x2={150 + fib * 20}
-              y2={400}
-              stroke="blue"
+      {/* Gann Square of 9 */}
+      {activeTool === "gann-square" && (
+        <g transform="rotate(45 400 200)">
+          {[40, 80, 120, 160].map((size, i) => (
+            <rect
+              key={i}
+              x={400 - size / 2}
+              y={200 - size / 2}
+              width={size}
+              height={size}
+              fill="none"
+              stroke="green"
               strokeWidth="1"
-              strokeDasharray="3 2"
             />
           ))}
         </g>
