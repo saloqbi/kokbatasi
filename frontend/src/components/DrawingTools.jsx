@@ -1,150 +1,129 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 
 const DrawingTools = ({
   lines,
   zones,
-  fractals = [],
-  waves = [],
+  fractals,
+  waves,
   onLinesChange,
   onZonesChange,
   onFractalsChange,
-  onWavesChange
+  onWavesChange,
 }) => {
-  const svgRef = useRef(null);
-  const [viewBox, setViewBox] = useState({ x: 0, y: 0, w: 800, h: 400 });
-  const [drag, setDrag] = useState(null);
+  const svgRef = useRef();
+  const viewBox = { x: 0, y: 0, w: 800, h: 400 };
 
-  // ✅ Zoom بعجلة الفأرة
   const handleWheel = (e) => {
     e.preventDefault();
-    const scale = e.deltaY > 0 ? 1.1 : 0.9;
-    const newW = viewBox.w * scale;
-    const newH = viewBox.h * scale;
-    setViewBox({
-      ...viewBox,
-      w: newW,
-      h: newH
-    });
+    // يمكن لاحقًا تنفيذ Zoom
   };
 
-  // ✅ Pan بالفأرة
-  const handleMouseDown = (e) => {
-    setDrag({ x: e.clientX, y: e.clientY, viewBoxX: viewBox.x, viewBoxY: viewBox.y });
-  };
-
-  const handleMouseMove = (e) => {
-    if (!drag) return;
-    const dx = (e.clientX - drag.x) * (viewBox.w / 800);
-    const dy = (e.clientY - drag.y) * (viewBox.h / 400);
-    setViewBox({
-      ...viewBox,
-      x: drag.viewBoxX - dx,
-      y: drag.viewBoxY - dy
-    });
-  };
-
-  const handleMouseUp = () => {
-    setDrag(null);
-  };
+  const handleMouseDown = () => {};
+  const handleMouseMove = () => {};
+  const handleMouseUp = () => {};
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-2">✍️ أدوات الرسم</h3>
-      <p>🛠 دعم Zoom وPan عبر عجلة وسحب الفأرة</p>
+    <svg
+      ref={svgRef}
+      width="100%"
+      height="400"
+      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
+      onWheel={handleWheel}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      className="mt-6 border rounded bg-gray-50 cursor-grab"
+    >
+      {/* الخطوط */}
+      {lines.map((line, idx) => {
+        if (
+          [line.x1, line.y1, line.x2, line.y2].some((v) => isNaN(v))
+        )
+          return null;
+        return (
+          <line
+            key={idx}
+            x1={line.x1}
+            y1={line.y1}
+            x2={line.x2}
+            y2={line.y2}
+            stroke="blue"
+            strokeWidth="2"
+          />
+        );
+      })}
 
-      <div className="space-y-2 mt-4">
-        <button
-          className="bg-blue-500 text-white px-4 py-1 rounded"
-          onClick={() => {
-            const newLine = { x1: 0, y1: 0, x2: 100, y2: 100 };
-            onLinesChange([...lines, newLine]);
-          }}
-        >
-          ➕ إضافة خط افتراضي
-        </button>
+      {/* مناطق الدعم والمقاومة */}
+      {zones.map((zone, idx) => {
+        if (
+          [zone.x, zone.y, zone.width, zone.height].some((v) => isNaN(v))
+        )
+          return null;
+        return (
+          <rect
+            key={idx}
+            x={zone.x}
+            y={zone.y}
+            width={zone.width}
+            height={zone.height}
+            fill="orange"
+            opacity="0.2"
+          />
+        );
+      })}
 
-        <button
-          className="bg-green-500 text-white px-4 py-1 ml-2 rounded"
-          onClick={() => {
-            const newZone = { x: 0, y: 0, width: 100, height: 20 };
-            onZonesChange([...zones, newZone]);
-          }}
-        >
-          ➕ إضافة منطقة دعم
-        </button>
-
-        <button
-          className="bg-purple-500 text-white px-4 py-1 ml-2 rounded"
-          onClick={() => {
-            const newFractal = { x: 50, y: 50, direction: "up" };
-            onFractalsChange([...fractals, newFractal]);
-          }}
-        >
-          ➕ إضافة فراكتل
-        </button>
-
-        <button
-          className="bg-pink-500 text-white px-4 py-1 ml-2 rounded"
-          onClick={() => {
-            const newWave = { points: [0, 0, 50, 50, 100, 20], label: "1" };
-            onWavesChange([...waves, newWave]);
-          }}
-        >
-          ➕ إضافة موجة إليوت
-        </button>
-      </div>
-
-      {/* ✅ SVG مع دعم Zoom وPan */}
-      <svg
-        ref={svgRef}
-        width="100%"
-        height="400"
-        viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
-        onWheel={handleWheel}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        className="mt-6 border rounded bg-gray-50 cursor-grab"
-      >
-        {/* Fractals */}
-        {fractals.map((p, idx) => (
+      {/* Fractals */}
+      {fractals.map((p, idx) => {
+        const x = p.index * 10;
+        const y = p.type === "top" ? 40 : 380;
+        if (isNaN(x) || isNaN(y)) return null;
+        return (
           <text
             key={idx}
-            x={p.index * 10}
-            y={p.type === "top" ? 40 : 380}
+            x={x}
+            y={y}
             fontSize="16"
             fill={p.type === "top" ? "red" : "blue"}
           >
             {p.type === "top" ? "⬆️" : "⬇️"}
           </text>
-        ))}
+        );
+      })}
 
-        {/* Elliott Waves */}
-        {waves.length >= 2 &&
-          waves.map((wave, i) => {
-            if (i === waves.length - 1) return null;
-            const p1 = waves[i];
-            const p2 = waves[i + 1];
-            return (
-              <g key={i}>
-                <line
-                  x1={p1.index * 10}
-                  y1={400 - p1.price}
-                  x2={p2.index * 10}
-                  y2={400 - p2.price}
-                  stroke="green"
-                  strokeWidth="2"
-                />
-                <text x={p1.index * 10} y={400 - p1.price - 10} fontSize="12" fill="black">
+      {/* Elliott Waves */}
+      {waves.length >= 2 &&
+        waves.map((wave, i) => {
+          if (i === waves.length - 1) return null;
+          const p1 = waves[i];
+          const p2 = waves[i + 1];
+
+          const x1 = p1.index * 10;
+          const y1 = 400 - p1.price;
+          const x2 = p2.index * 10;
+          const y2 = 400 - p2.price;
+
+          if ([x1, y1, x2, y2].some((v) => isNaN(v))) return null;
+
+          return (
+            <g key={i}>
+              <line
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="green"
+                strokeWidth="2"
+              />
+              {!isNaN(p1.index) && !isNaN(p1.price) && (
+                <text x={x1} y={y1 - 10} fontSize="12" fill="black">
                   {p1.label}
                 </text>
-              </g>
-            );
-          })}
-      </svg>
-    </div>
+              )}
+            </g>
+          );
+        })}
+    </svg>
   );
 };
 
 export default DrawingTools;
-//
