@@ -68,7 +68,6 @@ const SignalDetails = () => {
 
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
 
-        // ✅ استخدم البيانات الموجودة إن توفرت
         if (signalData.data?.length > 0) {
           console.log("📊 Using embedded signal data");
         } else {
@@ -122,11 +121,6 @@ const SignalDetails = () => {
         <h2 className="text-xl font-bold text-center">
           تفاصيل التوصية: {signal.symbol || "?"} ({signal.action || "?"})
         </h2>
-
-        <div className="bg-gray-100 p-3 text-sm rounded border">
-          <strong>🛠 محتوى التوصية (Debug):</strong>
-          <pre>{JSON.stringify(signal, null, 2)}</pre>
-        </div>
 
         <Tabs
           tabs={[
