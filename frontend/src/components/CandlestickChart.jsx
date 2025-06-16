@@ -1,65 +1,16 @@
-
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const CandlestickChart = ({ symbol }) => {
+const CandlestickChart = ({ symbol, data }) => {
   const ref = useRef();
   const API_KEY = "32V0QSYPVZZYK9GR"; // Alpha Vantage API Key
 
   useEffect(() => {
-    if (!symbol) {
-      console.warn("⛔ الرمز غير متوفر (symbol is undefined)");
-      return;
-    }
-
-    const fetchData = async () => {
-      let candles = [];
-
-      try {
-        if (symbol.endsWith("USDT")) {
-          // Binance API
-          const binanceSymbol = symbol.toUpperCase();
-          const url = `https://api.binance.com/api/v3/klines?symbol=${binanceSymbol}&interval=1d&limit=30`;
-          const res = await fetch(url);
-          const rawData = await res.json();
-
-          candles = rawData.map(d => ({
-            date: new Date(d[0]),
-            open: +d[1],
-            high: +d[2],
-            low: +d[3],
-            close: +d[4],
-          }));
-        } else {
-          // Alpha Vantage API
-          const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
-          const res = await fetch(url);
-          const json = await res.json();
-          const data = json["Time Series (Daily)"];
-
-          if (!data) {
-            console.warn("⛔ لم يتم العثور على بيانات الشموع لـ Alpha Vantage");
-            return;
-          }
-
-          candles = Object.entries(data).slice(0, 30).map(([dateStr, values]) => ({
-            date: new Date(dateStr),
-            open: +values["1. open"],
-            high: +values["2. high"],
-            low: +values["3. low"],
-            close: +values["4. close"],
-          })).reverse();
-        }
-
-        drawCandles(candles);
-      } catch (error) {
-        console.error("⚠️ فشل في تحميل بيانات الشموع:", error);
-      }
-    };
+    const svg = d3.select(ref.current);
+    svg.selectAll("*").remove();
 
     const drawCandles = (candles) => {
-      const svg = d3.select(ref.current);
-      svg.selectAll("*").remove();
+      if (!candles || candles.length === 0) return;
 
       const width = 600;
       const height = 300;
@@ -80,11 +31,11 @@ const CandlestickChart = ({ symbol }) => {
       svg.attr("width", width).attr("height", height);
 
       svg.append("g")
-        .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%d")));
 
       svg.append("g")
-        .attr("transform", "translate(" + margin.left + ",0)")
+        .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
 
       svg.selectAll(".candle")
@@ -108,8 +59,66 @@ const CandlestickChart = ({ symbol }) => {
         .attr("stroke", "black");
     };
 
+    // ✅ إذا البيانات متوفرة من props → استخدمها مباشرة
+    if (data && data.length > 0) {
+      const formatted = data.map(d => ({
+        date: new Date(d.time || d.date),
+        open: +d.open,
+        high: +d.high,
+        low: +d.low,
+        close: +d.close,
+      }));
+      drawCandles(formatted);
+      return;
+    }
+
+    // ❌ إذا لم تتوفر البيانات → جلبها من API حسب الرمز
+    if (!symbol) {
+      console.warn("⛔ لا يوجد symbol لطلب البيانات.");
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        let candles = [];
+
+        if (symbol.endsWith("USDT")) {
+          const url = `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=1d&limit=30`;
+          const res = await fetch(url);
+          const raw = await res.json();
+          candles = raw.map(d => ({
+            date: new Date(d[0]),
+            open: +d[1],
+            high: +d[2],
+            low: +d[3],
+            close: +d[4],
+          }));
+        } else {
+          const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
+          const res = await fetch(url);
+          const json = await res.json();
+          const data = json["Time Series (Daily)"];
+          if (!data) {
+            console.warn("⛔ Alpha Vantage لم يرجع بيانات.");
+            return;
+          }
+          candles = Object.entries(data).slice(0, 30).map(([dateStr, v]) => ({
+            date: new Date(dateStr),
+            open: +v["1. open"],
+            high: +v["2. high"],
+            low: +v["3. low"],
+            close: +v["4. close"],
+          })).reverse();
+        }
+
+        drawCandles(candles);
+      } catch (err) {
+        console.error("⚠️ خطأ في جلب بيانات الشموع:", err);
+      }
+    };
+
     fetchData();
-  }, [symbol]);
+  }, [symbol, data]);
 
   return <svg ref={ref}></svg>;
 };
