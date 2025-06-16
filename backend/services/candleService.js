@@ -41,6 +41,8 @@ async function fetchCandles(symbol) {
         apikey: ALPHA_API_KEY,
       },
     });
+    console.log("🔍 Alpha response:", alphaRes.data);
+
     if (alphaRes.data && alphaRes.data["Time Series (5min)"]) {
       return { source: "alpha", data: parseAlpha(alphaRes.data) };
     }
@@ -62,6 +64,8 @@ async function fetchCandles(symbol) {
     console.error("Binance fetch error:", err.message);
     throw new Error("Failed to fetch candlestick data from all sources.");
   }
+
+
 }
 
 module.exports = { fetchCandles };
