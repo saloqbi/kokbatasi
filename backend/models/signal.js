@@ -3,21 +3,21 @@ const mongoose = require("mongoose");
 const SignalSchema = new mongoose.Schema({
   symbol: { type: String, required: true },
   action: { type: String, enum: ["buy", "sell", "neutral"], required: true },
-  price: { type: Number }, // ✅ تم إضافته
+  price: { type: Number },
   lines: [
     { x1: Number, y1: Number, x2: Number, y2: Number }
   ],
   zones: [
     { x: Number, y: Number, width: Number, height: Number }
   ],
-  fractals: [ // ✅ نقاط فراكتل
+  fractals: [
     {
       index: Number,
       type: { type: String }, // "top" أو "bottom"
       price: Number
     }
   ],
-  waves: [ // ✅ موجات إليوت
+  waves: [
     {
       label: String,
       index: Number,
@@ -27,4 +27,5 @@ const SignalSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 }, { collection: "signals" });
 
-module.exports = mongoose.model("Signal", SignalSchema);
+// ✅ السطر الصحيح لتجنب الخطأ في Render أو أثناء hot reload
+module.exports = mongoose.models.Signal || mongoose.model("Signal", SignalSchema);
