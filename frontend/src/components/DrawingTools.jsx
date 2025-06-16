@@ -40,48 +40,48 @@ const DrawingTools = ({
       )}
 
       {/* Support/Resistance Zones */}
-      {activeTool === "zone" && zones.map((zone, idx) => (
-        <rect
-          key={idx}
-          x={zone.x}
-          y={zone.y}
-          width={zone.width}
-          height={zone.height}
-          fill="orange"
-          opacity="0.2"
-        />
-      ))}
+      {activeTool === "zone" &&
+        zones.map((zone, idx) => (
+          <rect
+            key={idx}
+            x={zone.x}
+            y={zone.y}
+            width={zone.width}
+            height={zone.height}
+            fill="orange"
+            opacity="0.2"
+          />
+        ))}
 
       {/* Fractals */}
-      {fractals.map((p, idx) => {
-        const x = p.index * 80 + padding;
-        const y = priceToY(p.price);
-        return (
-          <text
-            key={idx}
-            x={x}
-            y={p.type === "top" ? y - 10 : y + 15}
-            fontSize="18"
-            fill={p.type === "top" ? "red" : "blue"}
-            textAnchor="middle"
-          >
-            {p.type === "top" ? "⬆️" : "⬇️"}
-          </text>
-        );
-      })}
+      {activeTool === "fractal" &&
+        fractals.map((p, idx) => {
+          const x = p.index * 80 + padding;
+          const y = priceToY(p.price);
+          return (
+            <text
+              key={idx}
+              x={x}
+              y={p.type === "top" ? y - 10 : y + 15}
+              fontSize="18"
+              fill={p.type === "top" ? "red" : "blue"}
+              textAnchor="middle"
+            >
+              {p.type === "top" ? "⬆️" : "⬇️"}
+            </text>
+          );
+        })}
 
       {/* Elliott Waves */}
-      {waves.length >= 2 &&
+      {activeTool === "elliott" && waves.length >= 2 &&
         waves.map((wave, i) => {
           if (i === waves.length - 1) return null;
           const p1 = waves[i];
           const p2 = waves[i + 1];
-
           const x1 = p1.index * 80 + padding;
           const y1 = priceToY(p1.price);
           const x2 = p2.index * 80 + padding;
           const y2 = priceToY(p2.price);
-
           return (
             <g key={i}>
               <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="green" strokeWidth="2" />
@@ -92,7 +92,7 @@ const DrawingTools = ({
           );
         })}
 
-      {/* Gann Tools */}
+      {/* أدوات Gann */}
       {activeTool === "gann-box" && (
         <rect x={150} y={100} width={200} height={150} fill="purple" opacity="0.1" stroke="purple" />
       )}
@@ -146,12 +146,11 @@ const DrawingTools = ({
         </g>
       )}
 
-      {/* Fibonacci Retracement */}
+      {/* أدوات Fibonacci */}
       {activeTool === "fib-retracement" && (
         <line x1={100} y1={100} x2={300} y2={200} stroke="gold" strokeWidth="2" />
       )}
 
-      {/* Fibonacci Fan */}
       {activeTool === "fib-fan" && (
         <g>
           {[1, 2, 3].map((ratio, i) => (
@@ -168,7 +167,6 @@ const DrawingTools = ({
         </g>
       )}
 
-      {/* Fibonacci Time Zones */}
       {activeTool === "fib-zones" && (
         <g>
           {[0, 1, 2, 3, 5, 8, 13].map((step, i) => (
@@ -186,19 +184,17 @@ const DrawingTools = ({
         </g>
       )}
 
-      {/* ICT Tool */}
+      {/* أدوات إضافية */}
       {activeTool === "ict" && (
         <text x={200} y={250} fontSize="20">🔍 ICT Tool</text>
       )}
 
-      {/* Channel Tool */}
       {activeTool === "channel" && (
         <g>
           <rect x={150} y={150} width={300} height={80} fill="none" stroke="teal" strokeDasharray="4 2" />
         </g>
       )}
 
-      {/* Wyckoff Tool */}
       {activeTool === "wyckoff" && (
         <text x={300} y={280} fontSize="18">📚 Wyckoff Zone</text>
       )}
