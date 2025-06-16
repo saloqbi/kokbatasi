@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -54,7 +55,7 @@ const AllSignalsPage = () => {
 
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredSignals
-          .filter((signal) => signal.symbol) // ✅ لا تعرض إلا من لديه رمز
+          .filter((signal) => signal.symbol) // ✅ لا تعرض إلا من لديه symbol
           .map((signal) => (
             <Link
               key={signal._id}
