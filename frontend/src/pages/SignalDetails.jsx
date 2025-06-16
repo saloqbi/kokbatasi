@@ -82,6 +82,9 @@ const SignalDetails = () => {
         const fractalDetected = detectFractals(signalData.data);
         const waveDetected = detectElliottWaves(fractalDetected);
 
+        console.log("🌀 Fractals:", fractalDetected);
+        console.log("🌊 Elliott Waves:", waveDetected);
+
         setSignal(signalData);
         setLines(signalData.lines || []);
         setZones(signalData.zones || []);
@@ -149,16 +152,21 @@ const SignalDetails = () => {
           )}
 
           {selectedTab === "draw" && (
-            <DrawingTools
-              lines={lines}
-              zones={zones}
-              fractals={fractals}
-              waves={waves}
-              onLinesChange={setLines}
-              onZonesChange={setZones}
-              onFractalsChange={setFractals}
-              onWavesChange={setWaves}
-            />
+            <>
+              <div className="mb-2 text-sm text-gray-700">
+                🌀 عدد الفراكتلات: {fractals.length} | 🌊 عدد موجات إليوت: {waves.length}
+              </div>
+              <DrawingTools
+                lines={lines}
+                zones={zones}
+                fractals={fractals}
+                waves={waves}
+                onLinesChange={setLines}
+                onZonesChange={setZones}
+                onFractalsChange={setFractals}
+                onWavesChange={setWaves}
+              />
+            </>
           )}
         </div>
       </div>
