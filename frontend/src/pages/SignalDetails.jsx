@@ -18,23 +18,32 @@ const SignalDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fallbackMock = [
+    { time: "2025-06-15", open: 100, high: 110, low: 95, close: 105 },
+    { time: "2025-06-16", open: 105, high: 115, low: 100, close: 108 },
+    { time: "2025-06-17", open: 108, high: 112, low: 104, close: 110 },
+  ];
+
   useEffect(() => {
     const fetchAll = async () => {
       try {
         const signalRes = await axios.get(`/api/signals/${id}`);
         const signalData = signalRes.data;
 
-        // جلب بيانات الشموع من API خارجي (VPS أو ngrok)
-        try {
-          const candlesRes = await axios.get(`https://kokbatasi.onrender.com/api/candles/${signalData.symbol}`);
-          signalData.data = candlesRes.data?.data || [];
-        } catch (err) {
-          console.warn("⚠️ فشل جلب بيانات الشموع، سيتم استخدام بيانات تجريبية.");
-          signalData.data = [
-            { time: "2025-06-15T00:00:00Z", open: 100, high: 110, low: 95, close: 105, volume: 12345 },
-            { time: "2025-06-15T01:00:00Z", open: 105, high: 115, low: 100, close: 108, volume: 23456 },
-            { time: "2025-06-15T02:00:00Z", open: 108, high: 112, low: 104, close: 110, volume: 34567 }
-          ];
+        // ✅ تحقق من وجود symbol قبل جلب البيانات
+        if (signalData.symbol) {
+          try {
+            const candlesRes = await axios.get(
+              `https://kokbatasi.onrender.com/api/candles/${signalData.symbol}`
+            );
+            signalData.data = candlesRes.data?.data || [];
+          } catch (err) {
+            console.warn("⚠️ فشل جلب بيانات الشموع، سيتم استخدام بيانات تجريبية.");
+            signalData.data = fallbackMock;
+          }
+        } else {
+          console.warn("⚠️ لا يوجد symbol في التوصية.");
+          signalData.data = fallbackMock;
         }
 
         setSignal(signalData);
