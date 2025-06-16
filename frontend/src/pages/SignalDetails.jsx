@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -28,8 +27,6 @@ const SignalDetails = () => {
     const fetchAll = async () => {
       try {
         const signalRes = await axios.get(`/api/signals/${id}`);
-
-        // تحقق أن الاستجابة فعلاً JSON
         const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
 
         if (!signalData || !signalData.symbol) {
