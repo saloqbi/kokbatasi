@@ -34,7 +34,7 @@ const AllSignalsPage = () => {
   const filteredSignals =
     filter === "all"
       ? signals
-      : signals.filter((signal) => normalize(signal.recommendation) === normalize(filter));
+      : signals.filter((signal) => normalize(signal.action || signal.recommendation) === normalize(filter));
 
   const getIcon = (rec) => {
     const norm = normalize(rec);
@@ -71,18 +71,18 @@ const AllSignalsPage = () => {
             >
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold truncate text-gray-800 dark:text-white">
-                  {getIcon(signal.recommendation)} {signal.title || "عنوان غير متوفر"}
+                  {getIcon(signal.action)} {signal.symbol}
                 </h2>
                 <span
                   className={`text-xs font-bold px-2 py-1 rounded-full ${
-                    normalize(signal.recommendation) === "buy"
+                    normalize(signal.action) === "buy"
                       ? "bg-green-100 text-green-700"
-                      : normalize(signal.recommendation) === "sell"
+                      : normalize(signal.action) === "sell"
                       ? "bg-red-100 text-red-700"
                       : "bg-gray-200 text-gray-800"
                   }`}
                 >
-                  {signal.recommendation || "غير محددة"}
+                  {signal.action || "غير محددة"}
                 </span>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">
