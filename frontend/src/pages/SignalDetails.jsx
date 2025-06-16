@@ -24,7 +24,7 @@ const SignalDetails = () => {
         const signalRes = await axios.get(`/api/signals/${id}`);
         const signalData = signalRes.data;
 
-        const candlesRes = await axios.get(`/api/candles/${signalData.symbol}`);
+        const candlesRes = await axios.get(`https://kokbatasi.onrender.com/api/candles/${signalData.symbol}`);
         signalData.data = candlesRes.data?.data || [];
 
         setSignal(signalData);
