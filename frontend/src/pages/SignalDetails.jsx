@@ -1,4 +1,4 @@
-// ⚠️ نسخة نهائية محدثة - تشمل Fractal + Elliott Waves Auto
+// ⚠️ نسخة نهائية محدثة - تشمل Fractal + Elliott Waves Auto + دعم type/action
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -26,7 +26,6 @@ const SignalDetails = () => {
     { time: "2025-06-17", open: 108, high: 112, low: 104, close: 110 },
   ];
 
-  // 🔍 تحليل نقاط فراكتل تلقائياً
   const detectFractals = (candles) => {
     const points = [];
     for (let i = 2; i < candles.length - 2; i++) {
@@ -42,7 +41,6 @@ const SignalDetails = () => {
     return points;
   };
 
-  // 🧠 تحليل موجات إليوت بناءً على فراكتل
   const detectElliottWaves = (fractalPoints) => {
     const waves = [];
     if (fractalPoints.length < 5) return waves;
@@ -64,6 +62,9 @@ const SignalDetails = () => {
         const signalRes = await axios.get(`/api/signals/${id}`);
         const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
 
+        // ✅ دعم type كبديل لـ action إن لم يكن موجود
+        signalData.action = signalData.action || signalData.type?.toLowerCase();
+
         if (!signalData || !signalData.symbol) {
           throw new Error("❌ لا يوجد رمز صالح للتوصية.");
         }
@@ -78,7 +79,6 @@ const SignalDetails = () => {
           signalData.data = fallbackMock;
         }
 
-        // ✅ اكتشاف الأدوات التلقائية
         const fractalDetected = detectFractals(signalData.data);
         const waveDetected = detectElliottWaves(fractalDetected);
 
@@ -98,7 +98,6 @@ const SignalDetails = () => {
     fetchAll();
   }, [id]);
 
-  // ✅ حفظ تلقائي
   useEffect(() => {
     if (!signal) return;
     const timeout = setTimeout(() => {
