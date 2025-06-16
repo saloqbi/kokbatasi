@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -35,7 +34,7 @@ const AllSignalsPage = () => {
   const filteredSignals =
     filter === "all"
       ? signals
-      : signals.filter((signal) => normalize(signal.recommendation) === filter);
+      : signals.filter((signal) => normalize(signal.recommendation) === normalize(filter));
 
   const getIcon = (rec) => {
     const norm = normalize(rec);
