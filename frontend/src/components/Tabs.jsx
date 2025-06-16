@@ -1,6 +1,14 @@
 import React from "react";
 
 const Tabs = ({ tabs, selected, onChange }) => {
+  const handleClick = (tab) => {
+    if (typeof onChange === "function") {
+      onChange(tab.key);
+    } else {
+      console.error("❌ onChange is not a function:", onChange);
+    }
+  };
+
   return (
     <div className="flex space-x-2 rtl:space-x-reverse mb-4">
       {tabs.map((tab) => (
@@ -11,9 +19,7 @@ const Tabs = ({ tabs, selected, onChange }) => {
               ? "bg-blue-600 text-white"
               : "bg-white text-gray-700"
           }`}
-          onClick={() =>
-            typeof onChange === "function" && onChange(tab.key)
-          }
+          onClick={() => handleClick(tab)}
         >
           {tab.label}
         </button>
