@@ -13,6 +13,7 @@ function parseBinance(data) {
     high: parseFloat(high),
     low: parseFloat(low),
     close: parseFloat(close),
+    volume: 0  // Binance data here lacks volume in the current call, can be extended
   }));
 }
 
@@ -25,6 +26,7 @@ function parseAlpha(data) {
     high: parseFloat(ohlc["2. high"]),
     low: parseFloat(ohlc["3. low"]),
     close: parseFloat(ohlc["4. close"]),
+    volume: parseFloat(ohlc["5. volume"] || "0") // ✅ إضافة الحجم
   })).reverse();
 }
 
@@ -41,15 +43,21 @@ async function fetchCandles(symbol) {
         apikey: ALPHA_API_KEY,
       },
     });
-    console.log("🔍 Alpha response:", alphaRes.data);
 
-    if (alphaRes.data && alphaRes.data["Time Series (5min)"]) {
+    console.log("🔍 Alpha response keys:", Object.keys(alphaRes.data));
+
+    if (
+      alphaRes.data &&
+      alphaRes.data["Time Series (5min)"] &&
+      Object.keys(alphaRes.data["Time Series (5min)"]).length > 0
+    ) {
       return { source: "alpha", data: parseAlpha(alphaRes.data) };
     }
   } catch (err) {
-    console.warn("Alpha Vantage failed, fallback to Binance...");
+    console.warn("⚠️ Alpha Vantage failed:", err.message);
   }
 
+  // Try Binance fallback
   try {
     const binanceSymbol = symbol.toLowerCase() + "usdt";
     const binanceRes = await axios.get(BINANCE_BASE, {
@@ -61,11 +69,10 @@ async function fetchCandles(symbol) {
     });
     return { source: "binance", data: parseBinance(binanceRes.data) };
   } catch (err) {
-    console.error("Binance fetch error:", err.message);
+    console.error("❌ Binance fetch error:", err.message);
     throw new Error("Failed to fetch candlestick data from all sources.");
   }
-
-
 }
 
 module.exports = { fetchCandles };
+
