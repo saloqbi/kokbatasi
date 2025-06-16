@@ -109,7 +109,7 @@ const SignalDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!signal) return;
+    if (!signal || id === "mock-harmonic-test") return;
     const timeout = setTimeout(() => {
       axios.put(`${apiBase}/api/signals/${id}/drawings`, {
         lines,
