@@ -21,14 +21,13 @@ const SignalDetails = () => {
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
-  // ✅ fallback فيه قمة وقاع لظهور الفراكتلات
   const fallbackMock = [
     { time: "2025-06-10", open: 100, high: 105, low: 95, close: 100 },
     { time: "2025-06-11", open: 101, high: 106, low: 96, close: 102 },
-    { time: "2025-06-12", open: 102, high: 120, low: 100, close: 105 }, // قمة
+    { time: "2025-06-12", open: 102, high: 120, low: 100, close: 105 },
     { time: "2025-06-13", open: 104, high: 107, low: 99, close: 101 },
     { time: "2025-06-14", open: 100, high: 103, low: 94, close: 98 },
-    { time: "2025-06-15", open: 98, high: 101, low: 90, close: 92 },   // قاع
+    { time: "2025-06-15", open: 98, high: 101, low: 90, close: 92 },
     { time: "2025-06-16", open: 93, high: 97, low: 91, close: 96 },
   ];
 
@@ -67,21 +66,14 @@ const SignalDetails = () => {
       try {
         const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
         const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
-
         if (!signalData) throw new Error("❌ التوصية غير موجودة أو غير صالحة.");
         signalData.action = signalData.action || signalData.type?.toLowerCase();
-
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
-
-        // ✅ إجبار استخدام fallbackMock للتجربة
         signalData.data = fallbackMock;
-
         const fractalDetected = detectFractals(signalData.data);
         const waveDetected = detectElliottWaves(fractalDetected);
-
         console.log("🌀 Fractals:", fractalDetected);
         console.log("🌊 Elliott Waves:", waveDetected);
-
         setSignal(signalData);
         setLines(signalData.lines || []);
         setZones(signalData.zones || []);
@@ -94,7 +86,6 @@ const SignalDetails = () => {
         setLoading(false);
       }
     };
-
     fetchAll();
   }, [id]);
 
@@ -153,6 +144,7 @@ const SignalDetails = () => {
               <div className="mb-2 text-sm text-gray-700">
                 🌀 عدد الفراكتلات: {fractals.length} | 🌊 عدد موجات إليوت: {waves.length}
               </div>
+              <ToolSelector /> {/* ✅ أضفناه داخل تبويب أدوات الرسم */}
               <DrawingTools
                 lines={lines}
                 zones={zones}
