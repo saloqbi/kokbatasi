@@ -23,8 +23,10 @@ const createSignal = async (req, res) => {
   }
 };
 
-// ✅ توليد توصيات عشوائية مع إظهار الخطأ النصي
+// ✅ توليد توصيات عشوائية (مع تسجيل الدخول للدالة + طباعة الخطأ النصي)
 const generateRandomSignals = async (req, res) => {
+  console.log("🔄 دخلنا على الدالة generateRandomSignals"); // ✅ تأكيد الوصول
+
   try {
     const randomSignals = [];
     const actions = ['buy', 'sell'];
@@ -44,6 +46,8 @@ const generateRandomSignals = async (req, res) => {
       randomSignals.push(randomSignal);
     }
 
+    console.log("✅ تم إنشاء التوصيات:", randomSignals.length);
+
     res.status(201).json({
       message: "✅ Random signals generated",
       data: randomSignals
@@ -52,7 +56,7 @@ const generateRandomSignals = async (req, res) => {
     console.error("❌ Error generating signals:", error.message, error.stack);
     res.status(500).json({
       message: "❌ Failed to generate random signals",
-      error: String(error) // ✅ الخطأ يظهر مباشرة في المتصفح
+      error: String(error)
     });
   }
 };
