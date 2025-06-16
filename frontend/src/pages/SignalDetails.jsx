@@ -65,11 +65,15 @@ const SignalDetails = () => {
             symbol: "MOCK",
             action: "buy",
             data: [
+              { time: "T0", open: 95, high: 97, low: 93, close: 96 },
               { time: "T1", open: 100, high: 105, low: 95, close: 100 },
               { time: "T2", open: 100, high: 108, low: 98, close: 108 },
               { time: "T3", open: 108, high: 104, low: 102, close: 104 },
               { time: "T4", open: 104, high: 110, low: 103, close: 110 },
               { time: "T5", open: 110, high: 102, low: 100, close: 102 },
+              { time: "T6", open: 102, high: 105, low: 99, close: 100 },
+              { time: "T7", open: 100, high: 101, low: 97, close: 98 },
+              { time: "T8", open: 98, high: 100, low: 95, close: 99 },
             ]
           };
         } else {
