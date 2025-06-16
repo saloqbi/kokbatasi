@@ -7,6 +7,8 @@ import DrawingTools from "../components/DrawingTools";
 import Tabs from "../components/Tabs";
 import ToolSelector from "../tools/ToolSelector";
 import { SignalContext } from "../context/SignalContext";
+import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
+import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector"; // ✅ استيراد كاشف الهارمونيك
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -16,6 +18,8 @@ const SignalDetails = () => {
   const [zones, setZones] = useState([]);
   const [fractals, setFractals] = useState([]);
   const [waves, setWaves] = useState([]);
+  const [abcdPatterns, setABCDPatterns] = useState([]);
+  const [harmonicPatterns, setHarmonicPatterns] = useState([]); // ✅ حالة جديدة
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -70,15 +74,24 @@ const SignalDetails = () => {
         signalData.action = signalData.action || signalData.type?.toLowerCase();
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
         signalData.data = fallbackMock;
+
         const fractalDetected = detectFractals(signalData.data);
         const waveDetected = detectElliottWaves(fractalDetected);
+        const abcdDetected = detectABCDPatterns(signalData.data);
+        const harmonicDetected = detectHarmonicPatterns(signalData.data); // ✅ كشف الهارمونيك
+
         console.log("🌀 Fractals:", fractalDetected);
         console.log("🌊 Elliott Waves:", waveDetected);
+        console.log("🔷 ABCD Patterns:", abcdDetected);
+        console.log("🎯 Harmonic Patterns:", harmonicDetected);
+
         setSignal(signalData);
         setLines(signalData.lines || []);
         setZones(signalData.zones || []);
         setFractals(fractalDetected);
         setWaves(waveDetected);
+        setABCDPatterns(abcdDetected);
+        setHarmonicPatterns(harmonicDetected); // ✅ تخزين النماذج
       } catch (err) {
         console.error("❌ فشل تحميل التوصية:", err);
         setError("فشل في تحميل البيانات. تأكد من الاتصال ووجود التوصية.");
@@ -97,10 +110,12 @@ const SignalDetails = () => {
         zones,
         fractals,
         waves,
+        abcdPatterns,
+        harmonicPatterns, // ✅ حفظ الهارمونيك
       });
     }, 1000);
     return () => clearTimeout(timeout);
-  }, [lines, zones, fractals, waves]);
+  }, [lines, zones, fractals, waves, abcdPatterns, harmonicPatterns]);
 
   if (loading) return <div>📊 جاري تحميل التوصية...</div>;
   if (error) return <div className="text-red-600">❌ {error}</div>;
@@ -142,14 +157,16 @@ const SignalDetails = () => {
           {selectedTab === "draw" && (
             <>
               <div className="mb-2 text-sm text-gray-700">
-                🌀 عدد الفراكتلات: {fractals.length} | 🌊 عدد موجات إليوت: {waves.length}
+                🌀 عدد الفراكتلات: {fractals.length} | 🌊 عدد موجات إليوت: {waves.length} | 🔷 نماذج ABCD: {abcdPatterns.length} | 🎯 نماذج هارمونيك: {harmonicPatterns.length}
               </div>
-              <ToolSelector /> {/* ✅ أضفناه داخل تبويب أدوات الرسم */}
+              <ToolSelector />
               <DrawingTools
                 lines={lines}
                 zones={zones}
                 fractals={fractals}
                 waves={waves}
+                abcdPatterns={abcdPatterns}
+                harmonicPatterns={harmonicPatterns} // ✅ تمرير الهارمونيك
                 onLinesChange={setLines}
                 onZonesChange={setZones}
                 onFractalsChange={setFractals}

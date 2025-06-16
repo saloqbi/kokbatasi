@@ -6,6 +6,8 @@ const DrawingTools = ({
   zones,
   fractals,
   waves,
+  abcdPatterns = [],
+  harmonicPatterns = [], // ✅ دعم الهارمونيك
   onLinesChange,
   onZonesChange,
   onFractalsChange,
@@ -17,7 +19,12 @@ const DrawingTools = ({
   const height = 400;
   const padding = 40;
 
-  const allPrices = [...fractals.map(p => p.price), ...waves.map(w => w.price)];
+  const allPrices = [
+    ...fractals.map(p => p.price),
+    ...waves.map(w => w.price),
+    ...abcdPatterns.flatMap(p => [p.points.A.price, p.points.B.price, p.points.C.price, p.points.D.price]),
+    ...harmonicPatterns.flatMap(p => [p.points.X.price, p.points.A.price, p.points.B.price, p.points.C.price, p.points.D.price]),
+  ];
   const minPrice = Math.min(...allPrices, 90);
   const maxPrice = Math.max(...allPrices, 120);
 
@@ -25,6 +32,8 @@ const DrawingTools = ({
     const scale = (price - minPrice) / (maxPrice - minPrice);
     return height - padding - scale * (height - 2 * padding);
   };
+
+  const indexToX = (index) => index * 80 + padding;
 
   return (
     <svg
@@ -56,7 +65,7 @@ const DrawingTools = ({
       {/* Fractals */}
       {activeTool === "fractal" &&
         fractals.map((p, idx) => {
-          const x = p.index * 80 + padding;
+          const x = indexToX(p.index);
           const y = priceToY(p.price);
           return (
             <text
@@ -78,9 +87,9 @@ const DrawingTools = ({
           if (i === waves.length - 1) return null;
           const p1 = waves[i];
           const p2 = waves[i + 1];
-          const x1 = p1.index * 80 + padding;
+          const x1 = indexToX(p1.index);
           const y1 = priceToY(p1.price);
-          const x2 = p2.index * 80 + padding;
+          const x2 = indexToX(p2.index);
           const y2 = priceToY(p2.price);
           return (
             <g key={i}>
@@ -91,6 +100,48 @@ const DrawingTools = ({
             </g>
           );
         })}
+
+      {/* رسم نماذج ABCD التلقائية */}
+      {abcdPatterns.map((pattern, i) => {
+        const { A, B, C, D } = pattern.points;
+        const xa = indexToX(A.index), ya = priceToY(A.price);
+        const xb = indexToX(B.index), yb = priceToY(B.price);
+        const xc = indexToX(C.index), yc = priceToY(C.price);
+        const xd = indexToX(D.index), yd = priceToY(D.price);
+        return (
+          <g key={`abcd-${i}`}>
+            <line x1={xa} y1={ya} x2={xb} y2={yb} stroke="green" strokeWidth="2" />
+            <line x1={xb} y1={yb} x2={xc} y2={yc} stroke="orange" strokeWidth="2" />
+            <line x1={xc} y1={yc} x2={xd} y2={yd} stroke="green" strokeWidth="2" />
+            <text x={xd + 5} y={yd} fontSize="10" fill="gray">
+              {pattern.direction.toUpperCase()} ABCD
+            </text>
+          </g>
+        );
+      })}
+
+      {/* رسم نماذج Harmonic التلقائية */}
+      {harmonicPatterns.map((pattern, i) => {
+        const { X, A, B, C, D } = pattern.points;
+        const xX = indexToX(X.index), yX = priceToY(X.price);
+        const xA = indexToX(A.index), yA = priceToY(A.price);
+        const xB = indexToX(B.index), yB = priceToY(B.price);
+        const xC = indexToX(C.index), yC = priceToY(C.price);
+        const xD = indexToX(D.index), yD = priceToY(D.price);
+        return (
+          <g key={`harmonic-${i}`}>
+            <polyline
+              points={`${xX},${yX} ${xA},${yA} ${xB},${yB} ${xC},${yC} ${xD},${yD}`}
+              fill="none"
+              stroke="purple"
+              strokeWidth="2"
+            />
+            <text x={xD + 5} y={yD} fontSize="10" fill="purple">
+              {pattern.name} ({pattern.direction})
+            </text>
+          </g>
+        );
+      })}
 
       {/* أدوات Gann */}
       {activeTool === "gann-box" && (
