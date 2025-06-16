@@ -34,20 +34,13 @@ const DrawingTools = ({
       viewBox={`0 0 ${width} ${height}`}
       className="mt-6 border rounded bg-gray-50 cursor-crosshair"
     >
-      {/* خطوط الاتجاه (Trendline ثابتة حالياً) */}
+      {/* Trendline */}
       {activeTool === "trendline" && (
-        <line
-          x1={100}
-          y1={100}
-          x2={300}
-          y2={200}
-          stroke="blue"
-          strokeWidth="2"
-        />
+        <line x1={100} y1={100} x2={300} y2={200} stroke="blue" strokeWidth="2" />
       )}
 
-      {/* مناطق الدعم والمقاومة */}
-      {zones.map((zone, idx) => (
+      {/* Support/Resistance Zones */}
+      {activeTool === "zone" && zones.map((zone, idx) => (
         <rect
           key={idx}
           x={zone.x}
@@ -99,22 +92,19 @@ const DrawingTools = ({
           );
         })}
 
-      {/* Gann Box */}
+      {/* Gann Tools */}
       {activeTool === "gann-box" && (
         <rect x={150} y={100} width={200} height={150} fill="purple" opacity="0.1" stroke="purple" />
       )}
 
-      {/* Gann Grid */}
-      {activeTool === "gann-grid" && (
+      {activeTool === "gann-grid" &&
         Array.from({ length: 5 }).map((_, i) => (
           <g key={i}>
             <line x1={100 + i * 40} y1={0} x2={100 + i * 40} y2={400} stroke="gray" strokeDasharray="4 2" />
             <line x1={0} y1={50 + i * 40} x2={800} y2={50 + i * 40} stroke="gray" strokeDasharray="4 2" />
           </g>
-        ))
-      )}
+        ))}
 
-      {/* Gann Fan */}
       {activeTool === "gann-fan" && (
         <g>
           {[1, 2, 3].map((ratio, i) => (
@@ -131,7 +121,6 @@ const DrawingTools = ({
         </g>
       )}
 
-      {/* Gann Circle */}
       {activeTool === "gann-circle" && (
         <g>
           {[40, 80, 120, 160].map((r, i) => (
@@ -140,7 +129,6 @@ const DrawingTools = ({
         </g>
       )}
 
-      {/* Gann Square of 9 */}
       {activeTool === "gann-square" && (
         <g transform="rotate(45 400 200)">
           {[40, 80, 120, 160].map((size, i) => (
@@ -156,6 +144,63 @@ const DrawingTools = ({
             />
           ))}
         </g>
+      )}
+
+      {/* Fibonacci Retracement */}
+      {activeTool === "fib-retracement" && (
+        <line x1={100} y1={100} x2={300} y2={200} stroke="gold" strokeWidth="2" />
+      )}
+
+      {/* Fibonacci Fan */}
+      {activeTool === "fib-fan" && (
+        <g>
+          {[1, 2, 3].map((ratio, i) => (
+            <line
+              key={i}
+              x1={150}
+              y1={300}
+              x2={150 + 120}
+              y2={300 - 120 / ratio}
+              stroke="green"
+              strokeWidth="1.5"
+            />
+          ))}
+        </g>
+      )}
+
+      {/* Fibonacci Time Zones */}
+      {activeTool === "fib-zones" && (
+        <g>
+          {[0, 1, 2, 3, 5, 8, 13].map((step, i) => (
+            <line
+              key={i}
+              x1={100 + step * 20}
+              y1={0}
+              x2={100 + step * 20}
+              y2={height}
+              stroke="blue"
+              strokeDasharray="4 2"
+              strokeWidth="1"
+            />
+          ))}
+        </g>
+      )}
+
+      {/* ICT Tool */}
+      {activeTool === "ict" && (
+        <text x={200} y={250} fontSize="20">🔍 ICT Tool</text>
+      )}
+
+      {/* Channel Tool */}
+      {activeTool === "channel" && (
+        <g>
+          <rect x={150} y={150} width={300} height={80} fill="none" stroke="teal" strokeDasharray="4 2" />
+        </g>
+      )}
+
+      {/* Wyckoff Tool */}
+      {activeTool === "wyckoff" && (
+        <text x={300} y={280} fontSize="18">📚 Wyckoff Zone</text>
       )}
     </svg>
   );
