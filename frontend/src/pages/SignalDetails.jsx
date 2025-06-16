@@ -30,19 +30,18 @@ const SignalDetails = () => {
         const signalRes = await axios.get(`/api/signals/${id}`);
         const signalData = signalRes.data;
 
-        // ✅ تحقق من وجود symbol قبل جلب البيانات
-        if (signalData.symbol) {
+        if (signalData.symbol && typeof signalData.symbol === "string") {
           try {
             const candlesRes = await axios.get(
               `https://kokbatasi.onrender.com/api/candles/${signalData.symbol}`
             );
             signalData.data = candlesRes.data?.data || [];
           } catch (err) {
-            console.warn("⚠️ فشل جلب بيانات الشموع، سيتم استخدام بيانات تجريبية.");
+            console.warn("⚠️ فشل جلب بيانات الشموع، استخدام بيانات تجريبية.");
             signalData.data = fallbackMock;
           }
         } else {
-          console.warn("⚠️ لا يوجد symbol في التوصية.");
+          console.warn("⚠️ رمز symbol غير متوفر أو غير صالح.");
           signalData.data = fallbackMock;
         }
 
