@@ -21,15 +21,15 @@ const SignalDetails = () => {
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
-  // ✅ تم توسيع مجموعة fallback لتسمح بالكشف عن الفراكتلات والموجات
+  // ✅ fallback جديد فيه قمة حادة وقاع حاد
   const fallbackMock = [
-    { time: "2025-06-10", open: 105, high: 110, low: 100, close: 108 },
-    { time: "2025-06-11", open: 108, high: 114, low: 107, close: 112 },
-    { time: "2025-06-12", open: 112, high: 118, low: 110, close: 116 },
-    { time: "2025-06-13", open: 116, high: 120, low: 114, close: 115 },
-    { time: "2025-06-14", open: 115, high: 117, low: 111, close: 112 },
-    { time: "2025-06-15", open: 112, high: 114, low: 109, close: 110 },
-    { time: "2025-06-16", open: 110, high: 113, low: 108, close: 111 },
+    { time: "2025-06-10", open: 100, high: 105, low: 95, close: 100 },
+    { time: "2025-06-11", open: 101, high: 106, low: 96, close: 102 },
+    { time: "2025-06-12", open: 102, high: 120, low: 100, close: 105 }, // ⬆️ قمة واضحة
+    { time: "2025-06-13", open: 104, high: 107, low: 99, close: 101 },
+    { time: "2025-06-14", open: 100, high: 103, low: 94, close: 98 },
+    { time: "2025-06-15", open: 98, high: 101, low: 90, close: 92 },   // ⬇️ قاع واضح
+    { time: "2025-06-16", open: 93, high: 97, low: 91, close: 96 },
   ];
 
   const detectFractals = (candles) => {
