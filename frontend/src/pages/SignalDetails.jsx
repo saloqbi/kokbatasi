@@ -21,10 +21,15 @@ const SignalDetails = () => {
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
+  // ✅ تم توسيع مجموعة fallback لتسمح بالكشف عن الفراكتلات والموجات
   const fallbackMock = [
-    { time: "2025-06-15", open: 100, high: 110, low: 95, close: 105 },
-    { time: "2025-06-16", open: 105, high: 115, low: 100, close: 108 },
-    { time: "2025-06-17", open: 108, high: 112, low: 104, close: 110 },
+    { time: "2025-06-10", open: 105, high: 110, low: 100, close: 108 },
+    { time: "2025-06-11", open: 108, high: 114, low: 107, close: 112 },
+    { time: "2025-06-12", open: 112, high: 118, low: 110, close: 116 },
+    { time: "2025-06-13", open: 116, high: 120, low: 114, close: 115 },
+    { time: "2025-06-14", open: 115, high: 117, low: 111, close: 112 },
+    { time: "2025-06-15", open: 112, high: 114, low: 109, close: 110 },
+    { time: "2025-06-16", open: 110, high: 113, low: 108, close: 111 },
   ];
 
   const detectFractals = (candles) => {
