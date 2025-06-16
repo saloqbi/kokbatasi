@@ -8,7 +8,7 @@ import Tabs from "../components/Tabs";
 import ToolSelector from "../tools/ToolSelector";
 import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
-import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector"; // ✅ استيراد كاشف الهارمونيك
+import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -19,21 +19,11 @@ const SignalDetails = () => {
   const [fractals, setFractals] = useState([]);
   const [waves, setWaves] = useState([]);
   const [abcdPatterns, setABCDPatterns] = useState([]);
-  const [harmonicPatterns, setHarmonicPatterns] = useState([]); // ✅ حالة جديدة
+  const [harmonicPatterns, setHarmonicPatterns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
-
-  const fallbackMock = [
-    { time: "2025-06-10", open: 100, high: 105, low: 95, close: 100 },
-    { time: "2025-06-11", open: 101, high: 106, low: 96, close: 102 },
-    { time: "2025-06-12", open: 102, high: 120, low: 100, close: 105 },
-    { time: "2025-06-13", open: 104, high: 107, low: 99, close: 101 },
-    { time: "2025-06-14", open: 100, high: 103, low: 94, close: 98 },
-    { time: "2025-06-15", open: 98, high: 101, low: 90, close: 92 },
-    { time: "2025-06-16", open: 93, high: 97, low: 91, close: 96 },
-  ];
 
   const detectFractals = (candles) => {
     const points = [];
@@ -68,17 +58,33 @@ const SignalDetails = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
-        const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
+        let signalData;
+
+        if (id === "mock-harmonic-test") {
+          signalData = {
+            symbol: "MOCK",
+            action: "buy",
+            data: [
+              { time: "T1", open: 100, high: 105, low: 95, close: 100 },
+              { time: "T2", open: 100, high: 108, low: 98, close: 108 },
+              { time: "T3", open: 108, high: 104, low: 102, close: 104 },
+              { time: "T4", open: 104, high: 110, low: 103, close: 110 },
+              { time: "T5", open: 110, high: 102, low: 100, close: 102 },
+            ]
+          };
+        } else {
+          const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
+          signalData = typeof signalRes.data === "object" ? signalRes.data : null;
+        }
+
         if (!signalData) throw new Error("❌ التوصية غير موجودة أو غير صالحة.");
         signalData.action = signalData.action || signalData.type?.toLowerCase();
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
-        signalData.data = fallbackMock;
 
         const fractalDetected = detectFractals(signalData.data);
         const waveDetected = detectElliottWaves(fractalDetected);
         const abcdDetected = detectABCDPatterns(signalData.data);
-        const harmonicDetected = detectHarmonicPatterns(signalData.data); // ✅ كشف الهارمونيك
+        const harmonicDetected = detectHarmonicPatterns(signalData.data);
 
         console.log("🌀 Fractals:", fractalDetected);
         console.log("🌊 Elliott Waves:", waveDetected);
@@ -91,7 +97,7 @@ const SignalDetails = () => {
         setFractals(fractalDetected);
         setWaves(waveDetected);
         setABCDPatterns(abcdDetected);
-        setHarmonicPatterns(harmonicDetected); // ✅ تخزين النماذج
+        setHarmonicPatterns(harmonicDetected);
       } catch (err) {
         console.error("❌ فشل تحميل التوصية:", err);
         setError("فشل في تحميل البيانات. تأكد من الاتصال ووجود التوصية.");
@@ -111,7 +117,7 @@ const SignalDetails = () => {
         fractals,
         waves,
         abcdPatterns,
-        harmonicPatterns, // ✅ حفظ الهارمونيك
+        harmonicPatterns,
       });
     }, 1000);
     return () => clearTimeout(timeout);
@@ -166,7 +172,7 @@ const SignalDetails = () => {
                 fractals={fractals}
                 waves={waves}
                 abcdPatterns={abcdPatterns}
-                harmonicPatterns={harmonicPatterns} // ✅ تمرير الهارمونيك
+                harmonicPatterns={harmonicPatterns}
                 onLinesChange={setLines}
                 onZonesChange={setZones}
                 onFractalsChange={setFractals}
