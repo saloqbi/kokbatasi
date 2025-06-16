@@ -1,10 +1,56 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 
-const DrawingTools = ({ lines, zones, fractals = [], waves = [], onLinesChange, onZonesChange, onFractalsChange, onWavesChange }) => {
+const DrawingTools = ({
+  lines,
+  zones,
+  fractals = [],
+  waves = [],
+  onLinesChange,
+  onZonesChange,
+  onFractalsChange,
+  onWavesChange
+}) => {
+  const svgRef = useRef(null);
+  const [viewBox, setViewBox] = useState({ x: 0, y: 0, w: 800, h: 400 });
+  const [drag, setDrag] = useState(null);
+
+  // ✅ Zoom بعجلة الفأرة
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const scale = e.deltaY > 0 ? 1.1 : 0.9;
+    const newW = viewBox.w * scale;
+    const newH = viewBox.h * scale;
+    setViewBox({
+      ...viewBox,
+      w: newW,
+      h: newH
+    });
+  };
+
+  // ✅ Pan بالفأرة
+  const handleMouseDown = (e) => {
+    setDrag({ x: e.clientX, y: e.clientY, viewBoxX: viewBox.x, viewBoxY: viewBox.y });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!drag) return;
+    const dx = (e.clientX - drag.x) * (viewBox.w / 800);
+    const dy = (e.clientY - drag.y) * (viewBox.h / 400);
+    setViewBox({
+      ...viewBox,
+      x: drag.viewBoxX - dx,
+      y: drag.viewBoxY - dy
+    });
+  };
+
+  const handleMouseUp = () => {
+    setDrag(null);
+  };
+
   return (
     <div>
       <h3 className="text-lg font-semibold mb-2">✍️ أدوات الرسم</h3>
-      <p>🛠 هذه الواجهة مخصصة للرسم اليدوي والتحليل التفاعلي (يشمل خطوط، مناطق، فراكتل، وموجات إليوت)</p>
+      <p>🛠 دعم Zoom وPan عبر عجلة وسحب الفأرة</p>
 
       <div className="space-y-2 mt-4">
         <button
@@ -47,6 +93,55 @@ const DrawingTools = ({ lines, zones, fractals = [], waves = [], onLinesChange, 
           ➕ إضافة موجة إليوت
         </button>
       </div>
+
+      {/* ✅ SVG مع دعم Zoom وPan */}
+      <svg
+        ref={svgRef}
+        width="100%"
+        height="400"
+        viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        className="mt-6 border rounded bg-gray-50 cursor-grab"
+      >
+        {/* Fractals */}
+        {fractals.map((p, idx) => (
+          <text
+            key={idx}
+            x={p.index * 10}
+            y={p.type === "top" ? 40 : 380}
+            fontSize="16"
+            fill={p.type === "top" ? "red" : "blue"}
+          >
+            {p.type === "top" ? "⬆️" : "⬇️"}
+          </text>
+        ))}
+
+        {/* Elliott Waves */}
+        {waves.length >= 2 &&
+          waves.map((wave, i) => {
+            if (i === waves.length - 1) return null;
+            const p1 = waves[i];
+            const p2 = waves[i + 1];
+            return (
+              <g key={i}>
+                <line
+                  x1={p1.index * 10}
+                  y1={400 - p1.price}
+                  x2={p2.index * 10}
+                  y2={400 - p2.price}
+                  stroke="green"
+                  strokeWidth="2"
+                />
+                <text x={p1.index * 10} y={400 - p1.price - 10} fontSize="12" fill="black">
+                  {p1.label}
+                </text>
+              </g>
+            );
+          })}
+      </svg>
     </div>
   );
 };

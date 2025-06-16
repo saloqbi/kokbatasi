@@ -1,3 +1,4 @@
+// ⚠️ نسخة نهائية محدثة - تشمل Fractal + Elliott Waves Auto
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -25,6 +26,38 @@ const SignalDetails = () => {
     { time: "2025-06-17", open: 108, high: 112, low: 104, close: 110 },
   ];
 
+  // 🔍 تحليل نقاط فراكتل تلقائياً
+  const detectFractals = (candles) => {
+    const points = [];
+    for (let i = 2; i < candles.length - 2; i++) {
+      const prev = candles.slice(i - 2, i);
+      const next = candles.slice(i + 1, i + 3);
+      const curr = candles[i];
+      const isTop = prev.every(p => p.high < curr.high) && next.every(n => n.high < curr.high);
+      const isBottom = prev.every(p => p.low > curr.low) && next.every(n => n.low > curr.low);
+      if (isTop || isBottom) {
+        points.push({ index: i, price: isTop ? curr.high : curr.low, type: isTop ? 'top' : 'bottom' });
+      }
+    }
+    return points;
+  };
+
+  // 🧠 تحليل موجات إليوت بناءً على فراكتل
+  const detectElliottWaves = (fractalPoints) => {
+    const waves = [];
+    if (fractalPoints.length < 5) return waves;
+    for (let i = 0; i <= fractalPoints.length - 5; i++) {
+      const seq = fractalPoints.slice(i, i + 5);
+      waves.push(...seq.map((p, idx) => ({
+        label: `${idx + 1}`,
+        index: p.index,
+        price: p.price
+      })));
+      break;
+    }
+    return waves;
+  };
+
   useEffect(() => {
     const fetchAll = async () => {
       try {
@@ -45,11 +78,15 @@ const SignalDetails = () => {
           signalData.data = fallbackMock;
         }
 
+        // ✅ اكتشاف الأدوات التلقائية
+        const fractalDetected = detectFractals(signalData.data);
+        const waveDetected = detectElliottWaves(fractalDetected);
+
         setSignal(signalData);
         setLines(signalData.lines || []);
         setZones(signalData.zones || []);
-        setFractals(signalData.fractals || []);
-        setWaves(signalData.waves || []);
+        setFractals(fractalDetected);
+        setWaves(waveDetected);
       } catch (err) {
         console.error("❌ فشل تحميل التوصية:", err);
         setError("فشل في تحميل البيانات. تأكد من الاتصال ووجود التوصية.");
@@ -61,7 +98,7 @@ const SignalDetails = () => {
     fetchAll();
   }, [id]);
 
-  // حفظ تلقائي عند تغيير الأدوات
+  // ✅ حفظ تلقائي
   useEffect(() => {
     if (!signal) return;
     const timeout = setTimeout(() => {
@@ -136,4 +173,3 @@ const SignalDetails = () => {
 };
 
 export default SignalDetails;
-//
