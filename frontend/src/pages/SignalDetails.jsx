@@ -28,20 +28,21 @@ const SignalDetails = () => {
     const fetchAll = async () => {
       try {
         const signalRes = await axios.get(`/api/signals/${id}`);
-        const signalData = signalRes.data;
 
-        if (signalData.symbol && typeof signalData.symbol === "string") {
-          try {
-            const candlesRes = await axios.get(
-              `https://kokbatasi.onrender.com/api/candles/${signalData.symbol}`
-            );
-            signalData.data = candlesRes.data?.data || [];
-          } catch (err) {
-            console.warn("⚠️ فشل جلب بيانات الشموع، استخدام بيانات تجريبية.");
-            signalData.data = fallbackMock;
-          }
-        } else {
-          console.warn("⚠️ رمز symbol غير متوفر أو غير صالح.");
+        // تحقق أن الاستجابة فعلاً JSON
+        const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
+
+        if (!signalData || !signalData.symbol) {
+          throw new Error("❌ لا يوجد رمز صالح للتوصية.");
+        }
+
+        try {
+          const candlesRes = await axios.get(
+            `https://kokbatasi.onrender.com/api/candles/${signalData.symbol}`
+          );
+          signalData.data = candlesRes.data?.data || [];
+        } catch (err) {
+          console.warn("⚠️ فشل جلب بيانات الشموع، استخدام بيانات تجريبية.");
           signalData.data = fallbackMock;
         }
 
