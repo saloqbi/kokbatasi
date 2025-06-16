@@ -1,28 +1,27 @@
 const Signal = require('../models/signal');
 
+// ✅ استرجاع جميع التوصيات
 const getSignals = async (req, res) => {
   try {
-    console.log("🔍 Trying to fetch signals from database...");
     const signals = await Signal.find();
-    console.log("✅ Signals fetched successfully:", signals.length);
     res.json(signals);
   } catch (error) {
-    console.error("❌ Error fetching signals:", error.message);
     res.status(500).json({ message: "Failed to fetch signals" });
   }
 };
 
+// ✅ إنشاء توصية جديدة
 const createSignal = async (req, res) => {
   try {
     const newSignal = new Signal(req.body);
     await newSignal.save();
     res.status(201).json(newSignal);
   } catch (error) {
-    console.error("❌ Error creating signal:", error.message);
     res.status(500).json({ message: "Failed to create signal" });
   }
 };
 
+// ✅ توليد توصيات عشوائية
 const generateRandomSignals = async (req, res) => {
   try {
     const randomSignals = [];
@@ -43,8 +42,23 @@ const generateRandomSignals = async (req, res) => {
 
     res.status(201).json({ message: "Random signals generated", data: randomSignals });
   } catch (error) {
-    console.error("❌ Error generating random signals:", error.message);
     res.status(500).json({ message: "Failed to generate random signals" });
+  }
+};
+
+// ✅ تحديث أدوات الرسم (خطوط، مناطق، فراكتل، موجات إليوت)
+const updateSignalDrawings = async (req, res) => {
+  try {
+    const { lines, zones, fractals, waves } = req.body;
+    const signal = await Signal.findByIdAndUpdate(
+      req.params.id,
+      { lines, zones, fractals, waves },
+      { new: true }
+    );
+    if (!signal) return res.status(404).json({ message: "Signal not found" });
+    res.json(signal);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update signal drawings" });
   }
 };
 
@@ -52,4 +66,5 @@ module.exports = {
   getSignals,
   createSignal,
   generateRandomSignals,
+  updateSignalDrawings,
 };

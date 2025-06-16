@@ -14,6 +14,8 @@ const SignalDetails = () => {
   const [selectedTab, setSelectedTab] = useState("candles");
   const [lines, setLines] = useState([]);
   const [zones, setZones] = useState([]);
+  const [fractals, setFractals] = useState([]);
+  const [waves, setWaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -44,6 +46,10 @@ const SignalDetails = () => {
         }
 
         setSignal(signalData);
+        setLines(signalData.lines || []);
+        setZones(signalData.zones || []);
+        setFractals(signalData.fractals || []);
+        setWaves(signalData.waves || []);
       } catch (err) {
         console.error("❌ فشل تحميل التوصية:", err);
         setError("فشل في تحميل البيانات. تأكد من الاتصال ووجود التوصية.");
@@ -52,29 +58,22 @@ const SignalDetails = () => {
       }
     };
 
-    const fetchDrawings = async () => {
-      try {
-        const res = await axios.get(`/api/drawings/${id}`);
-        setLines(res.data.lines || []);
-        setZones(res.data.zones || []);
-      } catch (err) {
-        console.error("فشل في تحميل الرسومات:", err);
-      }
-    };
-
     fetchAll();
-    fetchDrawings();
   }, [id]);
 
-  const handleLineUpdate = (newLines) => {
-    setLines(newLines);
-    axios.post(`/api/drawings/${id}`, { lines: newLines, zones });
-  };
-
-  const handleZoneUpdate = (newZones) => {
-    setZones(newZones);
-    axios.post(`/api/drawings/${id}`, { lines, zones: newZones });
-  };
+  // حفظ تلقائي عند تغيير الأدوات
+  useEffect(() => {
+    if (!signal) return;
+    const timeout = setTimeout(() => {
+      axios.put(`/api/signals/${id}/drawings`, {
+        lines,
+        zones,
+        fractals,
+        waves,
+      });
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [lines, zones, fractals, waves]);
 
   if (loading) return <div>📊 جاري تحميل التوصية...</div>;
   if (error) return <div className="text-red-600">❌ {error}</div>;
@@ -122,8 +121,12 @@ const SignalDetails = () => {
             <DrawingTools
               lines={lines}
               zones={zones}
-              onLinesChange={handleLineUpdate}
-              onZonesChange={handleZoneUpdate}
+              fractals={fractals}
+              waves={waves}
+              onLinesChange={setLines}
+              onZonesChange={setZones}
+              onFractalsChange={setFractals}
+              onWavesChange={setWaves}
             />
           )}
         </div>
