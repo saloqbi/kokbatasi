@@ -5,7 +5,7 @@ import { createChart } from "lightweight-charts";
 const CandleChart = ({ data = [] }) => {
   const chartRef = useRef();
 
-  // بيانات افتراضية في حال فشل جلب البيانات الحقيقية
+  // بيانات تجريبية في حال عدم توفر بيانات حقيقية
   const fallbackData = [
     { time: "2025-06-15", open: 100, high: 110, low: 95, close: 105 },
     { time: "2025-06-16", open: 105, high: 115, low: 100, close: 108 },
