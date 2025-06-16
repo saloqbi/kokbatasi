@@ -18,8 +18,8 @@ const AllSignalsPage = () => {
       }
     };
 
-    fetchSignals(); // أول تحميل
-    const interval = setInterval(fetchSignals, 10000); // تحديث كل 10 ثوانٍ
+    fetchSignals();
+    const interval = setInterval(fetchSignals, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -53,35 +53,37 @@ const AllSignalsPage = () => {
       </div>
 
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredSignals.map((signal) => (
-          <Link
-            key={signal._id}
-            to={`/signals/${signal._id}`}
-            className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-2xl shadow hover:shadow-lg transition duration-200 p-5 flex flex-col justify-between"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold truncate text-gray-800 dark:text-white">
-                {getIcon(signal.recommendation)} {signal.title || "عنوان غير متوفر"}
-              </h2>
-              <span
-                className={`text-xs font-bold px-2 py-1 rounded-full ${
-                  signal.recommendation?.toLowerCase() === "buy"
-                    ? "bg-green-100 text-green-700"
-                    : signal.recommendation?.toLowerCase() === "sell"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-gray-200 text-gray-800"
-                }`}
-              >
-                {signal.recommendation || "غير محددة"}
-              </span>
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-              💰 السعر: {signal.price || "غير متوفر"}
-            </div>
-            <div className="text-xs text-gray-400 dark:text-gray-500">
-              📅 {new Date(signal.createdAt).toLocaleString("ar-EG")}
-            </div>
-          </Link>
+        {filteredSignals
+          .filter((signal) => signal.symbol) // ✅ لا تعرض إلا من لديه رمز
+          .map((signal) => (
+            <Link
+              key={signal._id}
+              to={`/signals/${signal._id}`}
+              className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-2xl shadow hover:shadow-lg transition duration-200 p-5 flex flex-col justify-between"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-semibold truncate text-gray-800 dark:text-white">
+                  {getIcon(signal.recommendation)} {signal.title || "عنوان غير متوفر"}
+                </h2>
+                <span
+                  className={`text-xs font-bold px-2 py-1 rounded-full ${
+                    signal.recommendation?.toLowerCase() === "buy"
+                      ? "bg-green-100 text-green-700"
+                      : signal.recommendation?.toLowerCase() === "sell"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  {signal.recommendation || "غير محددة"}
+                </span>
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+                💰 السعر: {signal.price || "غير متوفر"}
+              </div>
+              <div className="text-xs text-gray-400 dark:text-gray-500">
+                📅 {new Date(signal.createdAt).toLocaleString("ar-EG")}
+              </div>
+            </Link>
         ))}
       </div>
     </div>
