@@ -1,10 +1,10 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { Layer, Circle } from 'react-konva';
-import { SignalContext } from '../context/SignalContext';
+import { useSignalContext } from '../context/SignalContext';
 
 const FractalTool = () => {
-  const { selectedSignal } = useContext(SignalContext);
+  const { selectedSignal } = useSignalContext();
   const [peaks, setPeaks] = useState([]);
   const [troughs, setTroughs] = useState([]);
 

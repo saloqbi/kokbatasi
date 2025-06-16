@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 
 const SignalContext = createContext();
@@ -13,3 +12,6 @@ export const SignalProvider = ({ children }) => {
 };
 
 export const useSignalContext = () => useContext(SignalContext);
+
+// ✅ التصدير الضروري لأدوات التحليل
+export { SignalContext };
