@@ -7,7 +7,7 @@ const getSignals = async (req, res) => {
     res.json(signals);
   } catch (error) {
     console.error("❌ Error fetching signals:", error.message, error.stack);
-    res.status(500).json({ message: "Failed to fetch signals", error: error.message });
+    res.status(500).json({ message: "Failed to fetch signals", error: String(error) });
   }
 };
 
@@ -19,11 +19,11 @@ const createSignal = async (req, res) => {
     res.status(201).json(newSignal);
   } catch (error) {
     console.error("❌ Error creating signal:", error.message, error.stack);
-    res.status(500).json({ message: "Failed to create signal", error: error.message });
+    res.status(500).json({ message: "Failed to create signal", error: String(error) });
   }
 };
 
-// ✅ توليد توصيات عشوائية (نسخة مدمجة + استجابة خطأ واضحة)
+// ✅ توليد توصيات عشوائية مع إظهار الخطأ النصي
 const generateRandomSignals = async (req, res) => {
   try {
     const randomSignals = [];
@@ -52,8 +52,7 @@ const generateRandomSignals = async (req, res) => {
     console.error("❌ Error generating signals:", error.message, error.stack);
     res.status(500).json({
       message: "❌ Failed to generate random signals",
-      error: error.message,
-      stack: error.stack // ✅ طباعة كاملة في الاستجابة
+      error: String(error) // ✅ الخطأ يظهر مباشرة في المتصفح
     });
   }
 };
@@ -71,7 +70,7 @@ const updateSignalDrawings = async (req, res) => {
     res.json(signal);
   } catch (error) {
     console.error("❌ Error updating drawings:", error.message, error.stack);
-    res.status(500).json({ message: "Failed to update signal drawings", error: error.message });
+    res.status(500).json({ message: "Failed to update signal drawings", error: String(error) });
   }
 };
 
