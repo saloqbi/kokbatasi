@@ -5,7 +5,7 @@ const ToolSelector = () => {
   const { activeTool, setActiveTool } = useContext(ToolContext);
 
   const tools = [
-    { key: 'trendline', label: '📏 خط الاتجاه' }, // ✅ التصحيح هنا
+    { key: 'trendline', label: '📏 خط الاتجاه' },
     { key: 'zone', label: '📦 منطقة دعم/مقاومة' },
     { key: 'gann-box', label: '🟪 Gann Box' },
     { key: 'gann-grid', label: '🟫 Gann Grid' },
@@ -15,6 +15,9 @@ const ToolSelector = () => {
     { key: 'fib-zones', label: '🔵 Fibonacci Time Zones' },
     { key: 'fractal', label: '🌀 Fractal Tool' },
     { key: 'elliott', label: '🌊 Elliott Waves' },
+    { key: 'abcd', label: '🔷 ABCD Pattern' },
+    { key: 'harmonic', label: '🎯 Harmonic Pattern' },
+    { key: 'price-action', label: '⭐ Price Action' },
     { key: 'ict', label: '🔍 ICT Tool' },
     { key: 'channel', label: '📊 Channel Tool' },
     { key: 'wyckoff', label: '📚 Wyckoff Tool' },
