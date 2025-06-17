@@ -9,7 +9,7 @@ import ToolSelector from "../tools/ToolSelector";
 import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
 import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
-import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector"; // ✅ جديد
+import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -21,7 +21,7 @@ const SignalDetails = () => {
   const [waves, setWaves] = useState([]);
   const [abcdPatterns, setABCDPatterns] = useState([]);
   const [harmonicPatterns, setHarmonicPatterns] = useState([]);
-  const [priceActions, setPriceActions] = useState([]); // ✅ جديد
+  const [priceActions, setPriceActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -75,7 +75,7 @@ const SignalDetails = () => {
               { time: "T5", open: 110, high: 102, low: 100, close: 102 },
               { time: "T6", open: 102, high: 105, low: 99, close: 100 },
               { time: "T7", open: 100, high: 101, low: 97, close: 98 },
-              { time: "T8", open: 98, high: 100, low: 95, close: 99 },
+              { time: "T8", open: 98, high: 100, low: 95, close: 99 }
             ]
           };
         } else {
@@ -127,7 +127,7 @@ const SignalDetails = () => {
         waves,
         abcdPatterns,
         harmonicPatterns,
-        priceActions,
+        priceActions
       });
     }, 1000);
     return () => clearTimeout(timeout);
@@ -148,7 +148,7 @@ const SignalDetails = () => {
           tabs={[
             { key: "candles", label: "الشموع اليابانية" },
             { key: "analysis", label: "📊 تحليل فني" },
-            { key: "draw", label: "✍️ أدوات الرسم" },
+            { key: "draw", label: "✍️ أدوات الرسم" }
           ]}
           selected={selectedTab}
           onChange={setSelectedTab}
