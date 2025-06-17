@@ -6,6 +6,7 @@ import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import DrawingTools from "../components/DrawingTools";
 import Tabs from "../components/Tabs";
 import ToolSelector from "../tools/ToolSelector";
+import { ToolProvider } from "../context/ToolContext";
 import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
 import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
@@ -138,62 +139,64 @@ const SignalDetails = () => {
   if (!signal) return <div>⚠️ لا توجد توصية.</div>;
 
   return (
-    <SignalContext.Provider value={{ selectedSignal: signal }}>
-      <div className="p-4 space-y-4">
-        <h2 className="text-xl font-bold text-center">
-          تفاصيل التوصية: {signal.symbol || "?"} ({signal.action || "?"})
-        </h2>
+    <ToolProvider>
+      <SignalContext.Provider value={{ selectedSignal: signal }}>
+        <div className="p-4 space-y-4">
+          <h2 className="text-xl font-bold text-center">
+            تفاصيل التوصية: {signal.symbol || "?"} ({signal.action || "?"})
+          </h2>
 
-        <Tabs
-          tabs={[
-            { key: "candles", label: "الشموع اليابانية" },
-            { key: "analysis", label: "📊 تحليل فني" },
-            { key: "draw", label: "✍️ أدوات الرسم" }
-          ]}
-          selected={selectedTab}
-          onChange={setSelectedTab}
-        />
+          <Tabs
+            tabs={[
+              { key: "candles", label: "الشموع اليابانية" },
+              { key: "analysis", label: "📊 تحليل فني" },
+              { key: "draw", label: "✍️ أدوات الرسم" }
+            ]}
+            selected={selectedTab}
+            onChange={setSelectedTab}
+          />
 
-        <div className="border rounded-xl p-3 shadow bg-white">
-          {selectedTab === "candles" && (
-            signal.data?.length > 0 ? (
-              <CandlestickChart symbol={signal.symbol} data={signal.data} />
-            ) : (
-              <div className="text-yellow-600">⚠️ لا توجد بيانات شموع متاحة لهذا الرمز.</div>
-            )
-          )}
+          <div className="border rounded-xl p-3 shadow bg-white">
+            {selectedTab === "candles" && (
+              signal.data?.length > 0 ? (
+                <CandlestickChart symbol={signal.symbol} data={signal.data} />
+              ) : (
+                <div className="text-yellow-600">⚠️ لا توجد بيانات شموع متاحة لهذا الرمز.</div>
+              )
+            )}
 
-          {selectedTab === "analysis" && (
-            <>
-              <TechnicalAnalysisTab lines={lines} zones={zones} />
-              <ToolSelector />
-            </>
-          )}
+            {selectedTab === "analysis" && (
+              <>
+                <TechnicalAnalysisTab lines={lines} zones={zones} />
+                <ToolSelector />
+              </>
+            )}
 
-          {selectedTab === "draw" && (
-            <>
-              <div className="mb-2 text-sm text-gray-700">
-                🌀 عدد الفراكتلات: {fractals.length} | 🌊 إليوت: {waves.length} | 🔷 ABCD: {abcdPatterns.length} | 🎯 Harmonic: {harmonicPatterns.length} | ⭐️ Price Action: {priceActions.length}
-              </div>
-              <ToolSelector />
-              <DrawingTools
-                lines={lines}
-                zones={zones}
-                fractals={fractals}
-                waves={waves}
-                abcdPatterns={abcdPatterns}
-                harmonicPatterns={harmonicPatterns}
-                priceActions={priceActions}
-                onLinesChange={setLines}
-                onZonesChange={setZones}
-                onFractalsChange={setFractals}
-                onWavesChange={setWaves}
-              />
-            </>
-          )}
+            {selectedTab === "draw" && (
+              <>
+                <div className="mb-2 text-sm text-gray-700">
+                  🌀 عدد الفراكتلات: {fractals.length} | 🌊 إليوت: {waves.length} | 🔷 ABCD: {abcdPatterns.length} | 🎯 Harmonic: {harmonicPatterns.length} | ⭐️ Price Action: {priceActions.length}
+                </div>
+                <ToolSelector />
+                <DrawingTools
+                  lines={lines}
+                  zones={zones}
+                  fractals={fractals}
+                  waves={waves}
+                  abcdPatterns={abcdPatterns}
+                  harmonicPatterns={harmonicPatterns}
+                  priceActions={priceActions}
+                  onLinesChange={setLines}
+                  onZonesChange={setZones}
+                  onFractalsChange={setFractals}
+                  onWavesChange={setWaves}
+                />
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </SignalContext.Provider>
+      </SignalContext.Provider>
+    </ToolProvider>
   );
 };
 
