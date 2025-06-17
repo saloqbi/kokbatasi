@@ -4,8 +4,8 @@ import { ToolContext } from "../context/ToolContext";
 const DrawingTools = ({
   lines = [{ price: 102 }],
   zones = [{ from: 100, to: 98 }],
-  fractals,
-  waves,
+  fractals = [],
+  waves = [],
   abcdPatterns = [],
   harmonicPatterns = [],
   priceActions = [],
@@ -15,7 +15,6 @@ const DrawingTools = ({
   onWavesChange,
 }) => {
   const svgRef = useRef();
-  const { activeTool } = useContext(ToolContext);
   const width = 800;
   const height = 400;
   const padding = 40;
@@ -59,7 +58,7 @@ const DrawingTools = ({
       })}
 
       {/* Support & Resistance Lines */}
-      {activeTool === "line" && lines.map((line, i) => (
+      {lines.map((line, i) => (
         <line
           key={`line-${i}`}
           x1={0}
@@ -73,7 +72,7 @@ const DrawingTools = ({
       ))}
 
       {/* Zones */}
-      {activeTool === "zone" && zones.map((zone, i) => {
+      {zones.map((zone, i) => {
         const y1 = priceToY(zone.from);
         const y2 = priceToY(zone.to);
         return (
@@ -90,7 +89,7 @@ const DrawingTools = ({
       })}
 
       {/* Fractals */}
-      {activeTool === "fractal" && fractals.map((p, idx) => {
+      {fractals.map((p, idx) => {
         const x = indexToX(p.index);
         const y = priceToY(p.price);
         return (
@@ -108,7 +107,7 @@ const DrawingTools = ({
       })}
 
       {/* Elliott Waves */}
-      {activeTool === "elliott" && waves.length >= 2 &&
+      {waves.length >= 2 &&
         waves.map((wave, i) => {
           if (i === waves.length - 1) return null;
           const p1 = waves[i];
@@ -128,7 +127,7 @@ const DrawingTools = ({
         })}
 
       {/* ABCD Patterns */}
-      {activeTool === "abcd" && abcdPatterns.map((pattern, i) => {
+      {abcdPatterns.map((pattern, i) => {
         const { A, B, C, D } = pattern.points;
         const xa = indexToX(A.index), ya = priceToY(A.price);
         const xb = indexToX(B.index), yb = priceToY(B.price);
@@ -147,7 +146,7 @@ const DrawingTools = ({
       })}
 
       {/* Harmonic Patterns */}
-      {activeTool === "harmonic" && harmonicPatterns.map((pattern, i) => {
+      {harmonicPatterns.map((pattern, i) => {
         const { X, A, B, C, D } = pattern.points;
         const xX = indexToX(X.index), yX = priceToY(X.price);
         const xA = indexToX(A.index), yA = priceToY(A.price);
@@ -168,8 +167,6 @@ const DrawingTools = ({
           </g>
         );
       })}
-
-      {/* باقي أدوات Gann, Fibonacci, ICT, Channel, Wyckoff محفوظة كما هي */}
     </svg>
   );
 };
