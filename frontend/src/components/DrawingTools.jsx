@@ -15,6 +15,7 @@ const DrawingTools = ({
   onWavesChange,
 }) => {
   const svgRef = useRef();
+  const { activeTool } = useContext(ToolContext);
   const width = 800;
   const height = 400;
   const padding = 40;
@@ -47,8 +48,8 @@ const DrawingTools = ({
       viewBox={`0 0 ${width} ${height}`}
       className="mt-6 border rounded bg-gray-50 cursor-crosshair"
     >
-      {/* ⭐️ Price Action Patterns - تظهر دائمًا */}
-      {priceActions.map((pattern, i) => {
+      {/* ⭐️ Price Action Patterns */}
+      {activeTool === "price-action" && priceActions.map((pattern, i) => {
         const x = indexToX(pattern.index);
         return (
           <text key={`pa-${i}`} x={x} y={20} fontSize="10" fill="black" textAnchor="middle">
@@ -58,7 +59,7 @@ const DrawingTools = ({
       })}
 
       {/* Support & Resistance Lines */}
-      {lines.map((line, i) => (
+      {activeTool === "line" && lines.map((line, i) => (
         <line
           key={`line-${i}`}
           x1={0}
@@ -72,7 +73,7 @@ const DrawingTools = ({
       ))}
 
       {/* Zones */}
-      {zones.map((zone, i) => {
+      {activeTool === "zone" && zones.map((zone, i) => {
         const y1 = priceToY(zone.from);
         const y2 = priceToY(zone.to);
         return (
@@ -89,7 +90,7 @@ const DrawingTools = ({
       })}
 
       {/* Fractals */}
-      {fractals.map((p, idx) => {
+      {activeTool === "fractal" && fractals.map((p, idx) => {
         const x = indexToX(p.index);
         const y = priceToY(p.price);
         return (
@@ -107,7 +108,7 @@ const DrawingTools = ({
       })}
 
       {/* Elliott Waves */}
-      {waves.length >= 2 &&
+      {activeTool === "elliott" && waves.length >= 2 &&
         waves.map((wave, i) => {
           if (i === waves.length - 1) return null;
           const p1 = waves[i];
@@ -127,7 +128,7 @@ const DrawingTools = ({
         })}
 
       {/* ABCD Patterns */}
-      {abcdPatterns.map((pattern, i) => {
+      {activeTool === "abcd" && abcdPatterns.map((pattern, i) => {
         const { A, B, C, D } = pattern.points;
         const xa = indexToX(A.index), ya = priceToY(A.price);
         const xb = indexToX(B.index), yb = priceToY(B.price);
@@ -146,7 +147,7 @@ const DrawingTools = ({
       })}
 
       {/* Harmonic Patterns */}
-      {harmonicPatterns.map((pattern, i) => {
+      {activeTool === "harmonic" && harmonicPatterns.map((pattern, i) => {
         const { X, A, B, C, D } = pattern.points;
         const xX = indexToX(X.index), yX = priceToY(X.price);
         const xA = indexToX(A.index), yA = priceToY(A.price);
