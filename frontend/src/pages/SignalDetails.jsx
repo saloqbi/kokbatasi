@@ -9,6 +9,7 @@ import ToolSelector from "../tools/ToolSelector";
 import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
 import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
+import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector"; // ✅ جديد
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -20,6 +21,7 @@ const SignalDetails = () => {
   const [waves, setWaves] = useState([]);
   const [abcdPatterns, setABCDPatterns] = useState([]);
   const [harmonicPatterns, setHarmonicPatterns] = useState([]);
+  const [priceActions, setPriceActions] = useState([]); // ✅ جديد
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -89,11 +91,13 @@ const SignalDetails = () => {
         const waveDetected = detectElliottWaves(fractalDetected);
         const abcdDetected = detectABCDPatterns(signalData.data);
         const harmonicDetected = detectHarmonicPatterns(signalData.data);
+        const priceActionDetected = detectPriceActionPatterns(signalData.data);
 
         console.log("🌀 Fractals:", fractalDetected);
         console.log("🌊 Elliott Waves:", waveDetected);
         console.log("🔷 ABCD Patterns:", abcdDetected);
         console.log("🎯 Harmonic Patterns:", harmonicDetected);
+        console.log("⭐️ Price Action Patterns:", priceActionDetected);
 
         setSignal(signalData);
         setLines(signalData.lines || []);
@@ -102,6 +106,7 @@ const SignalDetails = () => {
         setWaves(waveDetected);
         setABCDPatterns(abcdDetected);
         setHarmonicPatterns(harmonicDetected);
+        setPriceActions(priceActionDetected);
       } catch (err) {
         console.error("❌ فشل تحميل التوصية:", err);
         setError("فشل في تحميل البيانات. تأكد من الاتصال ووجود التوصية.");
@@ -122,10 +127,11 @@ const SignalDetails = () => {
         waves,
         abcdPatterns,
         harmonicPatterns,
+        priceActions,
       });
     }, 1000);
     return () => clearTimeout(timeout);
-  }, [lines, zones, fractals, waves, abcdPatterns, harmonicPatterns]);
+  }, [lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions]);
 
   if (loading) return <div>📊 جاري تحميل التوصية...</div>;
   if (error) return <div className="text-red-600">❌ {error}</div>;
@@ -167,7 +173,7 @@ const SignalDetails = () => {
           {selectedTab === "draw" && (
             <>
               <div className="mb-2 text-sm text-gray-700">
-                🌀 عدد الفراكتلات: {fractals.length} | 🌊 عدد موجات إليوت: {waves.length} | 🔷 نماذج ABCD: {abcdPatterns.length} | 🎯 نماذج هارمونيك: {harmonicPatterns.length}
+                🌀 عدد الفراكتلات: {fractals.length} | 🌊 إليوت: {waves.length} | 🔷 ABCD: {abcdPatterns.length} | 🎯 Harmonic: {harmonicPatterns.length} | ⭐️ Price Action: {priceActions.length}
               </div>
               <ToolSelector />
               <DrawingTools
@@ -177,6 +183,7 @@ const SignalDetails = () => {
                 waves={waves}
                 abcdPatterns={abcdPatterns}
                 harmonicPatterns={harmonicPatterns}
+                priceActions={priceActions}
                 onLinesChange={setLines}
                 onZonesChange={setZones}
                 onFractalsChange={setFractals}
