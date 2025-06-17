@@ -5,11 +5,13 @@ const ToolSelector = () => {
   const { activeTool, setActiveTool } = useContext(ToolContext);
 
   const tools = [
-    { key: 'trendline', label: '📏 خط الاتجاه' },
+    { key: 'line', label: '📏 خط الاتجاه' },
     { key: 'zone', label: '📦 منطقة دعم/مقاومة' },
     { key: 'gann-box', label: '🟪 Gann Box' },
     { key: 'gann-grid', label: '🟫 Gann Grid' },
     { key: 'gann-fan', label: '🟤 Gann Fan' },
+    { key: 'gann-circle', label: '⚪ Gann Circle' },
+    { key: 'gann-square', label: '🟩 Gann Square' },
     { key: 'fib-retracement', label: '🟡 Fibonacci Retracement' },
     { key: 'fib-fan', label: '🟢 Fibonacci Fan' },
     { key: 'fib-zones', label: '🔵 Fibonacci Time Zones' },
