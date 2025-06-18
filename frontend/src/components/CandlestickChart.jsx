@@ -16,7 +16,7 @@ const CandlestickChart = ({ symbol, data }) => {
       const margin = { top: 10, right: 30, bottom: 30, left: 60 };
 
       const x = d3.scaleBand()
-        .domain(candles.map((d, i) => i)) // استخدم الفهرس كـ X
+        .domain(candles.map((_, i) => i))
         .range([margin.left, width - margin.right])
         .padding(0.3);
 
@@ -58,7 +58,6 @@ const CandlestickChart = ({ symbol, data }) => {
         .attr("stroke", "black");
     };
 
-    // ✅ تنسيق البيانات وتمريرها إلى الرسم
     if (data && data.length > 0) {
       const formatted = data.map(d => ({
         date: new Date(d.time || d.date),
