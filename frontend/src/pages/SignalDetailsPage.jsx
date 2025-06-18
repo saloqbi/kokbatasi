@@ -124,7 +124,7 @@ const SignalDetails = () => {
               data={combinedData}
               activeTool={activeTool}
               lines={lines}
-              setLines={setLines}
+              setLines={setLines} {/* ✅ هذا هو التعديل الأهم */}
               zones={zones}
               fractals={fractals}
               waves={waves}
