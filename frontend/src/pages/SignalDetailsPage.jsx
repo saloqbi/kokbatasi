@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import CandlestickChart from "../components/CandlestickChart";
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import DrawingTools from "../components/DrawingTools";
 import Tabs from "../components/Tabs";
@@ -12,18 +13,7 @@ import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
 import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
 import { subscribeToCandles } from "../utils/websocket";
 
-console.log("📦 SignalDetailsPage.jsx بدأ التنفيذ"); // ✅ تأكيد
-
-const TestChart = () => {
-  console.log("🔥 TestChart يعمل");
-  return (
-    <div style={{ border: "2px dashed red", padding: 20, margin: 10 }}>
-      ✅ TestChart ظاهر الآن داخل SignalDetailsPage.jsx
-    </div>
-  );
-};
-
-const SignalDetailsPage = () => {
+const SignalDetails = () => {
   const { id } = useParams();
   const [signal, setSignal] = useState(null);
   const [selectedTab, setSelectedTab] = useState("candles");
@@ -114,7 +104,9 @@ const SignalDetailsPage = () => {
     <ToolProvider>
       <SignalContext.Provider value={{ selectedSignal: signal }}>
         <div className='p-4 space-y-4'>
-          <h2 className='text-xl font-bold text-center'>تفاصيل التوصية: {signal.symbol} ({signal.action})</h2>
+          <h2 className='text-xl font-bold text-center'>
+            تفاصيل التوصية: {signal.symbol} ({signal.action})
+          </h2>
 
           <Tabs
             tabs={[
@@ -127,7 +119,19 @@ const SignalDetailsPage = () => {
           />
 
           <div className='border rounded-xl p-3 shadow bg-white'>
-            <TestChart />
+            {/* ✅ عرض دائم للشموع */}
+            <CandlestickChart
+              symbol={signal.symbol}
+              data={combinedData}
+              activeTool={activeTool}
+              lines={lines}
+              zones={zones}
+              fractals={fractals}
+              waves={waves}
+              abcdPatterns={abcdPatterns}
+              harmonicPatterns={harmonicPatterns}
+              priceActions={priceActions}
+            />
 
             {selectedTab === "analysis" && (
               <>
@@ -139,6 +143,7 @@ const SignalDetailsPage = () => {
             {selectedTab === "draw" && (
               <>
                 <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
+                <DrawingTools />
               </>
             )}
           </div>
@@ -148,4 +153,4 @@ const SignalDetailsPage = () => {
   );
 };
 
-export default SignalDetailsPage;
+export default SignalDetails;
