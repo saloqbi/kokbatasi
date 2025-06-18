@@ -18,6 +18,7 @@ const CandlestickChart = ({
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
+    console.log("📊 CandlestickChart Mounted");
     console.log("📊 CandlestickChart Data:", data);
 
     if (!data || data.length === 0) {
@@ -71,7 +72,6 @@ const CandlestickChart = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // رسم الشموع
     g.selectAll(".candle")
       .data(data)
       .enter()
@@ -82,7 +82,6 @@ const CandlestickChart = ({
       .attr("height", (d) => Math.abs(yScale(d.open) - yScale(d.close)))
       .attr("fill", (d) => (d.close > d.open ? "green" : "red"));
 
-    // الفتائل
     g.selectAll(".wick")
       .data(data)
       .enter()
@@ -93,7 +92,6 @@ const CandlestickChart = ({
       .attr("y2", (d) => yScale(d.low))
       .attr("stroke", "black");
 
-    // الخطوط المرسومة
     lines.forEach((line) => {
       g.append("line")
         .attr("x1", xScale(line.start.index))

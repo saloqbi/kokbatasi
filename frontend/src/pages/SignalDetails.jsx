@@ -104,7 +104,9 @@ const SignalDetails = () => {
     <ToolProvider>
       <SignalContext.Provider value={{ selectedSignal: signal }}>
         <div className='p-4 space-y-4'>
-          <h2 className='text-xl font-bold text-center'>تفاصيل التوصية: {signal.symbol} ({signal.action})</h2>
+          <h2 className='text-xl font-bold text-center'>
+            تفاصيل التوصية: {signal.symbol} ({signal.action})
+          </h2>
 
           <Tabs
             tabs={[
@@ -122,6 +124,7 @@ const SignalDetails = () => {
               data={combinedData}
               activeTool={activeTool}
               lines={lines}
+              setLines={setLines} // ✅ هذا هو التعديل المهم
               zones={zones}
               fractals={fractals}
               waves={waves}

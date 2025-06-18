@@ -8,14 +8,14 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AllSignalsPage from "./pages/AllSignalsPage";
 import { SignalProvider } from "./context/SignalContext";
-import { ToolProvider } from "./context/ToolContext"; // ✅ تمت إضافته
+import { ToolProvider } from "./context/ToolContext";
 
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
 const App = () => (
   <SignalProvider>
-    <ToolProvider> {/* ✅ تم إضافة هذا التغليف */}
+    <ToolProvider>
       <Router>
         <Routes>
           <Route path="/" element={<AllSignals />} />
