@@ -76,7 +76,6 @@ const CandlestickChart = ({
       .data(data)
       .enter()
       .append("rect")
-      .attr("class", "candle")
       .attr("x", (_, i) => xScale(i))
       .attr("y", (d) => yScale(Math.max(d.open, d.close)))
       .attr("width", xScale.bandwidth())
@@ -92,9 +91,9 @@ const CandlestickChart = ({
       .attr("x2", (_, i) => xScale(i) + xScale.bandwidth() / 2)
       .attr("y1", (d) => yScale(d.high))
       .attr("y2", (d) => yScale(d.low))
-      .attr("stroke", (d) => (d.close > d.open ? "green" : "red"));
+      .attr("stroke", "black");
 
-    // رسم الخطوط اليدوية
+    // الخطوط المرسومة
     lines.forEach((line) => {
       g.append("line")
         .attr("x1", xScale(line.start.index))
