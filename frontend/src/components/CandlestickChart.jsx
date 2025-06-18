@@ -5,13 +5,6 @@ const CandlestickChart = ({ symbol, data, activeTool, lines = [], zones = [], fr
   const ref = useRef();
 
   useEffect(() => {
-    if (!data || data.length === 0) {
-      console.warn("🚫 لا توجد بيانات شموع صالحة:", data);
-      return;
-    }
-
-    console.log("✅ بيانات الشموع:", data.slice(0, 5)); // طباعة نموذج
-
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove();
 
@@ -28,24 +21,15 @@ const CandlestickChart = ({ symbol, data, activeTool, lines = [], zones = [], fr
 
     const y = d3.scaleLinear()
       .domain([
-        d3.min(candles, d => +d.low),
-        d3.max(candles, d => +d.high)
+        d3.min(candles, d => d.low),
+        d3.max(candles, d => d.high)
       ])
       .nice()
       .range([height - margin.bottom, margin.top]);
 
     svg.attr("width", width).attr("height", height);
 
-    // اختبار مبدأي لرسم مستطيل دائمًا
-    svg.append("rect")
-      .attr("x", 50)
-      .attr("y", 50)
-      .attr("width", 100)
-      .attr("height", 50)
-      .attr("fill", "lightblue")
-      .attr("opacity", 0.3);
-
-    // رسم المحاور
+    // Draw axes
     svg.append("g")
       .attr("transform", `translate(0,${height - margin.bottom})`)
       .call(d3.axisBottom(x).tickFormat(i => i));
@@ -54,16 +38,16 @@ const CandlestickChart = ({ symbol, data, activeTool, lines = [], zones = [], fr
       .attr("transform", `translate(${margin.left},0)`)
       .call(d3.axisLeft(y));
 
-    // رسم الشموع
+    // Draw candlesticks
     svg.selectAll(".candle")
       .data(candles)
       .enter()
       .append("rect")
       .attr("x", d => x(d.index))
-      .attr("y", d => y(Math.max(+d.open, +d.close)))
+      .attr("y", d => y(Math.max(d.open, d.close)))
       .attr("width", x.bandwidth())
-      .attr("height", d => Math.abs(y(+d.open) - y(+d.close)))
-      .attr("fill", d => +d.close > +d.open ? "green" : "red");
+      .attr("height", d => Math.abs(y(d.open) - y(d.close)))
+      .attr("fill", d => d.close > d.open ? "green" : "red");
 
     svg.selectAll("line.stem")
       .data(candles)
@@ -71,11 +55,11 @@ const CandlestickChart = ({ symbol, data, activeTool, lines = [], zones = [], fr
       .append("line")
       .attr("x1", d => x(d.index) + x.bandwidth() / 2)
       .attr("x2", d => x(d.index) + x.bandwidth() / 2)
-      .attr("y1", d => y(+d.high))
-      .attr("y2", d => y(+d.low))
+      .attr("y1", d => y(d.high))
+      .attr("y2", d => y(d.low))
       .attr("stroke", "black");
 
-    // أدوات الرسم (كما كانت)
+    // Drawing tools over the chart
     const indexToX = i => x(i) + x.bandwidth() / 2;
     const priceToY = p => y(p);
 
@@ -134,6 +118,8 @@ const CandlestickChart = ({ symbol, data, activeTool, lines = [], zones = [], fr
           .text(p1.label);
       }
     }
+
+    // يمكن إضافة باقي الأدوات بنفس الطريقة...
   }, [data, activeTool, lines, zones, fractals, waves]);
 
   return <svg ref={ref}></svg>;
