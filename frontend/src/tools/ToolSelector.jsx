@@ -26,17 +26,17 @@ const ToolSelector = () => {
   ];
 
   return (
-    <div className="p-4 border rounded mt-4">
-      <h3 className="text-lg font-semibold mb-2">🧰 أدوات التحليل الفني:</h3>
-      <div className="flex flex-wrap gap-2">
+    <div className="p-4 border rounded mt-4 bg-white shadow">
+      <h3 className="text-lg font-semibold mb-3 text-center">🧰 أدوات التحليل الفني:</h3>
+      <div className="flex flex-wrap gap-2 items-center justify-center">
         {tools.map((tool) => (
           <button
             key={tool.key}
             onClick={() => setActiveTool(tool.key)}
-            className={`px-3 py-1 rounded border text-sm ${
+            className={`px-3 py-1 rounded border text-sm transition duration-200 ${
               activeTool === tool.key
                 ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-800'
+                : 'bg-gray-100 text-gray-800 hover:bg-blue-100'
             }`}
           >
             {tool.label}

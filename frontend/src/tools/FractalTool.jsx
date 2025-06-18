@@ -1,6 +1,5 @@
-
 import React, { useContext, useEffect, useState } from 'react';
-import { Layer, Circle } from 'react-konva';
+import { Circle } from 'react-konva';
 import { useSignalContext } from '../context/SignalContext';
 
 const FractalTool = () => {
@@ -30,10 +29,10 @@ const FractalTool = () => {
   }, [selectedSignal]);
 
   return (
-    <Layer>
+    <>
       {peaks.map((p, i) => <Circle key={`p${i}`} x={p.x} y={p.y} radius={4} fill="red" />)}
       {troughs.map((t, i) => <Circle key={`t${i}`} x={t.x} y={t.y} radius={4} fill="blue" />)}
-    </Layer>
+    </>
   );
 };
 
