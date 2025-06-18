@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-// import CandlestickChart from "../components/CandlestickChart.jsx"; // مؤقتًا معطل
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import DrawingTools from "../components/DrawingTools";
 import Tabs from "../components/Tabs";
@@ -13,13 +12,13 @@ import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
 import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
 import { subscribeToCandles } from "../utils/websocket";
 
-console.log("📦 SignalDetails.jsx بدأ التنفيذ"); // ✅ تأكيد
+console.log("📦 ✅ SignalDetails.jsx بدأ التنفيذ");
 
 const TestChart = () => {
-  console.log("🔥 TestChart يعمل");
+  console.log("🔥 ✅ TestChart يعمل داخل SignalDetails.jsx");
   return (
-    <div style={{ border: "2px dashed red", padding: 20, margin: 10 }}>
-      ✅ TestChart ظاهر الآن
+    <div style={{ border: "2px dashed green", padding: 20, margin: 10 }}>
+      ✅ TestChart ظاهر الآن داخل SignalDetails.jsx
     </div>
   );
 };
