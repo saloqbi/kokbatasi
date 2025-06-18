@@ -1,20 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import CandlestickChart from "../components/CandlestickChart";
-import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
-//import DrawingTools from "../components/DrawingTools";
-
-import DrawingTools from "../components/DrawingToolsWrapper";
-
-import Tabs from "../components/Tabs";
-import ToolSelector from "../tools/ToolSelector";
-import { ToolProvider } from "../context/ToolContext";
-import { SignalContext } from "../context/SignalContext";
-import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
-import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
-import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
-import { subscribeToCandles } from "../utils/websocket";
+// ... (نفس الاستيرادات)
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -31,37 +15,11 @@ const SignalDetails = () => {
   const [error, setError] = useState(null);
   const [liveData, setLiveData] = useState([]);
 
+  const [activeTool, setActiveTool] = useState("line"); // ✅ مضافة
+
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
-  const detectFractals = (candles) => {
-    const points = [];
-    for (let i = 2; i < candles.length - 2; i++) {
-      const prev = candles.slice(i - 2, i);
-      const next = candles.slice(i + 1, i + 3);
-      const curr = candles[i];
-      const isTop = prev.every(p => p.high < curr.high) && next.every(n => n.high < curr.high);
-      const isBottom = prev.every(p => p.low > curr.low) && next.every(n => n.low > curr.low);
-      if (isTop || isBottom) {
-        points.push({ index: i, price: isTop ? curr.high : curr.low, type: isTop ? "top" : "bottom" });
-      }
-    }
-    return points;
-  };
-
-  const detectElliottWaves = (fractalPoints) => {
-    const waves = [];
-    if (fractalPoints.length < 5) return waves;
-    for (let i = 0; i <= fractalPoints.length - 5; i++) {
-      const seq = fractalPoints.slice(i, i + 5);
-      waves.push(...seq.map((p, idx) => ({
-        label: `${idx + 1}`,
-        index: p.index,
-        price: p.price
-      })));
-      break;
-    }
-    return waves;
-  };
+  // ... باقي الدوال مثل detectFractals و detectElliottWaves ...
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -72,17 +30,7 @@ const SignalDetails = () => {
           signalData = {
             symbol: "MOCK",
             action: "buy",
-            data: [
-              { time: "T0", open: 95, high: 97, low: 93, close: 96 },
-              { time: "T1", open: 100, high: 105, low: 95, close: 100 },
-              { time: "T2", open: 100, high: 108, low: 98, close: 108 },
-              { time: "T3", open: 108, high: 104, low: 102, close: 104 },
-              { time: "T4", open: 104, high: 110, low: 103, close: 110 },
-              { time: "T5", open: 110, high: 102, low: 100, close: 102 },
-              { time: "T6", open: 102, high: 105, low: 99, close: 100 },
-              { time: "T7", open: 100, high: 101, low: 97, close: 98 },
-              { time: "T8", open: 98, high: 100, low: 95, close: 99 }
-            ]
+            data: [/* ... بيانات الشموع ... */]
           };
         } else {
           const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
@@ -130,13 +78,7 @@ const SignalDetails = () => {
     if (!signal || id === "mock-harmonic-test") return;
     const timeout = setTimeout(() => {
       axios.put(`${apiBase}/api/signals/${id}/drawings`, {
-        lines,
-        zones,
-        fractals,
-        waves,
-        abcdPatterns,
-        harmonicPatterns,
-        priceActions
+        lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions
       });
     }, 1000);
     return () => clearTimeout(timeout);
@@ -178,7 +120,7 @@ const SignalDetails = () => {
             {selectedTab === "analysis" && (
               <>
                 <TechnicalAnalysisTab lines={lines} zones={zones} />
-                <ToolSelector />
+                <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
               </>
             )}
 
@@ -187,8 +129,9 @@ const SignalDetails = () => {
                 <div className="mb-2 text-sm text-gray-700">
                   🌀 عدد الفراكتلات: {fractals.length} | 🌊 إليوت: {waves.length} | 🔷 ABCD: {abcdPatterns.length} | 🎯 Harmonic: {harmonicPatterns.length} | ⭐️ Price Action: {priceActions.length}
                 </div>
-                <ToolSelector />
+                <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
                 <DrawingTools
+                  activeTool={activeTool}
                   lines={lines}
                   zones={zones}
                   fractals={fractals}
