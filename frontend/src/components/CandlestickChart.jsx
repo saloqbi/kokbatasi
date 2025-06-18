@@ -75,7 +75,6 @@ const CandlestickChart = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Candles
     g.selectAll(".candle")
       .data(data)
       .enter()
@@ -86,7 +85,6 @@ const CandlestickChart = ({
       .attr("height", (d) => Math.abs(yScale(d.open) - yScale(d.close)))
       .attr("fill", (d) => (d.close > d.open ? "green" : "red"));
 
-    // Wicks
     g.selectAll(".wick")
       .data(data)
       .enter()
@@ -97,7 +95,6 @@ const CandlestickChart = ({
       .attr("y2", (d) => yScale(d.low))
       .attr("stroke", "black");
 
-    // خطوط مرسومة يدويًا
     lines.forEach((line) => {
       g.append("line")
         .attr("x1", xScale(line.start.index))
@@ -110,11 +107,11 @@ const CandlestickChart = ({
   }, [data, lines, activeTool, tempPoints]);
 
   return (
-    <div style={{ position: "relative" }}>
-      <svg ref={svgRef} style={{ position: "absolute", zIndex: 1 }}></svg>
-      <Stage width={800} height={400} style={{ position: "absolute", top: 0, left: 0, zIndex: 2 }}>
+    <div style={{ position: "relative", width, height }}>
+      <Stage width={width} height={height} style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}>
         <AllDrawingTools />
       </Stage>
+      <svg ref={svgRef} style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}></svg>
     </div>
   );
 };
