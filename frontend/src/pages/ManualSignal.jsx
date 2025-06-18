@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createSignal } from "../api/signals"; // ✅ استيراد الدالة
 
 const ManualSignal = () => {
   const navigate = useNavigate();
@@ -35,7 +36,6 @@ const ManualSignal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!form.title || !form.recommendation || !form.price) {
       setError("جميع الحقول الأساسية مطلوبة");
       return;
@@ -59,6 +59,39 @@ const ManualSignal = () => {
     } catch (err) {
       console.error("❌ فشل:", err);
       setError("حدث خطأ أثناء الإرسال");
+    }
+  };
+
+  // ✅ زر إنشاء توصية وهمية
+  const handleCreateMockSignal = async () => {
+    const mockData = [
+      { time: "2024-01-01", open: 100, high: 105, low: 98, close: 104 },
+      { time: "2024-01-02", open: 104, high: 107, low: 102, close: 106 },
+      { time: "2024-01-03", open: 106, high: 108, low: 105, close: 107 },
+      { time: "2024-01-04", open: 107, high: 110, low: 106, close: 109 },
+      { time: "2024-01-05", open: 109, high: 112, low: 108, close: 111 },
+      { time: "2024-01-06", open: 111, high: 113, low: 110, close: 112 },
+      { time: "2024-01-07", open: 112, high: 115, low: 111, close: 114 },
+    ];
+
+    const newSignal = {
+      symbol: "AAPL",
+      action: "buy",
+      type: "long",
+      price: 111,
+      lines: [],
+      zones: [],
+      fractals: [],
+      waves: [],
+      data: mockData,
+    };
+
+    const result = await createSignal(newSignal);
+    if (result) {
+      alert(`✅ تم إنشاء التوصية بنجاح\nID: ${result._id}`);
+      window.open(`/signals/${result._id}`, "_blank");
+    } else {
+      alert("❌ فشل في إنشاء التوصية");
     }
   };
 
@@ -102,7 +135,7 @@ const ManualSignal = () => {
             📊 بيانات الشموع (Candlestick Data)
           </h3>
           {form.data.map((point, index) => (
-            <div key={index} className="grid grid-cols-5 gap-2 items-center mb-2">
+            <div key={index} className="grid grid-cols-6 gap-2 items-center mb-2">
               <input
                 type="text"
                 placeholder="الوقت"
@@ -165,6 +198,15 @@ const ManualSignal = () => {
           حفظ التوصية
         </button>
       </form>
+
+      {/* ✅ زر اختبار سريع */}
+      <hr className="my-6 border-t border-gray-300" />
+      <button
+        onClick={handleCreateMockSignal}
+        className="w-full bg-indigo-600 text-white p-3 rounded hover:bg-indigo-700"
+      >
+        🔁 إنشاء توصية وهمية (مع بيانات جاهزة)
+      </button>
     </div>
   );
 };
