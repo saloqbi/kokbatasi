@@ -28,7 +28,7 @@ const SignalDetails = () => {
   const [error, setError] = useState(null);
   const [liveData, setLiveData] = useState([]);
 
-  const { activeTool } = useContext(ToolContext);
+  const { activeTool } = useContext(ToolContext); // ✅ تم إضافته هنا
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
   const detectFractals = (candles) => {
@@ -64,76 +64,73 @@ const SignalDetails = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        let signalData;
         const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
-        signalData = typeof signalRes.data === "object" ? signalRes.data : null;
+        const signalData = signalRes.data;
+        if (!signalData || !signalData.symbol) throw new Error("❌ التوصية غير صالحة");
 
-        if (!signalData) throw new Error("❌ التوصية غير موجودة أو غير صالحة.");
-        signalData.action = signalData.action || signalData.type?.toLowerCase();
-        if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
+        const candles = Array.isArray(signalData.data) && signalData.data.length > 0
+          ? signalData.data
+          : liveData;
 
-        const hasData = Array.isArray(signalData.data) && signalData.data.length > 0;
-        const candles = hasData ? signalData.data : liveData;
-
-        if (!hasData) {
+        if (!signalData.data || signalData.data.length === 0) {
           subscribeToCandles(signalData.symbol, (newCandle) => {
             setLiveData(prev => [...prev.slice(-29), newCandle]);
           });
         }
 
-        const fractalDetected = detectFractals(candles);
-        const waveDetected = detectElliottWaves(fractalDetected);
-        const abcdDetected = detectABCDPatterns(candles);
-        const harmonicDetected = detectHarmonicPatterns(candles);
-        const priceActionDetected = detectPriceActionPatterns(candles);
+        const fractals = detectFractals(candles);
+        const waves = detectElliottWaves(fractals);
+        const abcd = detectABCDPatterns(candles);
+        const harmonic = detectHarmonicPatterns(candles);
+        const priceAction = detectPriceActionPatterns(candles);
 
         setSignal(signalData);
         setLines(signalData.lines || []);
         setZones(signalData.zones || []);
-        setFractals(fractalDetected);
-        setWaves(waveDetected);
-        setABCDPatterns(abcdDetected);
-        setHarmonicPatterns(harmonicDetected);
-        setPriceActions(priceActionDetected);
+        setFractals(fractals);
+        setWaves(waves);
+        setABCDPatterns(abcd);
+        setHarmonicPatterns(harmonic);
+        setPriceActions(priceAction);
       } catch (err) {
-        console.error("❌ فشل تحميل التوصية:", err);
-        setError("فشل في تحميل البيانات. تأكد من الاتصال ووجود التوصية.");
+        console.error("❌ فشل تحميل:", err);
+        setError("فشل تحميل التوصية.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchAll();
-  }, [id, liveData]);
+  }, [id]);
 
   useEffect(() => {
-    if (!signal || id === "mock-harmonic-test") return;
+    if (!signal) return;
     const timeout = setTimeout(() => {
       axios.put(`${apiBase}/api/signals/${id}/drawings`, {
-        lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions
+        lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions,
       });
     }, 1000);
     return () => clearTimeout(timeout);
   }, [lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions]);
 
-  if (loading) return <div>📊 جاري تحميل التوصية...</div>;
-  if (error) return <div className="text-red-600">❌ {error}</div>;
-  if (!signal) return <div>⚠️ لا توجد توصية.</div>;
+  const combinedData = Array.isArray(signal?.data) ? signal.data : liveData;
 
-  const combinedData = Array.isArray(signal.data) ? signal.data : liveData;
+  if (loading) return <div>📊 جاري تحميل التوصية...</div>;
+  if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <ToolProvider>
       <SignalContext.Provider value={{ selectedSignal: signal }}>
         <div className="p-4 space-y-4">
           <h2 className="text-xl font-bold text-center">
-            تفاصيل التوصية: {signal.symbol || "?"} ({signal.action || "?"})
+            تفاصيل التوصية: {signal.symbol} ({signal.action})
           </h2>
 
           <Tabs
             tabs={[
               { key: "candles", label: "الشموع اليابانية" },
-              { key: "analysis", label: "📊 تحليل فني" },
-              { key: "draw", label: "✍️ أدوات الرسم" }
+              { key: "analysis", label: "📊 التحليل الفني" },
+              { key: "draw", label: "✍️ أدوات الرسم" },
             ]}
             selected={selectedTab}
             onChange={setSelectedTab}
@@ -141,11 +138,9 @@ const SignalDetails = () => {
 
           <div className="border rounded-xl p-3 shadow bg-white">
             {selectedTab === "candles" && (
-              combinedData.length > 0 ? (
-                <CandlestickChart symbol={signal.symbol} data={combinedData} />
-              ) : (
-                <div className="text-yellow-600">⚠️ لا توجد بيانات شموع متاحة لهذا الرمز.</div>
-              )
+              combinedData.length > 0
+                ? <CandlestickChart symbol={signal.symbol} data={combinedData} />
+                : <div className="text-yellow-600">⚠️ لا توجد بيانات.</div>
             )}
 
             {selectedTab === "analysis" && (
@@ -157,12 +152,9 @@ const SignalDetails = () => {
 
             {selectedTab === "draw" && (
               <>
-                <div className="mb-2 text-sm text-gray-700">
-                  🌀 عدد الفراكتلات: {fractals.length} | 🌊 إليوت: {waves.length} | 🔷 ABCD: {abcdPatterns.length} | 🎯 Harmonic: {harmonicPatterns.length} | ⭐️ Price Action: {priceActions.length}
-                </div>
                 <ToolSelector />
                 <DrawingTools
-                  activeTool={activeTool}
+                  activeTool={activeTool} // ✅ تمرير الأداة النشطة
                   lines={lines}
                   zones={zones}
                   fractals={fractals}
