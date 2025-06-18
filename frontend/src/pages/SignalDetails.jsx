@@ -11,7 +11,7 @@ import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
 import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
 import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
-import { subscribeToCandles } from "../utils/websocket"; // ✅ WebSocket دعم
+import { subscribeToCandles } from "../utils/websocket";
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -26,7 +26,7 @@ const SignalDetails = () => {
   const [priceActions, setPriceActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [liveData, setLiveData] = useState([]); // ✅ بيانات الشموع الحية
+  const [liveData, setLiveData] = useState([]);
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -39,7 +39,7 @@ const SignalDetails = () => {
       const isTop = prev.every(p => p.high < curr.high) && next.every(n => n.high < curr.high);
       const isBottom = prev.every(p => p.low > curr.low) && next.every(n => n.low > curr.low);
       if (isTop || isBottom) {
-        points.push({ index: i, price: isTop ? curr.high : curr.low, type: isTop ? 'top' : 'bottom' });
+        points.push({ index: i, price: isTop ? curr.high : curr.low, type: isTop ? "top" : "bottom" });
       }
     }
     return points;
@@ -90,22 +90,20 @@ const SignalDetails = () => {
         signalData.action = signalData.action || signalData.type?.toLowerCase();
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
 
-        // ✅ إذا لا توجد بيانات، اشترك مع TradingView
-        if (!signalData.data || signalData.data.length === 0) {
+        const hasData = Array.isArray(signalData.data) && signalData.data.length > 0;
+        const candles = hasData ? signalData.data : liveData;
+
+        if (!hasData) {
           subscribeToCandles(signalData.symbol, (newCandle) => {
-            setLiveData(prev => {
-              const updated = [...prev.slice(-29), newCandle];
-              return updated;
-            });
+            setLiveData(prev => [...prev.slice(-29), newCandle]);
           });
         }
 
-        // ✅ اكتشاف الأنماط
-        const fractalDetected = detectFractals(signalData.data || []);
+        const fractalDetected = detectFractals(candles);
         const waveDetected = detectElliottWaves(fractalDetected);
-        const abcdDetected = detectABCDPatterns(signalData.data || []);
-        const harmonicDetected = detectHarmonicPatterns(signalData.data || []);
-        const priceActionDetected = detectPriceActionPatterns(signalData.data || []);
+        const abcdDetected = detectABCDPatterns(candles);
+        const harmonicDetected = detectHarmonicPatterns(candles);
+        const priceActionDetected = detectPriceActionPatterns(candles);
 
         setSignal(signalData);
         setLines(signalData.lines || []);
@@ -123,7 +121,7 @@ const SignalDetails = () => {
       }
     };
     fetchAll();
-  }, [id]);
+  }, [id, liveData]);
 
   useEffect(() => {
     if (!signal || id === "mock-harmonic-test") return;
@@ -145,7 +143,7 @@ const SignalDetails = () => {
   if (error) return <div className="text-red-600">❌ {error}</div>;
   if (!signal) return <div>⚠️ لا توجد توصية.</div>;
 
-  const combinedData = signal.data?.length > 0 ? signal.data : liveData;
+  const combinedData = Array.isArray(signal.data) && signal.data.length > 0 ? signal.data : liveData;
 
   return (
     <ToolProvider>
