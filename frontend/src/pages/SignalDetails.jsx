@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import CandlestickChart from "../components/CandlestickChart";
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
-import DrawingTools from "../components/DrawingTools";
+import AllDrawingTools from "../tools/AllDrawingTools";
 import Tabs from "../components/Tabs";
 import ToolSelector from "../tools/ToolSelector";
 import { ToolProvider } from "../context/ToolContext";
@@ -119,7 +119,6 @@ const SignalDetails = () => {
           />
 
           <div className='border rounded-xl p-3 shadow bg-white'>
-            {/* ✅ عرض الشموع فقط عند تحديد التبويب */}
             {selectedTab === "candles" && (
               <CandlestickChart
                 symbol={signal.symbol}
@@ -171,8 +170,9 @@ const SignalDetails = () => {
                   harmonicPatterns={harmonicPatterns}
                   priceActions={priceActions}
                 />
-                <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                <DrawingTools />
+                <div className="mt-4">
+                  <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
+                </div>
               </>
             )}
           </div>
