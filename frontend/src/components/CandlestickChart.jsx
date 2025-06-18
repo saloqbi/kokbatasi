@@ -9,15 +9,24 @@ const CandlestickChart = ({
   zones = [],
   fractals = [],
   waves = [],
-  abcdPatterns = [],
-  harmonicPatterns = [],
-  priceActions = [],
 }) => {
   const svgRef = useRef();
 
   useEffect(() => {
+    console.log("📊 CandlestickChart Data:", data);
+
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove(); // clear
+
+    if (!data || data.length === 0) {
+      svg.append("text")
+        .attr("x", 100)
+        .attr("y", 50)
+        .text("⚠️ لا توجد بيانات شموع")
+        .attr("fill", "red")
+        .attr("font-size", "24px");
+      return;
+    }
 
     const width = 800;
     const height = 400;
@@ -65,8 +74,6 @@ const CandlestickChart = ({
       .attr("y1", (d) => yScale(d.high))
       .attr("y2", (d) => yScale(d.low))
       .attr("stroke", (d) => (d.close > d.open ? "green" : "red"));
-
-    // أدوات التحليل الفني
 
     // خطوط
     lines.forEach((line) => {
