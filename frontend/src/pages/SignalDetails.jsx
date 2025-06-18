@@ -17,6 +17,9 @@ import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
 import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
 import { subscribeToCandles } from "../utils/websocket";
 
+
+console.log("📦 SignalDetails.jsx بدأ التنفيذ");
+
 const SignalDetails = () => {
   const { id } = useParams();
   const [signal, setSignal] = useState(null);
