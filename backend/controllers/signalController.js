@@ -11,21 +11,42 @@ const getSignals = async (req, res) => {
   }
 };
 
-// ✅ إنشاء توصية جديدة
+// ✅ إنشاء توصية جديدة (مُعدل لحفظ الشموع)
 const createSignal = async (req, res) => {
   try {
-    const newSignal = new Signal(req.body);
-    await newSignal.save();
-    res.status(201).json(newSignal);
+    const {
+      symbol,
+      action,
+      price,
+      lines,
+      zones,
+      fractals,
+      waves,
+      data // ✅ الشموع
+    } = req.body;
+
+    const newSignal = new Signal({
+      symbol,
+      action,
+      price,
+      lines: lines || [],
+      zones: zones || [],
+      fractals: fractals || [],
+      waves: waves || [],
+      data: data || [] // ✅ تأكد من حفظها
+    });
+
+    const savedSignal = await newSignal.save();
+    res.status(201).json(savedSignal);
   } catch (error) {
     console.error("❌ Error creating signal:", error.message, error.stack);
     res.status(500).json({ message: "Failed to create signal", error: String(error) });
   }
 };
 
-// ✅ توليد توصيات عشوائية (مع تسجيل الدخول للدالة + طباعة الخطأ النصي)
+// ✅ توليد توصيات عشوائية
 const generateRandomSignals = async (req, res) => {
-  console.log("🔄 دخلنا على الدالة generateRandomSignals"); // ✅ تأكيد الوصول
+  console.log("🔄 دخلنا على الدالة generateRandomSignals");
 
   try {
     const randomSignals = [];
@@ -41,23 +62,17 @@ const generateRandomSignals = async (req, res) => {
         zones: [],
         fractals: [],
         waves: [],
+        data: [] // يمكن تعديلها لإضافة شموع لاحقًا
       });
       await randomSignal.save();
       randomSignals.push(randomSignal);
     }
 
     console.log("✅ تم إنشاء التوصيات:", randomSignals.length);
-
-    res.status(201).json({
-      message: "✅ Random signals generated",
-      data: randomSignals
-    });
+    res.status(201).json({ message: "✅ Random signals generated", data: randomSignals });
   } catch (error) {
     console.error("❌ Error generating signals:", error.message, error.stack);
-    res.status(500).json({
-      message: "❌ Failed to generate random signals",
-      error: String(error)
-    });
+    res.status(500).json({ message: "❌ Failed to generate random signals", error: String(error) });
   }
 };
 
