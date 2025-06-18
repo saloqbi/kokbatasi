@@ -49,6 +49,7 @@ const DrawingTools = ({
       viewBox={`0 0 ${width} ${height}`}
       className="mt-6 border rounded bg-gray-50 cursor-crosshair"
     >
+      {/* ⭐️ Price Action */}
       {activeTool === "price-action" && priceActions.map((pattern, i) => {
         const x = indexToX(pattern.index);
         return (
@@ -58,6 +59,7 @@ const DrawingTools = ({
         );
       })}
 
+      {/* 📏 خط أفقي */}
       {activeTool === "line" && lines.map((line, i) => (
         <line
           key={`line-${i}`}
@@ -71,6 +73,7 @@ const DrawingTools = ({
         />
       ))}
 
+      {/* 📦 مناطق دعم/مقاومة */}
       {activeTool === "zone" && zones.map((zone, i) => {
         const y1 = priceToY(zone.from);
         const y2 = priceToY(zone.to);
@@ -87,6 +90,7 @@ const DrawingTools = ({
         );
       })}
 
+      {/* 🌀 فراكتلات */}
       {activeTool === "fractal" && fractals.map((p, idx) => {
         const x = indexToX(p.index);
         const y = priceToY(p.price);
@@ -104,6 +108,7 @@ const DrawingTools = ({
         );
       })}
 
+      {/* 🌊 إليوت */}
       {activeTool === "elliott" && waves.length >= 2 &&
         waves.map((wave, i) => {
           if (i === waves.length - 1) return null;
@@ -123,8 +128,68 @@ const DrawingTools = ({
           );
         })}
 
-      {/* ABCD & Harmonic - نفس المنهج مع حماية index/price يمكن إضافته لو أردت */}
+      {/* 🔷 ABCD Pattern */}
+      {activeTool === "abcd" && abcdPatterns.map((p, i) => {
+        const A = p.points?.A, B = p.points?.B, C = p.points?.C, D = p.points?.D;
+        if (!A || !B || !C || !D) return null;
+        const points = [A, B, C, D];
+        return (
+          <g key={i}>
+            {points.slice(0, -1).map((pt, idx) => {
+              const p1 = pt;
+              const p2 = points[idx + 1];
+              return (
+                <line
+                  key={idx}
+                  x1={indexToX(p1.index)}
+                  y1={priceToY(p1.price)}
+                  x2={indexToX(p2.index)}
+                  y2={priceToY(p2.price)}
+                  stroke="purple"
+                  strokeWidth="2"
+                />
+              );
+            })}
+            {points.map((pt, idx) => (
+              <text key={`lbl-${idx}`} x={indexToX(pt.index)} y={priceToY(pt.price) - 6} fontSize="10" fill="black">
+                {["A", "B", "C", "D"][idx]}
+              </text>
+            ))}
+          </g>
+        );
+      })}
 
+      {/* 🦋 Harmonic Pattern */}
+      {activeTool === "harmonic" && harmonicPatterns.map((p, i) => {
+        const X = p.points?.X, A = p.points?.A, B = p.points?.B, C = p.points?.C, D = p.points?.D;
+        if (!X || !A || !B || !C || !D) return null;
+        const points = [X, A, B, C, D];
+        return (
+          <g key={i}>
+            {points.slice(0, -1).map((pt, idx) => {
+              const p1 = pt;
+              const p2 = points[idx + 1];
+              return (
+                <line
+                  key={idx}
+                  x1={indexToX(p1.index)}
+                  y1={priceToY(p1.price)}
+                  x2={indexToX(p2.index)}
+                  y2={priceToY(p2.price)}
+                  stroke="teal"
+                  strokeWidth="2"
+                  strokeDasharray="4"
+                />
+              );
+            })}
+            {points.map((pt, idx) => (
+              <text key={`lbl-${idx}`} x={indexToX(pt.index)} y={priceToY(pt.price) - 6} fontSize="10" fill="black">
+                {["X", "A", "B", "C", "D"][idx]}
+              </text>
+            ))}
+          </g>
+        );
+      })}
     </svg>
   );
 };
