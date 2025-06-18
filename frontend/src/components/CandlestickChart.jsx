@@ -15,10 +15,20 @@ const CandlestickChart = ({
   const [tempPoints, setTempPoints] = useState([]);
 
   useEffect(() => {
-    if (!data || data.length === 0) return;
-
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
+
+    console.log("📊 CandlestickChart Data:", data);
+
+    if (!data || data.length === 0) {
+      svg.append("text")
+        .attr("x", 50)
+        .attr("y", 50)
+        .text("⚠️ لا توجد بيانات لعرض الشموع!")
+        .attr("fill", "red")
+        .attr("font-size", "20px");
+      return;
+    }
 
     const width = 800;
     const height = 400;
@@ -44,9 +54,7 @@ const CandlestickChart = ({
         if (activeTool !== "line") return;
 
         const [x, y] = d3.pointer(event);
-        const index = Math.round(xScale.invert
-          ? xScale.invert(x - margin.left)
-          : xScale.domain()[Math.round((x - margin.left) / xScale.step())]);
+        const index = Math.round((x - margin.left) / xScale.step());
         const price = yScale.invert(y - margin.top);
 
         const nearestIndex = Math.max(0, Math.min(data.length - 1, index));
@@ -63,7 +71,7 @@ const CandlestickChart = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Candles
+    // رسم الشموع
     g.selectAll(".candle")
       .data(data)
       .enter()
@@ -75,7 +83,7 @@ const CandlestickChart = ({
       .attr("height", (d) => Math.abs(yScale(d.open) - yScale(d.close)))
       .attr("fill", (d) => (d.close > d.open ? "green" : "red"));
 
-    // Wicks
+    // الفتائل
     g.selectAll(".wick")
       .data(data)
       .enter()
@@ -86,7 +94,7 @@ const CandlestickChart = ({
       .attr("y2", (d) => yScale(d.low))
       .attr("stroke", (d) => (d.close > d.open ? "green" : "red"));
 
-    // خطوط مرسومة
+    // رسم الخطوط اليدوية
     lines.forEach((line) => {
       g.append("line")
         .attr("x1", xScale(line.start.index))
