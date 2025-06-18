@@ -1,17 +1,21 @@
-
-import React, { useEffect } from 'react';
-import { useSignalContext } from '../context/SignalContext';
+import React, { useContext } from "react";
+import { Line } from "react-konva";
+import { SignalContext } from "../context/SignalContext";
 
 const GannTool = () => {
-  const { selectedSignal } = useSignalContext();
+  const { selectedSignal } = useContext(SignalContext);
 
-  useEffect(() => {
-    if (selectedSignal) {
-      console.log("🧭 تحليل Gann لـ:", selectedSignal.symbol);
-    }
-  }, [selectedSignal]);
+  if (!selectedSignal) return null;
 
-  return <div>🔵 أداة Gann Tool مفعّلة</div>;
+  const lines = [];
+  for (let i = 0; i <= 5; i++) {
+    lines.push(
+      <Line key={`v-${i}`} points={[100 + i * 20, 100, 100 + i * 20, 200]} stroke="blue" strokeWidth={1} />,
+      <Line key={`h-${i}`} points={[100, 100 + i * 20, 200, 100 + i * 20]} stroke="blue" strokeWidth={1} />
+    );
+  }
+
+  return <>{lines}</>;
 };
 
 export default GannTool;

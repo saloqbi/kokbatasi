@@ -1,17 +1,15 @@
-
-import React, { useEffect } from 'react';
-import { useSignalContext } from '../context/SignalContext';
+import React from "react";
+import { Line } from "react-konva";
 
 const TrendlineTool = () => {
-  const { selectedSignal } = useSignalContext();
-
-  useEffect(() => {
-    if (selectedSignal) {
-      console.log("📈 رسم خط اتجاه لـ:", selectedSignal.symbol);
-    }
-  }, [selectedSignal]);
-
-  return <div>🟢 أداة Trendline Tool مفعّلة</div>;
+  return (
+    <Line
+      points={[50, 250, 300, 150]}
+      stroke="blue"
+      strokeWidth={2}
+      dash={[5, 5]}
+    />
+  );
 };
 
 export default TrendlineTool;
