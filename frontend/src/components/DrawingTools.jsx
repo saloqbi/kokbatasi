@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 
 const DrawingTools = ({
   activeTool,
@@ -14,18 +14,6 @@ const DrawingTools = ({
   const width = 800;
   const height = 400;
   const padding = 40;
-
-  // ✅ Debug Log
-  useEffect(() => {
-    console.log("🧪 activeTool:", activeTool);
-    console.log("📏 lines:", lines);
-    console.log("📦 zones:", zones);
-    console.log("🌀 fractals:", fractals);
-    console.log("🌊 elliott waves:", waves);
-    console.log("🔷 abcdPatterns:", abcdPatterns);
-    console.log("🦋 harmonicPatterns:", harmonicPatterns);
-    console.log("⭐ priceActions:", priceActions);
-  }, [activeTool, lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions]);
 
   const allPrices = [
     ...fractals.map(p => p.price),
@@ -55,7 +43,146 @@ const DrawingTools = ({
       viewBox={`0 0 ${width} ${height}`}
       className="mt-6 border rounded bg-gray-50 cursor-crosshair"
     >
-      {/* هنا يمكنك إبقاء كود الرسم حسب activeTool، أو تركه فارغاً فقط لاختبار البيانات */}
+      {activeTool === "line" &&
+        lines.map((line, i) => (
+          <line
+            key={`line-${i}`}
+            x1={0}
+            y1={priceToY(line.price)}
+            x2={width}
+            y2={priceToY(line.price)}
+            stroke="gray"
+            strokeWidth="1"
+            strokeDasharray="4"
+          />
+        ))}
+
+      {activeTool === "zone" &&
+        zones.map((zone, i) => {
+          const y1 = priceToY(zone.from);
+          const y2 = priceToY(zone.to);
+          return (
+            <rect
+              key={`zone-${i}`}
+              x={0}
+              y={Math.min(y1, y2)}
+              width={width}
+              height={Math.abs(y1 - y2)}
+              fill="orange"
+              opacity={0.1}
+            />
+          );
+        })}
+
+      {activeTool === "fractal" &&
+        fractals.map((p, idx) => (
+          <text
+            key={idx}
+            x={indexToX(p.index)}
+            y={p.type === "top" ? priceToY(p.price) - 10 : priceToY(p.price) + 15}
+            fontSize="18"
+            fill={p.type === "top" ? "red" : "blue"}
+            textAnchor="middle"
+          >
+            {p.type === "top" ? "⬆️" : "⬇️"}
+          </text>
+        ))}
+
+      {activeTool === "elliott" &&
+        waves.map((wave, i) => {
+          if (i === waves.length - 1) return null;
+          const p1 = wave;
+          const p2 = waves[i + 1];
+          return (
+            <g key={i}>
+              <line
+                x1={indexToX(p1.index)}
+                y1={priceToY(p1.price)}
+                x2={indexToX(p2.index)}
+                y2={priceToY(p2.price)}
+                stroke="green"
+                strokeWidth="2"
+              />
+              <text
+                x={indexToX(p1.index)}
+                y={priceToY(p1.price) - 8}
+                fontSize="12"
+                fill="black"
+                textAnchor="middle"
+              >
+                {p1.label}
+              </text>
+            </g>
+          );
+        })}
+
+      {activeTool === "abcd" &&
+        abcdPatterns.map((p, i) => {
+          const pts = [p.points?.A, p.points?.B, p.points?.C, p.points?.D];
+          if (pts.some(pt => !pt)) return null;
+          return (
+            <g key={i}>
+              {pts.slice(0, -1).map((pt, idx) => {
+                const p1 = pt;
+                const p2 = pts[idx + 1];
+                return (
+                  <line
+                    key={idx}
+                    x1={indexToX(p1.index)}
+                    y1={priceToY(p1.price)}
+                    x2={indexToX(p2.index)}
+                    y2={priceToY(p2.price)}
+                    stroke="purple"
+                    strokeWidth="2"
+                  />
+                );
+              })}
+              {pts.map((pt, idx) => (
+                <text key={idx} x={indexToX(pt.index)} y={priceToY(pt.price) - 6} fontSize="10" fill="black">
+                  {["A", "B", "C", "D"][idx]}
+                </text>
+              ))}
+            </g>
+          );
+        })}
+
+      {activeTool === "harmonic" &&
+        harmonicPatterns.map((p, i) => {
+          const pts = [p.points?.X, p.points?.A, p.points?.B, p.points?.C, p.points?.D];
+          if (pts.some(pt => !pt)) return null;
+          return (
+            <g key={i}>
+              {pts.slice(0, -1).map((pt, idx) => {
+                const p1 = pt;
+                const p2 = pts[idx + 1];
+                return (
+                  <line
+                    key={idx}
+                    x1={indexToX(p1.index)}
+                    y1={priceToY(p1.price)}
+                    x2={indexToX(p2.index)}
+                    y2={priceToY(p2.price)}
+                    stroke="teal"
+                    strokeWidth="2"
+                    strokeDasharray="4"
+                  />
+                );
+              })}
+              {pts.map((pt, idx) => (
+                <text key={idx} x={indexToX(pt.index)} y={priceToY(pt.price) - 6} fontSize="10" fill="black">
+                  {["X", "A", "B", "C", "D"][idx]}
+                </text>
+              ))}
+            </g>
+          );
+        })}
+
+      {activeTool === "price" &&
+        priceActions.map((pattern, i) => (
+          <text key={i} x={indexToX(pattern.index)} y={20} fontSize="10" fill="black" textAnchor="middle">
+            ⭐ {pattern.type} ({pattern.direction})
+          </text>
+        ))}
     </svg>
   );
 };

@@ -28,7 +28,7 @@ const SignalDetails = () => {
   const [error, setError] = useState(null);
   const [liveData, setLiveData] = useState([]);
 
-  const { activeTool } = useContext(ToolContext); // ✅ تم إضافته هنا
+  const { activeTool } = useContext(ToolContext);
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
   const detectFractals = (candles) => {
@@ -138,9 +138,11 @@ const SignalDetails = () => {
 
           <div className="border rounded-xl p-3 shadow bg-white">
             {selectedTab === "candles" && (
-              combinedData.length > 0
-                ? <CandlestickChart symbol={signal.symbol} data={combinedData} />
-                : <div className="text-yellow-600">⚠️ لا توجد بيانات.</div>
+              combinedData.length > 0 ? (
+                <CandlestickChart symbol={signal.symbol} data={combinedData} />
+              ) : (
+                <div className="text-yellow-600">⚠️ لا توجد بيانات.</div>
+              )
             )}
 
             {selectedTab === "analysis" && (
@@ -154,7 +156,7 @@ const SignalDetails = () => {
               <>
                 <ToolSelector />
                 <DrawingTools
-                  activeTool={activeTool} // ✅ تمرير الأداة النشطة
+                  activeTool={activeTool}
                   lines={lines}
                   zones={zones}
                   fractals={fractals}
