@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import CandlestickChart from "../components/CandlestickChart.jsx"; // ✅ تمت إضافة الامتداد
+// import CandlestickChart from "../components/CandlestickChart.jsx"; // مؤقتًا معطل
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import DrawingTools from "../components/DrawingTools";
 import Tabs from "../components/Tabs";
@@ -14,6 +14,15 @@ import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector
 import { subscribeToCandles } from "../utils/websocket";
 
 console.log("📦 SignalDetails.jsx بدأ التنفيذ"); // ✅ تأكيد
+
+const TestChart = () => {
+  console.log("🔥 TestChart يعمل");
+  return (
+    <div style={{ border: "2px dashed red", padding: 20, margin: 10 }}>
+      ✅ TestChart ظاهر الآن
+    </div>
+  );
+};
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -119,18 +128,7 @@ const SignalDetails = () => {
           />
 
           <div className='border rounded-xl p-3 shadow bg-white'>
-            <CandlestickChart
-              symbol={signal.symbol}
-              data={combinedData}
-              activeTool={activeTool}
-              lines={lines}
-              zones={zones}
-              fractals={fractals}
-              waves={waves}
-              abcdPatterns={abcdPatterns}
-              harmonicPatterns={harmonicPatterns}
-              priceActions={priceActions}
-            />
+            <TestChart />
 
             {selectedTab === "analysis" && (
               <>
