@@ -6,8 +6,7 @@ import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import DrawingTools from "../components/DrawingTools";
 import Tabs from "../components/Tabs";
 import ToolSelector from "../tools/ToolSelector";
-import { ToolProvider } from "../context/ToolContext";
-import { ToolContext } from "../context/ToolContext";
+import { ToolProvider, ToolContext } from "../context/ToolContext";
 import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
 import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
@@ -68,7 +67,10 @@ const SignalDetails = () => {
         let signalData;
         const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
         signalData = typeof signalRes.data === "object" ? signalRes.data : null;
-        if (!signalData || !signalData.symbol) throw new Error("❌ لا توجد توصية صالحة");
+
+        if (!signalData) throw new Error("❌ التوصية غير موجودة أو غير صالحة.");
+        signalData.action = signalData.action || signalData.type?.toLowerCase();
+        if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
 
         const hasData = Array.isArray(signalData.data) && signalData.data.length > 0;
         const candles = hasData ? signalData.data : liveData;
@@ -94,16 +96,17 @@ const SignalDetails = () => {
         setHarmonicPatterns(harmonicDetected);
         setPriceActions(priceActionDetected);
       } catch (err) {
-        setError("فشل تحميل التوصية");
+        console.error("❌ فشل تحميل التوصية:", err);
+        setError("فشل في تحميل البيانات. تأكد من الاتصال ووجود التوصية.");
       } finally {
         setLoading(false);
       }
     };
     fetchAll();
-  }, [id]);
+  }, [id, liveData]);
 
   useEffect(() => {
-    if (!signal || id === "mock") return;
+    if (!signal || id === "mock-harmonic-test") return;
     const timeout = setTimeout(() => {
       axios.put(`${apiBase}/api/signals/${id}/drawings`, {
         lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions
@@ -112,7 +115,7 @@ const SignalDetails = () => {
     return () => clearTimeout(timeout);
   }, [lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions]);
 
-  if (loading) return <div>📊 جاري التحميل...</div>;
+  if (loading) return <div>📊 جاري تحميل التوصية...</div>;
   if (error) return <div className="text-red-600">❌ {error}</div>;
   if (!signal) return <div>⚠️ لا توجد توصية.</div>;
 
@@ -128,9 +131,9 @@ const SignalDetails = () => {
 
           <Tabs
             tabs={[
-              { key: "candles", label: "📈 الشموع" },
-              { key: "analysis", label: "📊 التحليل الفني" },
-              { key: "draw", label: "✍️ أدوات الرسم" },
+              { key: "candles", label: "الشموع اليابانية" },
+              { key: "analysis", label: "📊 تحليل فني" },
+              { key: "draw", label: "✍️ أدوات الرسم" }
             ]}
             selected={selectedTab}
             onChange={setSelectedTab}
@@ -138,9 +141,11 @@ const SignalDetails = () => {
 
           <div className="border rounded-xl p-3 shadow bg-white">
             {selectedTab === "candles" && (
-              combinedData.length > 0
-                ? <CandlestickChart symbol={signal.symbol} data={combinedData} />
-                : <div>⚠️ لا توجد بيانات</div>
+              combinedData.length > 0 ? (
+                <CandlestickChart symbol={signal.symbol} data={combinedData} />
+              ) : (
+                <div className="text-yellow-600">⚠️ لا توجد بيانات شموع متاحة لهذا الرمز.</div>
+              )
             )}
 
             {selectedTab === "analysis" && (
@@ -152,6 +157,9 @@ const SignalDetails = () => {
 
             {selectedTab === "draw" && (
               <>
+                <div className="mb-2 text-sm text-gray-700">
+                  🌀 عدد الفراكتلات: {fractals.length} | 🌊 إليوت: {waves.length} | 🔷 ABCD: {abcdPatterns.length} | 🎯 Harmonic: {harmonicPatterns.length} | ⭐️ Price Action: {priceActions.length}
+                </div>
                 <ToolSelector />
                 <DrawingTools
                   activeTool={activeTool}
