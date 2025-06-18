@@ -4,7 +4,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import CandlestickChart from "../components/CandlestickChart";
+import CandlestickChart from "../components/CandlestickChart.jsx";
+
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import DrawingTools from "../components/DrawingTools";
 import Tabs from "../components/Tabs";
