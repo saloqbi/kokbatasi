@@ -11,6 +11,7 @@ import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
 import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
 import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
+import { subscribeToCandles } from "../utils/websocket"; // ✅ WebSocket دعم
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ const SignalDetails = () => {
   const [priceActions, setPriceActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [liveData, setLiveData] = useState([]); // ✅ بيانات الشموع الحية
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -88,17 +90,22 @@ const SignalDetails = () => {
         signalData.action = signalData.action || signalData.type?.toLowerCase();
         if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
 
-        const fractalDetected = detectFractals(signalData.data);
-        const waveDetected = detectElliottWaves(fractalDetected);
-        const abcdDetected = detectABCDPatterns(signalData.data);
-        const harmonicDetected = detectHarmonicPatterns(signalData.data);
-        const priceActionDetected = detectPriceActionPatterns(signalData.data);
+        // ✅ إذا لا توجد بيانات، اشترك مع TradingView
+        if (!signalData.data || signalData.data.length === 0) {
+          subscribeToCandles(signalData.symbol, (newCandle) => {
+            setLiveData(prev => {
+              const updated = [...prev.slice(-29), newCandle];
+              return updated;
+            });
+          });
+        }
 
-        console.log("🌀 Fractals:", fractalDetected);
-        console.log("🌊 Elliott Waves:", waveDetected);
-        console.log("🔷 ABCD Patterns:", abcdDetected);
-        console.log("🎯 Harmonic Patterns:", harmonicDetected);
-        console.log("⭐️ Price Action Patterns:", priceActionDetected);
+        // ✅ اكتشاف الأنماط
+        const fractalDetected = detectFractals(signalData.data || []);
+        const waveDetected = detectElliottWaves(fractalDetected);
+        const abcdDetected = detectABCDPatterns(signalData.data || []);
+        const harmonicDetected = detectHarmonicPatterns(signalData.data || []);
+        const priceActionDetected = detectPriceActionPatterns(signalData.data || []);
 
         setSignal(signalData);
         setLines(signalData.lines || []);
@@ -138,6 +145,8 @@ const SignalDetails = () => {
   if (error) return <div className="text-red-600">❌ {error}</div>;
   if (!signal) return <div>⚠️ لا توجد توصية.</div>;
 
+  const combinedData = signal.data?.length > 0 ? signal.data : liveData;
+
   return (
     <ToolProvider>
       <SignalContext.Provider value={{ selectedSignal: signal }}>
@@ -158,8 +167,8 @@ const SignalDetails = () => {
 
           <div className="border rounded-xl p-3 shadow bg-white">
             {selectedTab === "candles" && (
-              signal.data?.length > 0 ? (
-                <CandlestickChart symbol={signal.symbol} data={signal.data} />
+              combinedData.length > 0 ? (
+                <CandlestickChart symbol={signal.symbol} data={combinedData} />
               ) : (
                 <div className="text-yellow-600">⚠️ لا توجد بيانات شموع متاحة لهذا الرمز.</div>
               )
