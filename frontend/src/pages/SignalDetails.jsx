@@ -14,6 +14,8 @@ import { subscribeToCandles } from "../utils/websocket";
 
 console.log("📦 ✅ SignalDetails.jsx بدأ التنفيذ");
 throw new Error("🔥 تم تنفيذ الملف SignalDetails.jsx فعليًا");
+throw new Error("🔥 هذا هو الملف الفعلي SignalDetails.jsx");
+
 
 const TestChart = () => {
   console.log("🔥 ✅ TestChart يعمل داخل SignalDetails.jsx");
