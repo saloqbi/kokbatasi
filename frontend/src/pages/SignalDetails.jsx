@@ -1,3 +1,6 @@
+// ✅ SignalDetails.jsx - الشارت ظاهر دائمًا في كل التبويبات
+// ... الاستيرادات كالمعتاد
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -27,7 +30,6 @@ const SignalDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [liveData, setLiveData] = useState([]);
-
   const [activeTool, setActiveTool] = useState("line");
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
@@ -65,21 +67,10 @@ const SignalDetails = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        let signalData;
-        if (id === "mock-harmonic-test") {
-          signalData = {
-            symbol: "MOCK",
-            action: "buy",
-            data: []
-          };
-        } else {
-          const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
-          signalData = typeof signalRes.data === "object" ? signalRes.data : null;
-        }
+        const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
+        const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
 
-        if (!signalData) throw new Error("❌ التوصية غير موجودة أو غير صالحة.");
-        signalData.action = signalData.action || signalData.type?.toLowerCase();
-        if (!signalData.symbol) throw new Error("❌ لا يوجد رمز صالح للتوصية.");
+        if (!signalData || !signalData.symbol) throw new Error("❌ التوصية غير صالحة");
 
         const hasData = Array.isArray(signalData.data) && signalData.data.length > 0;
         const candles = hasData ? signalData.data : liveData;
@@ -90,53 +81,33 @@ const SignalDetails = () => {
           });
         }
 
-        const fractalDetected = detectFractals(candles);
-        const waveDetected = detectElliottWaves(fractalDetected);
-        const abcdDetected = detectABCDPatterns(candles);
-        const harmonicDetected = detectHarmonicPatterns(candles);
-        const priceActionDetected = detectPriceActionPatterns(candles);
-
         setSignal(signalData);
         setLines(signalData.lines || []);
         setZones(signalData.zones || []);
-        setFractals(fractalDetected);
-        setWaves(waveDetected);
-        setABCDPatterns(abcdDetected);
-        setHarmonicPatterns(harmonicDetected);
-        setPriceActions(priceActionDetected);
+        setFractals(detectFractals(candles));
+        setWaves(detectElliottWaves(detectFractals(candles)));
+        setABCDPatterns(detectABCDPatterns(candles));
+        setHarmonicPatterns(detectHarmonicPatterns(candles));
+        setPriceActions(detectPriceActionPatterns(candles));
       } catch (err) {
-        console.error("❌ فشل تحميل التوصية:", err);
-        setError("فشل في تحميل البيانات.");
+        setError("❌ فشل تحميل التوصية");
       } finally {
         setLoading(false);
       }
     };
     fetchAll();
-  }, [id, liveData]);
+  }, [id]);
 
-  useEffect(() => {
-    if (!signal || id === "mock-harmonic-test") return;
-    const timeout = setTimeout(() => {
-      axios.put(`${apiBase}/api/signals/${id}/drawings`, {
-        lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions
-      });
-    }, 1000);
-    return () => clearTimeout(timeout);
-  }, [lines, zones, fractals, waves, abcdPatterns, harmonicPatterns, priceActions]);
+  const combinedData = Array.isArray(signal?.data) && signal.data.length > 0 ? signal.data : liveData;
 
-  if (loading) return <div>📊 جاري تحميل التوصية...</div>;
-  if (error) return <div className="text-red-600">❌ {error}</div>;
-  if (!signal) return <div>⚠️ لا توجد توصية.</div>;
-
-  const combinedData = Array.isArray(signal.data) && signal.data.length > 0 ? signal.data : liveData;
+  if (loading) return <div>⏳ جاري التحميل...</div>;
+  if (error) return <div className='text-red-600'>{error}</div>;
 
   return (
     <ToolProvider>
       <SignalContext.Provider value={{ selectedSignal: signal }}>
-        <div className="p-4 space-y-4">
-          <h2 className="text-xl font-bold text-center">
-            تفاصيل التوصية: {signal.symbol || "?"} ({signal.action || "?"})
-          </h2>
+        <div className='p-4 space-y-4'>
+          <h2 className='text-xl font-bold text-center'>تفاصيل التوصية: {signal.symbol} ({signal.action})</h2>
 
           <Tabs
             tabs={[
@@ -148,7 +119,7 @@ const SignalDetails = () => {
             onChange={setSelectedTab}
           />
 
-          <div className="border rounded-xl p-3 shadow bg-white">
+          <div className='border rounded-xl p-3 shadow bg-white'>
             <CandlestickChart
               symbol={signal.symbol}
               data={combinedData}
