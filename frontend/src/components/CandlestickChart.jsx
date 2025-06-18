@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
 const CandlestickChart = ({
@@ -10,24 +10,28 @@ const CandlestickChart = ({
   zones = [],
   fractals = [],
   waves = [],
+  abcdPatterns = [],
+  harmonicPatterns = [],
+  priceActions = [],
 }) => {
   const svgRef = useRef();
   const [tempPoints, setTempPoints] = useState([]);
 
   useEffect(() => {
+    console.log("✅ CandlestickChart Mounted");
+    console.log("🔥 DATA:", data);
+
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    console.log("📊 CandlestickChart Mounted");
-    console.log("📊 CandlestickChart Data:", data);
-
     if (!data || data.length === 0) {
-      svg.append("text")
+      svg
+        .append("text")
         .attr("x", 50)
         .attr("y", 50)
-        .text("⚠️ لا توجد بيانات لعرض الشموع!")
+        .text("⚠️ لا توجد بيانات للعرض")
         .attr("fill", "red")
-        .attr("font-size", "20px");
+        .attr("font-size", "18px");
       return;
     }
 
@@ -50,8 +54,8 @@ const CandlestickChart = ({
     const g = svg
       .attr("width", width)
       .attr("height", height)
-      .style("background-color", "#fff")
-      .on("click", function (event) {
+      .style("background", "#fff")
+      .on("dblclick", function (event) {
         if (activeTool !== "line") return;
 
         const [x, y] = d3.pointer(event);
@@ -61,17 +65,18 @@ const CandlestickChart = ({
         const nearestIndex = Math.max(0, Math.min(data.length - 1, index));
         const point = { index: nearestIndex, price };
 
-        const newPoints = [...tempPoints, point];
-        setTempPoints(newPoints);
+        const updated = [...tempPoints, point];
+        setTempPoints(updated);
 
-        if (newPoints.length === 2) {
-          setLines((prev) => [...prev, { start: newPoints[0], end: newPoints[1] }]);
+        if (updated.length === 2) {
+          setLines((prev) => [...prev, { start: updated[0], end: updated[1] }]);
           setTempPoints([]);
         }
       })
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // Candles
     g.selectAll(".candle")
       .data(data)
       .enter()
@@ -82,6 +87,7 @@ const CandlestickChart = ({
       .attr("height", (d) => Math.abs(yScale(d.open) - yScale(d.close)))
       .attr("fill", (d) => (d.close > d.open ? "green" : "red"));
 
+    // Wicks
     g.selectAll(".wick")
       .data(data)
       .enter()
@@ -92,6 +98,7 @@ const CandlestickChart = ({
       .attr("y2", (d) => yScale(d.low))
       .attr("stroke", "black");
 
+    // خطوط مرسومة يدويًا
     lines.forEach((line) => {
       g.append("line")
         .attr("x1", xScale(line.start.index))
@@ -101,6 +108,7 @@ const CandlestickChart = ({
         .attr("stroke", "blue")
         .attr("stroke-width", 2);
     });
+
   }, [data, lines, activeTool, tempPoints]);
 
   return <svg ref={svgRef}></svg>;
