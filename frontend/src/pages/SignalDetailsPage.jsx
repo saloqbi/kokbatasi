@@ -3,7 +3,9 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import CandlestickChart from "../components/CandlestickChart";
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
-import DrawingTools from "../components/DrawingTools";
+//import DrawingTools from "../components/DrawingTools";
+import AllDrawingTools from "../tools/AllDrawingTools";
+
 import Tabs from "../components/Tabs";
 import ToolSelector from "../tools/ToolSelector";
 import { ToolProvider } from "../context/ToolContext";
@@ -143,7 +145,7 @@ const SignalDetails = () => {
             {selectedTab === "draw" && (
               <>
                 <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                <DrawingTools />
+                <AllDrawingTools/>
               </>
             )}
           </div>
