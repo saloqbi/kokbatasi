@@ -3,7 +3,10 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import CandlestickChart from "../components/CandlestickChart";
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
-import DrawingTools from "../components/DrawingTools";
+//import DrawingTools from "../components/DrawingTools";
+
+import DrawingTools from "../components/DrawingToolsWrapper";
+
 import Tabs from "../components/Tabs";
 import ToolSelector from "../tools/ToolSelector";
 import { ToolProvider } from "../context/ToolContext";
