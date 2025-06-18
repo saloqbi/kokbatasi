@@ -1,74 +1,126 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const CandlestickChart = ({ symbol, data }) => {
+const CandlestickChart = ({ symbol, data, activeTool, lines = [], zones = [], fractals = [], waves = [], abcdPatterns = [], harmonicPatterns = [], priceActions = [] }) => {
   const ref = useRef();
 
   useEffect(() => {
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove();
 
-    const drawCandles = (candles) => {
-      if (!candles || candles.length === 0) return;
+    const width = 800;
+    const height = 400;
+    const margin = { top: 20, right: 30, bottom: 30, left: 60 };
 
-      const width = 600;
-      const height = 300;
-      const margin = { top: 10, right: 30, bottom: 30, left: 60 };
+    const candles = data.map((d, i) => ({ ...d, index: i }));
 
-      const x = d3.scaleBand()
-        .domain(candles.map((_, i) => i))
-        .range([margin.left, width - margin.right])
-        .padding(0.3);
+    const x = d3.scaleBand()
+      .domain(candles.map(d => d.index))
+      .range([margin.left, width - margin.right])
+      .padding(0.3);
 
-      const y = d3.scaleLinear()
-        .domain([
-          d3.min(candles, d => d.low),
-          d3.max(candles, d => d.high)
-        ])
-        .range([height - margin.bottom, margin.top]);
+    const y = d3.scaleLinear()
+      .domain([
+        d3.min(candles, d => d.low),
+        d3.max(candles, d => d.high)
+      ])
+      .nice()
+      .range([height - margin.bottom, margin.top]);
 
-      svg.attr("width", width).attr("height", height);
+    svg.attr("width", width).attr("height", height);
 
-      svg.append("g")
-        .attr("transform", `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x).tickFormat(i => i));
+    // Draw axes
+    svg.append("g")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).tickFormat(i => i));
 
-      svg.append("g")
-        .attr("transform", `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y));
+    svg.append("g")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y));
 
-      svg.selectAll(".candle")
-        .data(candles)
-        .enter()
-        .append("rect")
-        .attr("x", (_, i) => x(i))
-        .attr("y", d => y(Math.max(d.open, d.close)))
-        .attr("width", x.bandwidth())
-        .attr("height", d => Math.abs(y(d.open) - y(d.close)))
-        .attr("fill", d => d.close > d.open ? "green" : "red");
+    // Draw candlesticks
+    svg.selectAll(".candle")
+      .data(candles)
+      .enter()
+      .append("rect")
+      .attr("x", d => x(d.index))
+      .attr("y", d => y(Math.max(d.open, d.close)))
+      .attr("width", x.bandwidth())
+      .attr("height", d => Math.abs(y(d.open) - y(d.close)))
+      .attr("fill", d => d.close > d.open ? "green" : "red");
 
-      svg.selectAll("line.stem")
-        .data(candles)
-        .enter()
-        .append("line")
-        .attr("x1", (_, i) => x(i) + x.bandwidth() / 2)
-        .attr("x2", (_, i) => x(i) + x.bandwidth() / 2)
-        .attr("y1", d => y(d.high))
-        .attr("y2", d => y(d.low))
-        .attr("stroke", "black");
-    };
+    svg.selectAll("line.stem")
+      .data(candles)
+      .enter()
+      .append("line")
+      .attr("x1", d => x(d.index) + x.bandwidth() / 2)
+      .attr("x2", d => x(d.index) + x.bandwidth() / 2)
+      .attr("y1", d => y(d.high))
+      .attr("y2", d => y(d.low))
+      .attr("stroke", "black");
 
-    if (data && data.length > 0) {
-      const formatted = data.map(d => ({
-        date: new Date(d.time || d.date),
-        open: +d.open,
-        high: +d.high,
-        low: +d.low,
-        close: +d.close,
-      }));
-      drawCandles(formatted);
+    // Drawing tools over the chart
+    const indexToX = i => x(i) + x.bandwidth() / 2;
+    const priceToY = p => y(p);
+
+    if (activeTool === "line") {
+      lines.forEach(line => {
+        svg.append("line")
+          .attr("x1", margin.left)
+          .attr("x2", width - margin.right)
+          .attr("y1", priceToY(line.price))
+          .attr("y2", priceToY(line.price))
+          .attr("stroke", "gray")
+          .attr("stroke-dasharray", "4");
+      });
     }
-  }, [symbol, data]);
+
+    if (activeTool === "zone") {
+      zones.forEach(zone => {
+        svg.append("rect")
+          .attr("x", margin.left)
+          .attr("width", width - margin.left - margin.right)
+          .attr("y", priceToY(Math.max(zone.from, zone.to)))
+          .attr("height", Math.abs(priceToY(zone.from) - priceToY(zone.to)))
+          .attr("fill", "orange")
+          .attr("opacity", 0.1);
+      });
+    }
+
+    if (activeTool === "fractal") {
+      fractals.forEach(p => {
+        svg.append("text")
+          .attr("x", indexToX(p.index))
+          .attr("y", p.type === "top" ? priceToY(p.price) - 10 : priceToY(p.price) + 15)
+          .attr("font-size", 18)
+          .attr("fill", p.type === "top" ? "red" : "blue")
+          .attr("text-anchor", "middle")
+          .text(p.type === "top" ? "⬆️" : "⬇️");
+      });
+    }
+
+    if (activeTool === "elliott") {
+      for (let i = 0; i < waves.length - 1; i++) {
+        const p1 = waves[i];
+        const p2 = waves[i + 1];
+        svg.append("line")
+          .attr("x1", indexToX(p1.index))
+          .attr("y1", priceToY(p1.price))
+          .attr("x2", indexToX(p2.index))
+          .attr("y2", priceToY(p2.price))
+          .attr("stroke", "green")
+          .attr("stroke-width", 2);
+        svg.append("text")
+          .attr("x", indexToX(p1.index))
+          .attr("y", priceToY(p1.price) - 8)
+          .attr("font-size", 12)
+          .attr("text-anchor", "middle")
+          .text(p1.label);
+      }
+    }
+
+    // يمكن إضافة باقي الأدوات بنفس الطريقة...
+  }, [data, activeTool, lines, zones, fractals, waves]);
 
   return <svg ref={ref}></svg>;
 };
