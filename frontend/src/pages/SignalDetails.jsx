@@ -1,4 +1,17 @@
-// ... (نفس الاستيرادات)
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import CandlestickChart from "../components/CandlestickChart";
+import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
+import DrawingTools from "../components/DrawingTools";
+import Tabs from "../components/Tabs";
+import ToolSelector from "../tools/ToolSelector";
+import { ToolProvider } from "../context/ToolContext";
+import { SignalContext } from "../context/SignalContext";
+import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
+import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
+import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
+import { subscribeToCandles } from "../utils/websocket";
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -15,22 +28,49 @@ const SignalDetails = () => {
   const [error, setError] = useState(null);
   const [liveData, setLiveData] = useState([]);
 
-  const [activeTool, setActiveTool] = useState("line"); // ✅ مضافة
+  const [activeTool, setActiveTool] = useState("line");
 
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
-  // ... باقي الدوال مثل detectFractals و detectElliottWaves ...
+  const detectFractals = (candles) => {
+    const points = [];
+    for (let i = 2; i < candles.length - 2; i++) {
+      const prev = candles.slice(i - 2, i);
+      const next = candles.slice(i + 1, i + 3);
+      const curr = candles[i];
+      const isTop = prev.every(p => p.high < curr.high) && next.every(n => n.high < curr.high);
+      const isBottom = prev.every(p => p.low > curr.low) && next.every(n => n.low > curr.low);
+      if (isTop || isBottom) {
+        points.push({ index: i, price: isTop ? curr.high : curr.low, type: isTop ? "top" : "bottom" });
+      }
+    }
+    return points;
+  };
+
+  const detectElliottWaves = (fractalPoints) => {
+    const waves = [];
+    if (fractalPoints.length < 5) return waves;
+    for (let i = 0; i <= fractalPoints.length - 5; i++) {
+      const seq = fractalPoints.slice(i, i + 5);
+      waves.push(...seq.map((p, idx) => ({
+        label: `${idx + 1}`,
+        index: p.index,
+        price: p.price
+      })));
+      break;
+    }
+    return waves;
+  };
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
         let signalData;
-
         if (id === "mock-harmonic-test") {
           signalData = {
             symbol: "MOCK",
             action: "buy",
-            data: [/* ... بيانات الشموع ... */]
+            data: []
           };
         } else {
           const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
@@ -66,7 +106,7 @@ const SignalDetails = () => {
         setPriceActions(priceActionDetected);
       } catch (err) {
         console.error("❌ فشل تحميل التوصية:", err);
-        setError("فشل في تحميل البيانات. تأكد من الاتصال ووجود التوصية.");
+        setError("فشل في تحميل البيانات.");
       } finally {
         setLoading(false);
       }
@@ -109,13 +149,18 @@ const SignalDetails = () => {
           />
 
           <div className="border rounded-xl p-3 shadow bg-white">
-            {selectedTab === "candles" && (
-              combinedData.length > 0 ? (
-                <CandlestickChart symbol={signal.symbol} data={combinedData} />
-              ) : (
-                <div className="text-yellow-600">⚠️ لا توجد بيانات شموع متاحة لهذا الرمز.</div>
-              )
-            )}
+            <CandlestickChart
+              symbol={signal.symbol}
+              data={combinedData}
+              activeTool={activeTool}
+              lines={lines}
+              zones={zones}
+              fractals={fractals}
+              waves={waves}
+              abcdPatterns={abcdPatterns}
+              harmonicPatterns={harmonicPatterns}
+              priceActions={priceActions}
+            />
 
             {selectedTab === "analysis" && (
               <>
@@ -126,24 +171,7 @@ const SignalDetails = () => {
 
             {selectedTab === "draw" && (
               <>
-                <div className="mb-2 text-sm text-gray-700">
-                  🌀 عدد الفراكتلات: {fractals.length} | 🌊 إليوت: {waves.length} | 🔷 ABCD: {abcdPatterns.length} | 🎯 Harmonic: {harmonicPatterns.length} | ⭐️ Price Action: {priceActions.length}
-                </div>
                 <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                <DrawingTools
-                  activeTool={activeTool}
-                  lines={lines}
-                  zones={zones}
-                  fractals={fractals}
-                  waves={waves}
-                  abcdPatterns={abcdPatterns}
-                  harmonicPatterns={harmonicPatterns}
-                  priceActions={priceActions}
-                  onLinesChange={setLines}
-                  onZonesChange={setZones}
-                  onFractalsChange={setFractals}
-                  onWavesChange={setWaves}
-                />
               </>
             )}
           </div>
