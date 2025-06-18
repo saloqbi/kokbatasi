@@ -119,22 +119,38 @@ const SignalDetails = () => {
           />
 
           <div className='border rounded-xl p-3 shadow bg-white'>
-            <CandlestickChart
-              symbol={signal.symbol}
-              data={combinedData}
-              activeTool={activeTool}
-              lines={lines}
-              setLines={setLines} // ✅ هذا هو التعديل المهم
-              zones={zones}
-              fractals={fractals}
-              waves={waves}
-              abcdPatterns={abcdPatterns}
-              harmonicPatterns={harmonicPatterns}
-              priceActions={priceActions}
-            />
+            {/* ✅ عرض الشموع فقط عند تحديد التبويب */}
+            {selectedTab === "candles" && (
+              <CandlestickChart
+                symbol={signal.symbol}
+                data={combinedData}
+                activeTool={activeTool}
+                lines={lines}
+                setLines={setLines}
+                zones={zones}
+                fractals={fractals}
+                waves={waves}
+                abcdPatterns={abcdPatterns}
+                harmonicPatterns={harmonicPatterns}
+                priceActions={priceActions}
+              />
+            )}
 
             {selectedTab === "analysis" && (
               <>
+                <CandlestickChart
+                  symbol={signal.symbol}
+                  data={combinedData}
+                  activeTool={activeTool}
+                  lines={lines}
+                  setLines={setLines}
+                  zones={zones}
+                  fractals={fractals}
+                  waves={waves}
+                  abcdPatterns={abcdPatterns}
+                  harmonicPatterns={harmonicPatterns}
+                  priceActions={priceActions}
+                />
                 <TechnicalAnalysisTab lines={lines} zones={zones} />
                 <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
               </>
@@ -142,6 +158,19 @@ const SignalDetails = () => {
 
             {selectedTab === "draw" && (
               <>
+                <CandlestickChart
+                  symbol={signal.symbol}
+                  data={combinedData}
+                  activeTool={activeTool}
+                  lines={lines}
+                  setLines={setLines}
+                  zones={zones}
+                  fractals={fractals}
+                  waves={waves}
+                  abcdPatterns={abcdPatterns}
+                  harmonicPatterns={harmonicPatterns}
+                  priceActions={priceActions}
+                />
                 <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
                 <DrawingTools />
               </>
