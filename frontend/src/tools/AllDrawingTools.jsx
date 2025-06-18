@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { Layer } from "react-konva";
 import { ToolContext } from "../context/ToolContext";
 import TrendlineTool from "./TrendlineTool";
 import SupportResistanceTool from "./SupportResistanceTool";
@@ -14,7 +15,7 @@ const AllDrawingTools = () => {
   const { activeTool } = useContext(ToolContext);
 
   return (
-    <>
+    <Layer>
       {activeTool === "line" && <TrendlineTool />}
       {activeTool === "zone" && <SupportResistanceTool />}
       {activeTool?.startsWith("fib") && <FibonacciTool />}
@@ -24,7 +25,7 @@ const AllDrawingTools = () => {
       {activeTool === "ict" && <ICTTool />}
       {activeTool === "channel" && <ChannelTool />}
       {activeTool === "wyckoff" && <WyckoffTool />}
-    </>
+    </Layer>
   );
 };
 

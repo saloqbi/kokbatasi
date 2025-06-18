@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
+import { Stage } from "react-konva";
+import AllDrawingTools from "../tools/AllDrawingTools";
 
 const CandlestickChart = ({
   symbol,
@@ -16,11 +18,10 @@ const CandlestickChart = ({
 }) => {
   const svgRef = useRef();
   const [tempPoints, setTempPoints] = useState([]);
+  const width = 800;
+  const height = 400;
 
   useEffect(() => {
-    console.log("✅ CandlestickChart Mounted");
-    console.log("🔥 DATA:", data);
-
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
@@ -35,8 +36,6 @@ const CandlestickChart = ({
       return;
     }
 
-    const width = 800;
-    const height = 400;
     const margin = { top: 20, right: 60, bottom: 30, left: 60 };
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
@@ -108,10 +107,16 @@ const CandlestickChart = ({
         .attr("stroke", "blue")
         .attr("stroke-width", 2);
     });
-
   }, [data, lines, activeTool, tempPoints]);
 
-  return <svg ref={svgRef}></svg>;
+  return (
+    <div style={{ position: "relative" }}>
+      <svg ref={svgRef} style={{ position: "absolute", zIndex: 1 }}></svg>
+      <Stage width={800} height={400} style={{ position: "absolute", top: 0, left: 0, zIndex: 2 }}>
+        <AllDrawingTools />
+      </Stage>
+    </div>
+  );
 };
 
 export default CandlestickChart;
