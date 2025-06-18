@@ -119,12 +119,12 @@ const SignalDetails = () => {
           />
 
           <div className='border rounded-xl p-3 shadow bg-white'>
-            {/* ✅ عرض دائم للشموع */}
             <CandlestickChart
               symbol={signal.symbol}
               data={combinedData}
               activeTool={activeTool}
               lines={lines}
+              setLines={setLines}
               zones={zones}
               fractals={fractals}
               waves={waves}
