@@ -23,6 +23,7 @@ const CandlestickChart = ({
   const height = 400;
 
   useEffect(() => {
+    console.log("🧠 useEffect يعمل الآن، signalId:", signalId, "الأداة:", activeTool);
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
@@ -56,6 +57,7 @@ const CandlestickChart = ({
       .attr("height", height)
       .style("background", "#fff")
       .on("dblclick", async function (event) {
+        console.log("🖱 تم النقر المزدوج، الأداة:", activeTool);
         if (activeTool !== "line") return;
 
         const [x, y] = d3.pointer(event);
