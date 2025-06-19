@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { Stage } from "react-konva";
@@ -74,12 +75,19 @@ const CandlestickChart = ({
           setTempPoints([]);
 
           try {
-            await fetch(`/api/signals/${signalId}/tools/lines`, {
+            console.log("📡 Sending to backend:", signalId, newLines);
+            const response = await fetch(`/api/signals/${signalId}/tools/lines`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ lines: newLines }),
             });
-            console.log("✅ تم حفظ الخط في MongoDB");
+
+            const result = await response.json();
+            if (result.success || response.ok) {
+              console.log("✅ تم حفظ الخط في MongoDB");
+            } else {
+              console.warn("⚠️ لم يتم تأكيد الحفظ:", result);
+            }
           } catch (err) {
             console.error("❌ فشل الحفظ:", err);
           }
