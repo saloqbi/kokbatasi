@@ -13,6 +13,7 @@ import WyckoffTool from "./WyckoffTool";
 
 const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) => {
   const { activeTool } = useContext(ToolContext);
+  console.log("🛠️ activeTool =", activeTool);
   const [tempPoints, setTempPoints] = useState([]);
   const [lines, setLines] = useState(savedLines);
 
