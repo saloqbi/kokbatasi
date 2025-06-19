@@ -54,7 +54,7 @@ const CandlestickChart = ({
       .attr("width", width)
       .attr("height", height)
       .style("background", "#fff")
-      .on("dblclick", function (event) {
+      .on("dblclick", async function (event) {
         if (activeTool !== "line") return;
 
         const [x, y] = d3.pointer(event);
@@ -68,8 +68,21 @@ const CandlestickChart = ({
         setTempPoints(updated);
 
         if (updated.length === 2) {
-          setLines((prev) => [...prev, { start: updated[0], end: updated[1] }]);
+          const newLine = { start: updated[0], end: updated[1] };
+          const newLines = [...lines, newLine];
+          setLines(newLines);
           setTempPoints([]);
+
+          try {
+            await fetch(`/api/signals/${symbol}/tools/lines`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ lines: newLines }),
+            });
+            console.log("✅ تم حفظ الخط في MongoDB");
+          } catch (err) {
+            console.error("❌ فشل الحفظ:", err);
+          }
         }
       })
       .append("g")

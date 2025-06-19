@@ -7,6 +7,8 @@ const {
   updateSignalDrawings
 } = require("../controllers/signalController");
 
+const { saveLines } = require("../controllers/signalToolsController"); // ✅ إضافة التحكم في الخطوط
+
 // ✅ توليد توصيات عشوائية
 router.get("/generate", generateRandomSignals);
 
@@ -34,5 +36,8 @@ router.post("/", createSignal);
 
 // ✅ تحديث أدوات الرسم
 router.put("/:id/drawings", updateSignalDrawings);
+
+// ✅ حفظ خطوط الاتجاه
+router.post("/:id/tools/lines", saveLines); // ✅ جديد
 
 module.exports = router;
