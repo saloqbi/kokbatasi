@@ -11,15 +11,10 @@ import ICTTool from "./ICTTool";
 import ChannelTool from "./ChannelTool";
 import WyckoffTool from "./WyckoffTool";
 
-const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) => {
+const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {}, xScale, yScale }) => {
   const { activeTool } = useContext(ToolContext);
   const [tempPoints, setTempPoints] = useState([]);
   const [lines, setLines] = useState(savedLines);
-
-  const padding = 40;
-  const canvasHeight = 400;
-  const priceScale = 3;
-  const indexScale = 10;
 
   useEffect(() => {
     setLines(savedLines);
@@ -39,14 +34,14 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) 
         start: {
           x: updated[0].x,
           y: updated[0].y,
-          index: Math.round((updated[0].x - padding) / indexScale),
-          price: (canvasHeight - updated[0].y) / priceScale,
+          index: xScale ? Math.round(xScale.invert(updated[0].x)) : 0,
+          price: yScale ? yScale.invert(updated[0].y) : 0,
         },
         end: {
           x: updated[1].x,
           y: updated[1].y,
-          index: Math.round((updated[1].x - padding) / indexScale),
-          price: (canvasHeight - updated[1].y) / priceScale,
+          index: xScale ? Math.round(xScale.invert(updated[1].x)) : 0,
+          price: yScale ? yScale.invert(updated[1].y) : 0,
         },
       };
       const newLines = [...lines, newLine];
@@ -74,10 +69,10 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) 
     <Layer onClick={handleClick}>
       {activeTool === "line" &&
         lines.map((line, index) => {
-          const x1 = line.start?.index != null ? line.start.index * indexScale + padding : line.start.x;
-          const y1 = line.start?.price != null ? canvasHeight - line.start.price * priceScale : line.start.y;
-          const x2 = line.end?.index != null ? line.end.index * indexScale + padding : line.end.x;
-          const y2 = line.end?.price != null ? canvasHeight - line.end.price * priceScale : line.end.y;
+          const x1 = xScale ? xScale(line.start.index) : line.start.x;
+          const y1 = yScale ? yScale(line.start.price) : line.start.y;
+          const x2 = xScale ? xScale(line.end.index) : line.end.x;
+          const y2 = yScale ? yScale(line.end.price) : line.end.y;
           return (
             <Line
               key={index}
