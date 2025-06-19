@@ -4,7 +4,7 @@ import { Stage } from "react-konva";
 import AllDrawingTools from "../tools/AllDrawingTools";
 
 const CandlestickChart = ({
-  symbol,
+  signalId,
   data,
   activeTool,
   lines = [],
@@ -74,7 +74,7 @@ const CandlestickChart = ({
           setTempPoints([]);
 
           try {
-            await fetch(`/api/signals/${symbol}/tools/lines`, {
+            await fetch(`/api/signals/${signalId}/tools/lines`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ lines: newLines }),

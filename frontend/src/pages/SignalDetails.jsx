@@ -121,7 +121,7 @@ const SignalDetails = () => {
           <div className='border rounded-xl p-3 shadow bg-white'>
             {selectedTab === "candles" && (
               <CandlestickChart
-                symbol={signal.symbol}
+                signalId={signal._id}
                 data={combinedData}
                 activeTool={activeTool}
                 lines={lines}
@@ -138,7 +138,7 @@ const SignalDetails = () => {
             {selectedTab === "analysis" && (
               <>
                 <CandlestickChart
-                  symbol={signal.symbol}
+                  signalId={signal._id}
                   data={combinedData}
                   activeTool={activeTool}
                   lines={lines}
@@ -158,7 +158,7 @@ const SignalDetails = () => {
             {selectedTab === "draw" && (
               <>
                 <CandlestickChart
-                  symbol={signal.symbol}
+                  signalId={signal._id}
                   data={combinedData}
                   activeTool={activeTool}
                   lines={lines}
