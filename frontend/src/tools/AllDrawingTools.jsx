@@ -16,6 +16,11 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) 
   const [tempPoints, setTempPoints] = useState([]);
   const [lines, setLines] = useState(savedLines);
 
+  const padding = 40;
+  const canvasHeight = 400;
+  const priceScale = 3;
+  const indexScale = 10;
+
   useEffect(() => {
     setLines(savedLines);
   }, [savedLines]);
@@ -65,13 +70,8 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) 
     }
   };
 
-  const padding = 40;
-  const canvasHeight = 400;
-  const priceScale = 3;
-  const indexScale = 10;
-
   return (
-    <Layer onDblClick={handleClick}>
+    <Layer onClick={handleClick}>
       {activeTool === "line" &&
         lines.map((line, index) => {
           const x1 = line.start?.index != null ? line.start.index * indexScale + padding : line.start.x;
