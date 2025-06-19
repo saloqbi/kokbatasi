@@ -23,7 +23,6 @@ const CandlestickChart = ({
   const height = 400;
 
   useEffect(() => {
-    console.log("🧠 useEffect يعمل الآن، signalId:", signalId, "الأداة:", activeTool);
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
@@ -56,46 +55,7 @@ const CandlestickChart = ({
       .attr("width", width)
       .attr("height", height)
       .style("background", "#fff")
-      .on("dblclick", async function (event) {
-        console.log("🖱 تم النقر المزدوج، الأداة:", activeTool);
-        if (activeTool !== "line") return;
-
-        const [x, y] = d3.pointer(event);
-        const index = Math.round((x - margin.left) / xScale.step());
-        const price = yScale.invert(y - margin.top);
-
-        const nearestIndex = Math.max(0, Math.min(data.length - 1, index));
-        const point = { index: nearestIndex, price };
-
-        const updated = [...tempPoints, point];
-        setTempPoints(updated);
-
-        if (updated.length === 2) {
-          const newLine = { start: updated[0], end: updated[1] };
-          const newLines = [...lines, newLine];
-          setLines(newLines);
-          setTempPoints([]);
-
-          try {
-            console.log("📡 Sending to backend:", signalId, newLines);
-            const response = await fetch(`/api/signals/${signalId}/tools/lines`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ lines: newLines }),
-            });
-
-            const result = await response.json();
-            if (result.success || response.ok) {
-              console.log("✅ تم حفظ الخط في MongoDB");
-            } else {
-              console.warn("⚠️ لم يتم تأكيد الحفظ:", result);
-            }
-          } catch (err) {
-            console.error("❌ فشل الحفظ:", err);
-          }
-        }
-      })
-      .append("g")
+            .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     g.selectAll(".candle")
@@ -129,12 +89,70 @@ const CandlestickChart = ({
     });
   }, [data, lines, activeTool, tempPoints]);
 
+  
+
+  const handleDoubleClick = async (event) => {
+    if (activeTool !== "line") return;
+    console.log("🖱 تم النقر المزدوج - React");
+
+    const bounds = svgRef.current.getBoundingClientRect();
+    const x = event.clientX - bounds.left;
+    const y = event.clientY - bounds.top;
+
+    const margin = { top: 20, right: 60, bottom: 30, left: 60 };
+    const chartWidth = width - margin.left - margin.right;
+
+    const xScale = d3
+      .scaleBand()
+      .domain(data.map((_, i) => i))
+      .range([0, chartWidth])
+      .padding(0.3);
+
+    const yMin = d3.min(data, (d) => d.low);
+    const yMax = d3.max(data, (d) => d.high);
+    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height - margin.top - margin.bottom, 0]);
+
+    const index = Math.round((x - margin.left) / xScale.step());
+    const price = yScale.invert(y - margin.top);
+
+    const nearestIndex = Math.max(0, Math.min(data.length - 1, index));
+    const point = { index: nearestIndex, price };
+
+    const updated = [...tempPoints, point];
+    setTempPoints(updated);
+
+    if (updated.length === 2) {
+      const newLine = { start: updated[0], end: updated[1] };
+      const newLines = [...lines, newLine];
+      setLines(newLines);
+      setTempPoints([]);
+
+      try {
+        console.log("📡 Saving line to backend with signalId:", signalId);
+        const response = await fetch(`/api/signals/${signalId}/tools/lines`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lines: newLines }),
+        });
+
+        const result = await response.json();
+        if (result.success || response.ok) {
+          console.log("✅ تم حفظ الخط في MongoDB");
+        } else {
+          console.warn("⚠️ فشل حفظ الخط:", result);
+        }
+      } catch (err) {
+        console.error("❌ خطأ أثناء الحفظ:", err);
+      }
+    }
+  };
+
   return (
     <div style={{ position: "relative", width, height }}>
       <Stage width={width} height={height} style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}>
         <AllDrawingTools />
       </Stage>
-      <svg ref={svgRef} style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}></svg>
+      <svg ref={svgRef} onDoubleClick={handleDoubleClick} style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}></svg>
     </div>
   );
 };
