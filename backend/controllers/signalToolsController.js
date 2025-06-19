@@ -1,4 +1,4 @@
-const Signal = require('../models/Signal');
+const Signal = require('../models/signal');
 
 // ✅ حفظ خطوط الاتجاه
 exports.saveLines = async (req, res) => {
@@ -6,13 +6,13 @@ exports.saveLines = async (req, res) => {
     const { id } = req.params;
     const { lines } = req.body;
 
-    const updated = await Signal.findByIdAndUpdate(
+    const updated = await signal.findByIdAndUpdate(
       id,
       { $set: { lines } },
       { new: true }
     );
 
-    if (!updated) return res.status(404).json({ error: 'Signal not found' });
+    if (!updated) return res.status(404).json({ error: 'signal not found' });
 
     res.json({ success: true, lines: updated.lines });
   } catch (err) {
