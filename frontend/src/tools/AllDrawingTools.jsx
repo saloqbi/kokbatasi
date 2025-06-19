@@ -35,14 +35,13 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) 
       setLines(newLines);
       setTempPoints([]);
 
-      // الحفظ إلى قاعدة البيانات
       try {
         fetch(`/api/signals/${signalId}/tools/lines`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ lines: newLines }),
-        }).then(res => res.json()).then((res) => {
-          if (res.success || res.ok) {
+        }).then((res) => {
+          if (res.ok) {
             console.log("✅ تم حفظ الخط في MongoDB");
             onSaveLines(newLines);
           }
@@ -53,18 +52,29 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) 
     }
   };
 
+  const padding = 40;
+  const canvasHeight = 400;
+  const priceScale = 3;
+  const indexScale = 10;
+
   return (
     <Layer onDblClick={handleClick}>
-      {/* أدوات التحليل الأخرى */}
       {activeTool === "line" &&
-        lines.map((line, i) => (
-          <Line
-            key={i}
-            points={[line.start.x, line.start.y, line.end.x, line.end.y]}
-            stroke="blue"
-            strokeWidth={2}
-          />
-        ))}
+        lines.map((line, index) => {
+          const x1 = line.start?.index != null ? line.start.index * indexScale + padding : line.start.x;
+          const y1 = line.start?.price != null ? canvasHeight - line.start.price * priceScale : line.start.y;
+          const x2 = line.end?.index != null ? line.end.index * indexScale + padding : line.end.x;
+          const y2 = line.end?.price != null ? canvasHeight - line.end.price * priceScale : line.end.y;
+          return (
+            <Line
+              key={index}
+              points={[x1, y1, x2, y2]}
+              stroke="blue"
+              strokeWidth={2}
+            />
+          );
+        })}
+
       {activeTool === "zone" && <SupportResistanceTool />}
       {activeTool?.startsWith("fib") && <FibonacciTool />}
       {activeTool?.startsWith("gann") && <GannTool />}
