@@ -122,7 +122,7 @@ const CandlestickChart = ({
   return (
     <div style={{ position: "relative", width, height }} >
       <Stage width={width} height={height} style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}>
-        <AllDrawingTools />
+        <AllDrawingTools signalId={signalId} savedLines={lines} onSaveLines={setLines} />
       </Stage>
       <svg ref={svgRef} style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}></svg>
     </div>
