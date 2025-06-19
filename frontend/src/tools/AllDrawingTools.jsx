@@ -30,7 +30,20 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {} }) 
     setTempPoints(updated);
 
     if (updated.length === 2) {
-      const newLine = { start: updated[0], end: updated[1] };
+      const newLine = {
+        start: {
+          x: updated[0].x,
+          y: updated[0].y,
+          index: Math.round((updated[0].x - padding) / indexScale),
+          price: (canvasHeight - updated[0].y) / priceScale,
+        },
+        end: {
+          x: updated[1].x,
+          y: updated[1].y,
+          index: Math.round((updated[1].x - padding) / indexScale),
+          price: (canvasHeight - updated[1].y) / priceScale,
+        },
+      };
       const newLines = [...lines, newLine];
       setLines(newLines);
       setTempPoints([]);
