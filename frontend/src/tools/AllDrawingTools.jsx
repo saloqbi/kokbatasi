@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Layer, Line } from "react-konva";
 import { ToolContext } from "../context/ToolContext";
-import TrendlineTool from "./TrendlineTool";
 import SupportResistanceTool from "./SupportResistanceTool";
 import FibonacciTool from "./FibonacciTool";
 import GannTool from "./GannTool";
@@ -11,7 +10,13 @@ import ICTTool from "./ICTTool";
 import ChannelTool from "./ChannelTool";
 import WyckoffTool from "./WyckoffTool";
 
-const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {}, xScale, yScale }) => {
+const AllDrawingTools = ({
+  signalId,
+  savedLines = [],
+  onSaveLines = () => {},
+  xScale,
+  yScale,
+}) => {
   const { activeTool } = useContext(ToolContext);
   const [tempPoints, setTempPoints] = useState([]);
   const [lines, setLines] = useState(savedLines);
@@ -30,20 +35,29 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {}, xS
     setTempPoints(updated);
 
     if (updated.length === 2) {
+      const getIndexFromX = (x) => {
+        if (!xScale) return 0;
+        const domain = xScale.domain();
+        const range = xScale.range();
+        const relative = x / (range[1] - range[0]);
+        return Math.round(relative * domain.length);
+      };
+
       const newLine = {
         start: {
           x: updated[0].x,
           y: updated[0].y,
-          index: xScale ? Math.round(xScale.invert(updated[0].x)) : 0,
+          index: getIndexFromX(updated[0].x),
           price: yScale ? yScale.invert(updated[0].y) : 0,
         },
         end: {
           x: updated[1].x,
           y: updated[1].y,
-          index: xScale ? Math.round(xScale.invert(updated[1].x)) : 0,
+          index: getIndexFromX(updated[1].x),
           price: yScale ? yScale.invert(updated[1].y) : 0,
         },
       };
+
       const newLines = [...lines, newLine];
       setLines(newLines);
       setTempPoints([]);
