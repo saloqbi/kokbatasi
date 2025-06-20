@@ -21,7 +21,7 @@ const CandlestickChart = ({
   const width = 800;
   const height = 400;
 
-  // ✅ تعريف xScale و yScale في النطاق العام للوظيفة
+  // ✅ تعريف xScale و yScale على مستوى المكون
   let xScale = d3.scaleBand();
   let yScale = d3.scaleLinear();
 
@@ -44,7 +44,7 @@ const CandlestickChart = ({
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
-    // ✅ إعادة تعيين xScale و yScale
+    // ✅ إعداد المقاييس
     xScale = d3
       .scaleBand()
       .domain(data.map((_, i) => i))
@@ -53,7 +53,6 @@ const CandlestickChart = ({
 
     const yMin = d3.min(data, (d) => d.low);
     const yMax = d3.max(data, (d) => d.high);
-
     yScale = d3.scaleLinear().domain([yMin, yMax]).range([chartHeight, 0]);
 
     const g = svg
@@ -116,7 +115,7 @@ const CandlestickChart = ({
       .attr("y2", (d) => yScale(d.low))
       .attr("stroke", "black");
 
-    // ✅ رسم الخطوط الموجودة
+    // ✅ رسم الخطوط السابقة (للتحقق)
     lines.forEach((line) => {
       g.append("line")
         .attr("x1", xScale(line.start.index))
@@ -130,8 +129,18 @@ const CandlestickChart = ({
 
   return (
     <div style={{ position: "relative", width, height }}>
-      {/* ✅ أدوات الرسم على الطبقة العلوية */}
-      <Stage width={width} height={height} style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}>
+      {/* ✅ أدوات الرسم التفاعلية فوق الشارت */}
+      <Stage
+        width={width}
+        height={height}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: 3,
+          pointerEvents: "auto", // ✅ تمكين التفاعل
+        }}
+      >
         <AllDrawingTools
           signalId={signalId}
           savedLines={lines}
@@ -141,8 +150,11 @@ const CandlestickChart = ({
         />
       </Stage>
 
-      {/* ✅ شارت D3 في الخلفية */}
-      <svg ref={svgRef} style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}></svg>
+      {/* ✅ خلفية الشموع */}
+      <svg
+        ref={svgRef}
+        style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
+      ></svg>
     </div>
   );
 };
