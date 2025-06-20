@@ -1,12 +1,12 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useContext } from "react";
 import * as d3 from "d3";
 import { Stage } from "react-konva";
 import AllDrawingTools from "../tools/AllDrawingTools";
+import { ToolContext } from "../context/ToolContext";
 
 const CandlestickChart = ({
   signalId,
   data,
-  activeTool,
   lines = [],
   setLines = () => {},
   zones = [],
@@ -21,7 +21,10 @@ const CandlestickChart = ({
   const width = 800;
   const height = 400;
 
-  // ✅ تعريف xScale و yScale على مستوى المكون
+  // ✅ استخدام ToolContext لقراءة الأداة النشطة
+  const { activeTool } = useContext(ToolContext);
+
+  // ✅ تعريف المقاييس
   let xScale = d3.scaleBand();
   let yScale = d3.scaleLinear();
 
@@ -44,7 +47,7 @@ const CandlestickChart = ({
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
-    // ✅ إعداد المقاييس
+    // إعداد المقاييس
     xScale = d3
       .scaleBand()
       .domain(data.map((_, i) => i))
@@ -115,7 +118,7 @@ const CandlestickChart = ({
       .attr("y2", (d) => yScale(d.low))
       .attr("stroke", "black");
 
-    // ✅ رسم الخطوط السابقة (للتحقق)
+    // ✅ رسم الخطوط القديمة
     lines.forEach((line) => {
       g.append("line")
         .attr("x1", xScale(line.start.index))
@@ -129,7 +132,7 @@ const CandlestickChart = ({
 
   return (
     <div style={{ position: "relative", width, height }}>
-      {/* ✅ أدوات الرسم التفاعلية فوق الشارت */}
+      {/* ✅ أدوات الرسم فوق الشارت */}
       <Stage
         width={width}
         height={height}
@@ -138,7 +141,7 @@ const CandlestickChart = ({
           top: 0,
           left: 0,
           zIndex: 3,
-          pointerEvents: "auto", // ✅ تمكين التفاعل
+          pointerEvents: "auto", // مهم للتفاعل
         }}
       >
         <AllDrawingTools
@@ -150,7 +153,7 @@ const CandlestickChart = ({
         />
       </Stage>
 
-      {/* ✅ خلفية الشموع */}
+      {/* ✅ الشموع في الخلف */}
       <svg
         ref={svgRef}
         style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
