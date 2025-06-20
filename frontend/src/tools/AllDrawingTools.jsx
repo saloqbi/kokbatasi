@@ -96,5 +96,3 @@ const AllDrawingTools = ({ signalId, savedLines = [], onSaveLines = () => {}, xS
 };
 
 export default AllDrawingTools;
-///
-
