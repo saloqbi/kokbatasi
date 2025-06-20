@@ -157,19 +157,28 @@ const SignalDetails = () => {
 
             {selectedTab === "draw" && (
               <>
-                <CandlestickChart
-                  signalId={signal._id}
-                  data={combinedData}
-                  activeTool={activeTool}
-                  lines={lines}
-                  setLines={setLines}
-                  zones={zones}
-                  fractals={fractals}
-                  waves={waves}
-                  abcdPatterns={abcdPatterns}
-                  harmonicPatterns={harmonicPatterns}
-                  priceActions={priceActions}
-                />
+                <div style={{ position: "relative" }}>
+                  <CandlestickChart
+                    signalId={signal._id}
+                    data={combinedData}
+                    activeTool={activeTool}
+                    lines={lines}
+                    setLines={setLines}
+                    zones={zones}
+                    fractals={fractals}
+                    waves={waves}
+                    abcdPatterns={abcdPatterns}
+                    harmonicPatterns={harmonicPatterns}
+                    priceActions={priceActions}
+                  />
+                  {/* ✅ عرض أدوات الرسم داخل نفس الشارت */}
+                  <AllDrawingTools
+                    signalId={signal._id}
+                    savedLines={lines}
+                    onSaveLines={setLines}
+                  />
+                </div>
+
                 <div className="mt-4">
                   <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
                 </div>
