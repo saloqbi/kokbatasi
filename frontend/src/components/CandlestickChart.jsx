@@ -21,6 +21,10 @@ const CandlestickChart = ({
   const width = 800;
   const height = 400;
 
+  // ✅ تعريف xScale و yScale في النطاق العام للوظيفة
+  let xScale = d3.scaleBand();
+  let yScale = d3.scaleLinear();
+
   useEffect(() => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -40,7 +44,8 @@ const CandlestickChart = ({
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
-    const xScale = d3
+    // ✅ إعادة تعيين xScale و yScale
+    xScale = d3
       .scaleBand()
       .domain(data.map((_, i) => i))
       .range([0, chartWidth])
@@ -48,7 +53,8 @@ const CandlestickChart = ({
 
     const yMin = d3.min(data, (d) => d.low);
     const yMax = d3.max(data, (d) => d.high);
-    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([chartHeight, 0]);
+
+    yScale = d3.scaleLinear().domain([yMin, yMax]).range([chartHeight, 0]);
 
     const g = svg
       .attr("width", width)
@@ -88,6 +94,7 @@ const CandlestickChart = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // ✅ رسم الشموع
     g.selectAll(".candle")
       .data(data)
       .enter()
@@ -98,6 +105,7 @@ const CandlestickChart = ({
       .attr("height", (d) => Math.abs(yScale(d.open) - yScale(d.close)))
       .attr("fill", (d) => (d.close > d.open ? "green" : "red"));
 
+    // ✅ رسم الظلال
     g.selectAll(".wick")
       .data(data)
       .enter()
@@ -108,6 +116,7 @@ const CandlestickChart = ({
       .attr("y2", (d) => yScale(d.low))
       .attr("stroke", "black");
 
+    // ✅ رسم الخطوط الموجودة
     lines.forEach((line) => {
       g.append("line")
         .attr("x1", xScale(line.start.index))
@@ -120,14 +129,22 @@ const CandlestickChart = ({
   }, [data, lines, activeTool, tempPoints]);
 
   return (
-    <div style={{ position: "relative", width, height }} >
+    <div style={{ position: "relative", width, height }}>
+      {/* ✅ أدوات الرسم على الطبقة العلوية */}
       <Stage width={width} height={height} style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}>
-        <AllDrawingTools signalId={signalId} savedLines={lines} onSaveLines={setLines} />
+        <AllDrawingTools
+          signalId={signalId}
+          savedLines={lines}
+          onSaveLines={setLines}
+          xScale={xScale}
+          yScale={yScale}
+        />
       </Stage>
+
+      {/* ✅ شارت D3 في الخلفية */}
       <svg ref={svgRef} style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}></svg>
     </div>
   );
 };
 
 export default CandlestickChart;
-///
