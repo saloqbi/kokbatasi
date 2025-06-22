@@ -29,6 +29,9 @@ const SignalDetails = () => {
   const [liveData, setLiveData] = useState([]);
   const [activeTool, setActiveTool] = useState("line");
 
+  const [xScale, setXScale] = useState(null);
+  const [yScale, setYScale] = useState(null);
+
   const apiBase = import.meta.env.VITE_REACT_APP_API_URL;
 
   const detectFractals = (candles) => {
@@ -65,7 +68,7 @@ const SignalDetails = () => {
     const fetchAll = async () => {
       try {
         const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
-        const signalData = typeof signalRes.data === "object" ? signalRes.data : null;
+        const signalData = signalRes.data;
 
         if (!signalData || !signalData.symbol) throw new Error("❌ التوصية غير صالحة");
 
@@ -132,6 +135,10 @@ const SignalDetails = () => {
                 abcdPatterns={abcdPatterns}
                 harmonicPatterns={harmonicPatterns}
                 priceActions={priceActions}
+                onReady={({ xScale, yScale }) => {
+                  setXScale(() => xScale);
+                  setYScale(() => yScale);
+                }}
               />
             )}
 
@@ -149,6 +156,10 @@ const SignalDetails = () => {
                   abcdPatterns={abcdPatterns}
                   harmonicPatterns={harmonicPatterns}
                   priceActions={priceActions}
+                  onReady={({ xScale, yScale }) => {
+                    setXScale(() => xScale);
+                    setYScale(() => yScale);
+                  }}
                 />
                 <TechnicalAnalysisTab lines={lines} zones={zones} />
                 <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
@@ -170,12 +181,17 @@ const SignalDetails = () => {
                     abcdPatterns={abcdPatterns}
                     harmonicPatterns={harmonicPatterns}
                     priceActions={priceActions}
+                    onReady={({ xScale, yScale }) => {
+                      setXScale(() => xScale);
+                      setYScale(() => yScale);
+                    }}
                   />
-                  {/* ✅ عرض أدوات الرسم داخل نفس الشارت */}
                   <AllDrawingTools
                     signalId={signal._id}
                     savedLines={lines}
                     onSaveLines={setLines}
+                    xScale={xScale}
+                    yScale={yScale}
                   />
                 </div>
 
