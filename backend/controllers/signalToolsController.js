@@ -6,7 +6,7 @@ exports.saveLines = async (req, res) => {
     const { id } = req.params;
     const { lines } = req.body;
 
-    const updated = await signal.findByIdAndUpdate(
+    const updated = await Signal.findByIdAndUpdate(
       id,
       { $set: { lines } },
       { new: true }
