@@ -39,8 +39,11 @@ const AllDrawingTools = ({
         if (!xScale) return 0;
         const domain = xScale.domain();
         const range = xScale.range();
-        const relative = x / (range[1] - range[0]);
-        return Math.round(relative * domain.length);
+        const rangeWidth = range[1] - range[0] || 1;
+        const relative = (x - range[0]) / rangeWidth;
+        const index = Math.round(relative * domain.length);
+        if (isNaN(index)) return;
+        return index;
       };
 
       const newLine = {
