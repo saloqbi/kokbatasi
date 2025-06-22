@@ -10,6 +10,8 @@ import ICTTool from "./ICTTool";
 import ChannelTool from "./ChannelTool";
 import WyckoffTool from "./WyckoffTool";
 
+const API_BASE = import.meta.env.VITE_API_URL; // ✅
+
 const AllDrawingTools = ({
   signalId,
   savedLines = [],
@@ -66,7 +68,7 @@ const AllDrawingTools = ({
       setTempPoints([]);
 
       try {
-        fetch(`/api/signals/${signalId}/tools/lines`, {
+        fetch(`${API_BASE}/api/signals/${signalId}/tools/lines`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ lines: newLines }),
@@ -74,6 +76,8 @@ const AllDrawingTools = ({
           if (res.ok) {
             console.log("✅ تم حفظ الخط في MongoDB");
             onSaveLines(newLines);
+          } else {
+            console.warn("⚠️ فشل الحفظ", res.status);
           }
         });
       } catch (err) {
@@ -116,4 +120,3 @@ const AllDrawingTools = ({
 };
 
 export default AllDrawingTools;
-///
