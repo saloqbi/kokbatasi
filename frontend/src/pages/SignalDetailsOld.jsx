@@ -1,5 +1,3 @@
-// ✅ SignalDetails.jsx بعد دمج التعديلات مع الكود الأصلي - النسخة النهائية
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -121,8 +119,7 @@ const SignalDetails = () => {
           />
 
           <div className='border rounded-xl p-3 shadow bg-white'>
-            {/* ✅ عرض الشارت والأدوات دائمًا */}
-            <div style={{ position: "relative" }}>
+            {selectedTab === "candles" && (
               <CandlestickChart
                 signalId={signal._id}
                 data={combinedData}
@@ -136,24 +133,56 @@ const SignalDetails = () => {
                 harmonicPatterns={harmonicPatterns}
                 priceActions={priceActions}
               />
-              <AllDrawingTools
-                signalId={signal._id}
-                savedLines={lines}
-                onSaveLines={setLines}
-              />
-            </div>
+            )}
 
             {selectedTab === "analysis" && (
               <>
+                <CandlestickChart
+                  signalId={signal._id}
+                  data={combinedData}
+                  activeTool={activeTool}
+                  lines={lines}
+                  setLines={setLines}
+                  zones={zones}
+                  fractals={fractals}
+                  waves={waves}
+                  abcdPatterns={abcdPatterns}
+                  harmonicPatterns={harmonicPatterns}
+                  priceActions={priceActions}
+                />
                 <TechnicalAnalysisTab lines={lines} zones={zones} />
                 <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
               </>
             )}
 
             {selectedTab === "draw" && (
-              <div className="mt-4">
-                <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-              </div>
+              <>
+                <div style={{ position: "relative" }}>
+                  <CandlestickChart
+                    signalId={signal._id}
+                    data={combinedData}
+                    activeTool={activeTool}
+                    lines={lines}
+                    setLines={setLines}
+                    zones={zones}
+                    fractals={fractals}
+                    waves={waves}
+                    abcdPatterns={abcdPatterns}
+                    harmonicPatterns={harmonicPatterns}
+                    priceActions={priceActions}
+                  />
+                  {/* ✅ عرض أدوات الرسم داخل نفس الشارت */}
+                  <AllDrawingTools
+                    signalId={signal._id}
+                    savedLines={lines}
+                    onSaveLines={setLines}
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
+                </div>
+              </>
             )}
           </div>
         </div>
