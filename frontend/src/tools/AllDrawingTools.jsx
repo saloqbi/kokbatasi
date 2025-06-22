@@ -88,7 +88,6 @@ const AllDrawingTools = ({
 
   return (
     <Layer onClick={handleClick}>
-      {/* ✅ مستطيل شفاف لتمكين استقبال النقرات داخل Layer */}
       <Rect x={0} y={0} width={1000} height={500} fill="transparent" listening={true} />
 
       {activeTool === "line" &&

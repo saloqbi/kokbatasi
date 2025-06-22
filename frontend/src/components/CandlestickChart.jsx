@@ -21,12 +21,11 @@ const CandlestickChart = ({
   const width = 800;
   const height = 400;
 
-  // ✅ استخدام ToolContext لقراءة الأداة النشطة
   const { activeTool } = useContext(ToolContext);
 
-  // ✅ تعريف المقاييس
-  let xScale = d3.scaleBand();
-  let yScale = d3.scaleLinear();
+  // ✅ استخدام useRef لتخزين المقاييس
+  const xScaleRef = useRef();
+  const yScaleRef = useRef();
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -47,8 +46,8 @@ const CandlestickChart = ({
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
-    // إعداد المقاييس
-    xScale = d3
+    // ✅ إعداد المقاييس وتخزينها في Ref
+    xScaleRef.current = d3
       .scaleBand()
       .domain(data.map((_, i) => i))
       .range([0, chartWidth])
@@ -56,7 +55,10 @@ const CandlestickChart = ({
 
     const yMin = d3.min(data, (d) => d.low);
     const yMax = d3.max(data, (d) => d.high);
-    yScale = d3.scaleLinear().domain([yMin, yMax]).range([chartHeight, 0]);
+    yScaleRef.current = d3
+      .scaleLinear()
+      .domain([yMin, yMax])
+      .range([chartHeight, 0]);
 
     const g = svg
       .attr("width", width)
@@ -66,8 +68,8 @@ const CandlestickChart = ({
         if (activeTool !== "line") return;
 
         const [x, y] = d3.pointer(event);
-        const index = Math.round((x - margin.left) / xScale.step());
-        const price = yScale.invert(y - margin.top);
+        const index = Math.round((x - margin.left) / xScaleRef.current.step());
+        const price = yScaleRef.current.invert(y - margin.top);
 
         const nearestIndex = Math.max(0, Math.min(data.length - 1, index));
         const point = { index: nearestIndex, price };
@@ -101,10 +103,10 @@ const CandlestickChart = ({
       .data(data)
       .enter()
       .append("rect")
-      .attr("x", (_, i) => xScale(i))
-      .attr("y", (d) => yScale(Math.max(d.open, d.close)))
-      .attr("width", xScale.bandwidth())
-      .attr("height", (d) => Math.abs(yScale(d.open) - yScale(d.close)))
+      .attr("x", (_, i) => xScaleRef.current(i))
+      .attr("y", (d) => yScaleRef.current(Math.max(d.open, d.close)))
+      .attr("width", xScaleRef.current.bandwidth())
+      .attr("height", (d) => Math.abs(yScaleRef.current(d.open) - yScaleRef.current(d.close)))
       .attr("fill", (d) => (d.close > d.open ? "green" : "red"));
 
     // ✅ رسم الظلال
@@ -112,19 +114,27 @@ const CandlestickChart = ({
       .data(data)
       .enter()
       .append("line")
-      .attr("x1", (_, i) => xScale(i) + xScale.bandwidth() / 2)
-      .attr("x2", (_, i) => xScale(i) + xScale.bandwidth() / 2)
-      .attr("y1", (d) => yScale(d.high))
-      .attr("y2", (d) => yScale(d.low))
+      .attr("x1", (_, i) => xScaleRef.current(i) + xScaleRef.current.bandwidth() / 2)
+      .attr("x2", (_, i) => xScaleRef.current(i) + xScaleRef.current.bandwidth() / 2)
+      .attr("y1", (d) => yScaleRef.current(d.high))
+      .attr("y2", (d) => yScaleRef.current(d.low))
       .attr("stroke", "black");
 
-    // ✅ رسم الخطوط القديمة
+    // ✅ رسم الخطوط السابقة
     lines.forEach((line) => {
+      if (
+        !line?.start || !line?.end ||
+        typeof line.start.index !== "number" ||
+        typeof line.start.price !== "number" ||
+        typeof line.end.index !== "number" ||
+        typeof line.end.price !== "number"
+      ) return;
+
       g.append("line")
-        .attr("x1", xScale(line.start.index))
-        .attr("y1", yScale(line.start.price))
-        .attr("x2", xScale(line.end.index))
-        .attr("y2", yScale(line.end.price))
+        .attr("x1", xScaleRef.current(line.start.index))
+        .attr("y1", yScaleRef.current(line.start.price))
+        .attr("x2", xScaleRef.current(line.end.index))
+        .attr("y2", yScaleRef.current(line.end.price))
         .attr("stroke", "blue")
         .attr("stroke-width", 2);
     });
@@ -132,7 +142,6 @@ const CandlestickChart = ({
 
   return (
     <div style={{ position: "relative", width, height }}>
-      {/* ✅ أدوات الرسم فوق الشارت */}
       <Stage
         width={width}
         height={height}
@@ -141,19 +150,18 @@ const CandlestickChart = ({
           top: 0,
           left: 0,
           zIndex: 3,
-          pointerEvents: "auto", // مهم للتفاعل
+          pointerEvents: "auto",
         }}
       >
         <AllDrawingTools
           signalId={signalId}
           savedLines={lines}
           onSaveLines={setLines}
-          xScale={xScale}
-          yScale={yScale}
+          xScale={xScaleRef.current}
+          yScale={yScaleRef.current}
         />
       </Stage>
 
-      {/* ✅ الشموع في الخلف */}
       <svg
         ref={svgRef}
         style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
