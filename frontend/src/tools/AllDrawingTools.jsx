@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Layer, Line } from "react-konva";
+import { Layer, Line, Rect } from "react-konva";
 import { ToolContext } from "../context/ToolContext";
 import SupportResistanceTool from "./SupportResistanceTool";
 import FibonacciTool from "./FibonacciTool";
@@ -81,6 +81,9 @@ const AllDrawingTools = ({
 
   return (
     <Layer onClick={handleClick}>
+      {/* ✅ مستطيل شفاف لتمكين استقبال النقرات داخل Layer */}
+      <Rect x={0} y={0} width={1000} height={500} fill="transparent" listening={true} />
+
       {activeTool === "line" &&
         lines.map((line, index) => {
           const x1 = xScale ? xScale(line.start.index) : line.start.x;
@@ -110,4 +113,3 @@ const AllDrawingTools = ({
 };
 
 export default AllDrawingTools;
-//
