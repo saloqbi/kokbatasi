@@ -7,10 +7,11 @@ exports.saveLines = async (req, res) => {
     const { lines } = req.body;
 
     const updated = await Signal.findByIdAndUpdate(
-      id,
-      { $set: { lines } },
-      { new: true }
-    );
+  	id,
+  	{ $set: { "tools.lines": lines } },
+ 	 { new: true }
+	);
+
 
     if (!updated) return res.status(404).json({ error: 'signal not found' });
 
