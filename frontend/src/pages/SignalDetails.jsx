@@ -186,13 +186,17 @@ const SignalDetails = () => {
                       setYScale(() => yScale);
                     }}
                   />
-                  <AllDrawingTools
-                    signalId={signal._id}
-                    savedLines={lines}
-                    onSaveLines={setLines}
-                    xScale={xScale}
-                    yScale={yScale}
-                  />
+                 <AllDrawingTools
+ 		activeTool={activeTool}
+ 		lines={lines}
+  		zones={zones}
+ 		fractals={fractals}
+  		waves={waves}
+  		abcdPatterns={abcdPatterns}
+  		harmonicPatterns={harmonicPatterns}
+  		priceActions={priceActions}
+		/>
+
                 </div>
 
                 <div className="mt-4">

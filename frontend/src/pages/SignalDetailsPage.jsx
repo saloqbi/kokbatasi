@@ -145,7 +145,17 @@ const SignalDetails = () => {
             {selectedTab === "draw" && (
               <>
                 <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                <AllDrawingTools/>
+                <AllDrawingTools
+  		activeTool={activeTool}
+  		lines={lines}
+  		zones={zones}
+  		fractals={fractals}
+  		waves={waves}
+  		abcdPatterns={abcdPatterns}
+  		harmonicPatterns={harmonicPatterns}
+  		priceActions={priceActions}
+		/>
+
               </>
             )}
           </div>
