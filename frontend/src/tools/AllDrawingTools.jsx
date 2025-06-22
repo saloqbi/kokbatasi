@@ -91,32 +91,30 @@ const AllDrawingTools = ({
       <Rect x={0} y={0} width={1000} height={500} fill="transparent" listening={true} />
 
       {activeTool === "line" &&
-        lines.map((line, index) => {
-          if (
-            !line?.start || !line?.end ||
-            typeof line.start.index !== "number" ||
-            typeof line.start.price !== "number" ||
-            typeof line.end.index !== "number" ||
-            typeof line.end.price !== "number"
-          ) {
-            console.warn("⚠️ تجاهل خط غير صالح:", line);
-            return null;
-          }
+        lines
+          .filter((line) =>
+            line?.start &&
+            line?.end &&
+            typeof line.start.index === "number" &&
+            typeof line.start.price === "number" &&
+            typeof line.end.index === "number" &&
+            typeof line.end.price === "number"
+          )
+          .map((line, index) => {
+            const x1 = xScale ? xScale(line.start.index) : line.start.x;
+            const y1 = yScale ? yScale(line.start.price) : line.start.y;
+            const x2 = xScale ? xScale(line.end.index) : line.end.x;
+            const y2 = yScale ? yScale(line.end.price) : line.end.y;
 
-          const x1 = xScale ? xScale(line.start.index) : line.start.x;
-          const y1 = yScale ? yScale(line.start.price) : line.start.y;
-          const x2 = xScale ? xScale(line.end.index) : line.end.x;
-          const y2 = yScale ? yScale(line.end.price) : line.end.y;
-
-          return (
-            <Line
-              key={index}
-              points={[x1, y1, x2, y2]}
-              stroke="blue"
-              strokeWidth={2}
-            />
-          );
-        })}
+            return (
+              <Line
+                key={index}
+                points={[x1, y1, x2, y2]}
+                stroke="blue"
+                strokeWidth={2}
+              />
+            );
+          })}
 
       {activeTool === "zone" && <SupportResistanceTool />}
       {activeTool?.startsWith("fib") && <FibonacciTool />}
