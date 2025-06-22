@@ -10,7 +10,7 @@ import ICTTool from "./ICTTool";
 import ChannelTool from "./ChannelTool";
 import WyckoffTool from "./WyckoffTool";
 
-const API_BASE = import.meta.env.VITE_API_URL; // ✅
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const AllDrawingTools = ({
   signalId,
@@ -93,10 +93,22 @@ const AllDrawingTools = ({
 
       {activeTool === "line" &&
         lines.map((line, index) => {
+          if (
+            !line?.start || !line?.end ||
+            typeof line.start.index !== "number" ||
+            typeof line.start.price !== "number" ||
+            typeof line.end.index !== "number" ||
+            typeof line.end.price !== "number"
+          ) {
+            console.warn("⚠️ تجاهل خط غير صالح:", line);
+            return null;
+          }
+
           const x1 = xScale ? xScale(line.start.index) : line.start.x;
           const y1 = yScale ? yScale(line.start.price) : line.start.y;
           const x2 = xScale ? xScale(line.end.index) : line.end.x;
           const y2 = yScale ? yScale(line.end.price) : line.end.y;
+
           return (
             <Line
               key={index}
