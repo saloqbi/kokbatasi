@@ -240,3 +240,4 @@ useEffect(() => {
 };
 
 export default SignalDetails;
+//
