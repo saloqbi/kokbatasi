@@ -77,7 +77,8 @@ const SignalDetails = () => {
             low: parseFloat(d[3]),
             close: parseFloat(d[4]),
           }));
-          setLiveData(candles);
+          console.log("✅ بيانات Binance:", candles);
+    setLiveData(candles);
         } catch (err) {
           console.error('فشل في جلب بيانات Binance', err);
         }
@@ -85,7 +86,8 @@ const SignalDetails = () => {
 
       if (signal?.symbol && (!Array.isArray(signal.data) || signal.data.length === 0)) {
         fetchBinanceCandles().then(candles => {
-      setLiveData(candles);
+      console.log("✅ بيانات Binance:", candles);
+    setLiveData(candles);
       setSignal(prev => ({ ...prev, data: candles }));
     });
       }
