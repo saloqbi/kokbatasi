@@ -24,8 +24,6 @@ const SignalDetails = () => {
   const [abcdPatterns, setABCDPatterns] = useState([]);
   const [harmonicPatterns, setHarmonicPatterns] = useState([]);
   const [priceActions, setPriceActions] = useState([]);
-const [channels, setChannels] = useState([]);
-const [toolPoints, setToolPoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [liveData, setLiveData] = useState([]);
@@ -66,7 +64,32 @@ const [toolPoints, setToolPoints] = useState([]);
     return waves;
   };
 
-  useEffect(() => {
+  
+    useEffect(() => {
+      const fetchBinanceCandles = async () => {
+        try {
+          const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${signal.symbol}USDT&interval=1m&limit=30`);
+          const data = await res.json();
+          const candles = data.map(d => ({
+            time: d[0],
+            open: parseFloat(d[1]),
+            high: parseFloat(d[2]),
+            low: parseFloat(d[3]),
+            close: parseFloat(d[4]),
+          }));
+          setLiveData(candles);
+        } catch (err) {
+          console.error('فشل في جلب بيانات Binance', err);
+        }
+      };
+
+      if (signal && (!Array.isArray(signal.data) || signal.data.length === 0)) {
+        fetchBinanceCandles();
+      }
+    }, [signal]);
+
+
+useEffect(() => {
     const fetchAll = async () => {
       try {
         const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
@@ -78,9 +101,7 @@ const [toolPoints, setToolPoints] = useState([]);
         const candles = hasData ? signalData.data : liveData;
 
         if (!hasData) {
-          subscribeToCandles(signalData.symbol, (newCandle) => {
-            setLiveData(prev => [...prev.slice(-29), newCandle]);
-          });
+          // تم استبداله بجلب بيانات Binance
         }
 
         setSignal(signalData);
@@ -94,7 +115,6 @@ const [toolPoints, setToolPoints] = useState([]);
         setABCDPatterns(detectABCDPatterns(candles));
         setHarmonicPatterns(detectHarmonicPatterns(candles));
         setPriceActions(detectPriceActionPatterns(candles));
-setChannels(signalData.channels || []);
       } catch (err) {
         setError("❌ فشل تحميل التوصية");
       } finally {
@@ -104,7 +124,7 @@ setChannels(signalData.channels || []);
     fetchAll();
   }, [id]);
 
-  const combinedData = (Array.isArray(signal?.data) && signal.data.length > 0) ? signal.data : liveData;
+  const combinedData = Array.isArray(signal?.data) && signal.data.length > 0 ? signal.data : liveData;
 
   if (loading) return <div>⏳ جاري التحميل...</div>;
   if (error) return <div className='text-red-600'>{error}</div>;
@@ -193,7 +213,6 @@ setChannels(signalData.channels || []);
                     }}
                   />
                  <AllDrawingTools
-              channels={channels}
   			activeTool={activeTool}
   			lines={lines}
   			setLines={setLines} // ✅ هذا السطر كان مفقود
@@ -221,12 +240,3 @@ setChannels(signalData.channels || []);
 };
 
 export default SignalDetails;
-
-
-  useEffect(() => {
-    if (signal && (!Array.isArray(signal.data) || signal.data.length === 0)) {
-      subscribeToCandles(signal.symbol, (newCandle) => {
-        setLiveData(prev => [...prev.slice(-29), newCandle]);
-      });
-    }
-  }, [signal]);
