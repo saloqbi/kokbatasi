@@ -1,3 +1,5 @@
+const Signal = require("../models/signal");
+
 // ✅ حفظ خطوط الاتجاه داخل signal مباشرة
 exports.saveLines = async (req, res) => {
   try {
@@ -6,7 +8,7 @@ exports.saveLines = async (req, res) => {
 
     const updated = await Signal.findByIdAndUpdate(
       id,
-      { $set: { lines } }, // ✅ هذا التعديل المهم
+      { $set: { lines } },
       { new: true }
     );
 

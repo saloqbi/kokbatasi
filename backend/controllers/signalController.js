@@ -1,7 +1,7 @@
 const Signal = require('../models/signal');
 const mongoose = require("mongoose");
 
-// ✅ استرجاع جميع التوصيات
+// جلب كل التوصيات
 const getSignals = async (req, res) => {
   try {
     const signals = await Signal.find();
@@ -12,7 +12,7 @@ const getSignals = async (req, res) => {
   }
 };
 
-// ✅ إنشاء توصية جديدة (مع الشموع)
+// إنشاء توصية جديدة
 const createSignal = async (req, res) => {
   try {
     const {
@@ -45,25 +45,21 @@ const createSignal = async (req, res) => {
   }
 };
 
-// ✅ توليد توصيات وهمية عشوائية
+// توليد توصيات وهمية
 const generateRandomSignals = async (req, res) => {
   console.log("🔄 دخلنا على الدالة generateRandomSignals");
 
   try {
-    const randomSignals = [];
     const actions = ['buy', 'sell'];
     const symbols = ['BTC', 'ETH', 'SP500', 'AAPL', 'TASI'];
+    const randomSignals = [];
 
     for (let i = 0; i < 5; i++) {
       const randomSignal = new Signal({
         symbol: symbols[Math.floor(Math.random() * symbols.length)],
         action: actions[Math.floor(Math.random() * actions.length)],
         price: parseFloat((Math.random() * 500).toFixed(2)),
-        lines: [],
-        zones: [],
-        fractals: [],
-        waves: [],
-        data: []
+        lines: [], zones: [], fractals: [], waves: [], data: []
       });
       await randomSignal.save();
       randomSignals.push(randomSignal);
@@ -77,10 +73,9 @@ const generateRandomSignals = async (req, res) => {
   }
 };
 
-// ✅ تحديث أدوات الرسم (مع التحقق من ObjectId)
+// تحديث أدوات الرسم
 const updateSignalDrawings = async (req, res) => {
   const signalId = req.params.id;
-
   if (!mongoose.Types.ObjectId.isValid(signalId)) {
     return res.status(400).json({ message: "Invalid signal ID" });
   }
