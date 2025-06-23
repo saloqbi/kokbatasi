@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 
 const DrawingTools = ({
@@ -10,6 +9,7 @@ const DrawingTools = ({
   abcdPatterns = [],
   harmonicPatterns = [],
   priceActions = [],
+  channels = [],
 }) => {
   const svgRef = useRef();
   const width = 800;
@@ -184,6 +184,30 @@ const DrawingTools = ({
             ⭐ {pattern.type} ({pattern.direction})
           </text>
         ))}
+
+      {activeTool === "channel" &&
+        channels.map((channel, index) => {
+          const { from, to, offset } = channel;
+          const x1 = indexToX(from.index);
+          const y1 = priceToY(from.price);
+          const x2 = indexToX(to.index);
+          const y2 = priceToY(to.price);
+
+          return (
+            <g key={index}>
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="blue" strokeWidth={2} />
+              <line
+                x1={x1}
+                y1={y1 + offset}
+                x2={x2}
+                y2={y2 + offset}
+                stroke="blue"
+                strokeWidth={2}
+                strokeDasharray="5,5"
+              />
+            </g>
+          );
+        })}
     </svg>
   );
 };

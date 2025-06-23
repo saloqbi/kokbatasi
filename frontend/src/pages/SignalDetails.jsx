@@ -24,6 +24,8 @@ const SignalDetails = () => {
   const [abcdPatterns, setABCDPatterns] = useState([]);
   const [harmonicPatterns, setHarmonicPatterns] = useState([]);
   const [priceActions, setPriceActions] = useState([]);
+const [channels, setChannels] = useState([]);
+const [toolPoints, setToolPoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [liveData, setLiveData] = useState([]);
@@ -92,6 +94,7 @@ const SignalDetails = () => {
         setABCDPatterns(detectABCDPatterns(candles));
         setHarmonicPatterns(detectHarmonicPatterns(candles));
         setPriceActions(detectPriceActionPatterns(candles));
+setChannels(signalData.channels || []);
       } catch (err) {
         setError("❌ فشل تحميل التوصية");
       } finally {
@@ -190,6 +193,7 @@ const SignalDetails = () => {
                     }}
                   />
                  <AllDrawingTools
+              channels={channels}
   			activeTool={activeTool}
   			lines={lines}
   			setLines={setLines} // ✅ هذا السطر كان مفقود

@@ -16,6 +16,19 @@ export const ToolProvider = ({ children }) => {
 
   const isActive = (tool) => activeTool === tool;
 
+  
+  const [channels, setChannels] = useState([]);
+
+  const addChannel = (newChannel) => setChannels(prev => [...prev, newChannel]);
+  const updateChannel = (index, updated) => {
+    setChannels(prev => {
+      const copy = [...prev];
+      copy[index] = updated;
+      return copy;
+    });
+  };
+  const removeChannel = (index) => setChannels(prev => prev.filter((_, i) => i !== index));
+
   const updateToolSettings = (tool, settings) => {
     setToolSettings((prev) => ({
       ...prev,
@@ -26,6 +39,11 @@ export const ToolProvider = ({ children }) => {
   return (
     <ToolContext.Provider
       value={{
+        channels,
+        addChannel,
+        updateChannel,
+        removeChannel,
+
         activeTool,
         setActiveTool, // ✅ تم إضافتها لحل المشكلة
         toolSettings,
