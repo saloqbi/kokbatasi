@@ -27,13 +27,15 @@ const AllSignalsPage = () => {
   const handleGenerateFakeSignal = async () => {
     try {
       const response = await axios.post(
-        import.meta.env.VITE_REACT_APP_API_URL + "/api/signals",
-        {
-          symbol: "ETH",
-          action: "BUY",
-          price: 3300
-        }
-      );
+  import.meta.env.VITE_REACT_APP_API_URL + "/api/signals",
+  {
+    symbol: "ETH",
+    action: "buy",
+    price: 3300,
+    data: [] // 🔴 ضروري حتى لا يفشل Mongoose بسبب الحقل المطلوب
+  }
+);
+
       alert("✅ تم إنشاء توصية وهمية بنجاح");
     } catch (error) {
       console.error("❌ فشل في إنشاء التوصية الوهمية:", error);

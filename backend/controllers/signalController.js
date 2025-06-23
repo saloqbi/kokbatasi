@@ -66,6 +66,8 @@ const generateRandomSignals = async (req, res) => {
     }
 
     console.log("✅ تم إنشاء التوصيات:", randomSignals.length);
+       console.log("📥 بيانات التوصية المستلمة:", req.body);
+
     res.status(201).json({ message: "✅ Random signals generated", data: randomSignals });
   } catch (error) {
     console.error("❌ Error generating signals:", error.message, error.stack);
