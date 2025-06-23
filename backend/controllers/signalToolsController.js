@@ -1,17 +1,14 @@
-const Signal = require('../models/signal');
-
-// ✅ حفظ خطوط الاتجاه
+// ✅ حفظ خطوط الاتجاه داخل signal مباشرة
 exports.saveLines = async (req, res) => {
   try {
     const { id } = req.params;
     const { lines } = req.body;
 
     const updated = await Signal.findByIdAndUpdate(
-  	id,
-  	{ $set: { "tools.lines": lines } },
- 	 { new: true }
-	);
-
+      id,
+      { $set: { lines } }, // ✅ هذا التعديل المهم
+      { new: true }
+    );
 
     if (!updated) return res.status(404).json({ error: 'signal not found' });
 
