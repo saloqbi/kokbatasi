@@ -190,15 +190,17 @@ const SignalDetails = () => {
                     }}
                   />
                  <AllDrawingTools
- 		activeTool={activeTool}
- 		lines={lines}
-  		zones={zones}
- 		fractals={fractals}
-  		waves={waves}
-  		abcdPatterns={abcdPatterns}
-  		harmonicPatterns={harmonicPatterns}
-  		priceActions={priceActions}
-		/>
+  			activeTool={activeTool}
+  			lines={lines}
+  			setLines={setLines} // ✅ هذا السطر كان مفقود
+ 		 	zones={zones}
+  			fractals={fractals}
+  			waves={waves}
+  			abcdPatterns={abcdPatterns}
+  			harmonicPatterns={harmonicPatterns}
+  			priceActions={priceActions}
+			/>
+
 
                 </div>
 
