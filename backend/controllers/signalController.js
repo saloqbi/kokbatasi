@@ -1,4 +1,5 @@
 const Signal = require('../models/signal');
+const mongoose = require("mongoose");
 
 // ✅ استرجاع جميع التوصيات
 const getSignals = async (req, res) => {
@@ -11,7 +12,7 @@ const getSignals = async (req, res) => {
   }
 };
 
-// ✅ إنشاء توصية جديدة (مُعدل لحفظ الشموع)
+// ✅ إنشاء توصية جديدة (مع الشموع)
 const createSignal = async (req, res) => {
   try {
     const {
@@ -22,7 +23,7 @@ const createSignal = async (req, res) => {
       zones,
       fractals,
       waves,
-      data // ✅ الشموع
+      data
     } = req.body;
 
     const newSignal = new Signal({
@@ -33,7 +34,7 @@ const createSignal = async (req, res) => {
       zones: zones || [],
       fractals: fractals || [],
       waves: waves || [],
-      data: data || [] // ✅ تأكد من حفظها
+      data: data || []
     });
 
     const savedSignal = await newSignal.save();
@@ -44,7 +45,7 @@ const createSignal = async (req, res) => {
   }
 };
 
-// ✅ توليد توصيات عشوائية
+// ✅ توليد توصيات وهمية عشوائية
 const generateRandomSignals = async (req, res) => {
   console.log("🔄 دخلنا على الدالة generateRandomSignals");
 
@@ -62,7 +63,7 @@ const generateRandomSignals = async (req, res) => {
         zones: [],
         fractals: [],
         waves: [],
-        data: [] // يمكن تعديلها لإضافة شموع لاحقًا
+        data: []
       });
       await randomSignal.save();
       randomSignals.push(randomSignal);
@@ -76,12 +77,18 @@ const generateRandomSignals = async (req, res) => {
   }
 };
 
-// ✅ تحديث أدوات الرسم
+// ✅ تحديث أدوات الرسم (مع التحقق من ObjectId)
 const updateSignalDrawings = async (req, res) => {
+  const signalId = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(signalId)) {
+    return res.status(400).json({ message: "Invalid signal ID" });
+  }
+
   try {
     const { lines, zones, fractals, waves } = req.body;
     const signal = await Signal.findByIdAndUpdate(
-      req.params.id,
+      signalId,
       { lines, zones, fractals, waves },
       { new: true }
     );
@@ -97,6 +104,5 @@ module.exports = {
   getSignals,
   createSignal,
   generateRandomSignals,
-  updateSignalDrawings,
+  updateSignalDrawings
 };
-//
