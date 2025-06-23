@@ -154,7 +154,7 @@ useEffect(() => {
             {selectedTab === "candles" && (
               <CandlestickChart
                 signalId={signal._id}
-                data={combinedData}
+                data={combinedData}  // ✅ هذا السطر مهم جدًا
                 activeTool={activeTool}
                 lines={lines}
                 setLines={setLines}
