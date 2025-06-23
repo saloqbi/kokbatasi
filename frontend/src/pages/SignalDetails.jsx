@@ -221,3 +221,12 @@ setChannels(signalData.channels || []);
 };
 
 export default SignalDetails;
+
+
+  useEffect(() => {
+    if (signal && (!Array.isArray(signal.data) || signal.data.length === 0)) {
+      subscribeToCandles(signal.symbol, (newCandle) => {
+        setLiveData(prev => [...prev.slice(-29), newCandle]);
+      });
+    }
+  }, [signal]);
