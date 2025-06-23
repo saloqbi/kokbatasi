@@ -82,7 +82,11 @@ const SignalDetails = () => {
         }
 
         setSignal(signalData);
-        setLines(signalData.tools?.lines || []);
+        const linesFromSignal =
+  	signalData.tools?.lines || signalData.lines || [];
+
+	setLines(linesFromSignal);
+
         setZones(signalData.zones || []);
         setFractals(detectFractals(candles));
         setWaves(detectElliottWaves(detectFractals(candles)));
