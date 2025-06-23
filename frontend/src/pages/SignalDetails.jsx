@@ -77,17 +77,15 @@ const SignalDetails = () => {
             low: parseFloat(d[3]),
             close: parseFloat(d[4]),
           }));
-          console.log("✅ بيانات Binance:", candles);
-    setLiveData(candles);
+          setLiveData(candles);
         } catch (err) {
           console.error('فشل في جلب بيانات Binance', err);
         }
       };
 
-      if (signal?.symbol && (!Array.isArray(signal.data) || signal.data.length === 0)) {
+      if (signal && (!Array.isArray(signal.data) || signal.data.length === 0)) {
         fetchBinanceCandles().then(candles => {
-      console.log("✅ بيانات Binance:", candles);
-    setLiveData(candles);
+      setLiveData(candles);
       setSignal(prev => ({ ...prev, data: candles }));
     });
       }
@@ -156,7 +154,7 @@ useEffect(() => {
             {selectedTab === "candles" && (
               <CandlestickChart
                 signalId={signal._id}
-                data={combinedData}  // ✅ هذا السطر مهم جدًا
+                data={combinedData}
                 activeTool={activeTool}
                 lines={lines}
                 setLines={setLines}
