@@ -68,7 +68,7 @@ const SignalDetails = () => {
     useEffect(() => {
       const fetchBinanceCandles = async () => {
         try {
-          const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${signal.symbol}USDT&interval=1m&limit=30`);
+          const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${signal.symbol.toUpperCase()}USDT&interval=1m&limit=30`);
           const data = await res.json();
           const candles = data.map(d => ({
             time: d[0],
@@ -240,4 +240,3 @@ useEffect(() => {
 };
 
 export default SignalDetails;
-//
