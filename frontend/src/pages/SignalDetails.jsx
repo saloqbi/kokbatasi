@@ -83,7 +83,7 @@ const SignalDetails = () => {
         }
       };
 
-      if (signal && (!Array.isArray(signal.data) || signal.data.length === 0)) {
+      if (signal?.symbol && (!Array.isArray(signal.data) || signal.data.length === 0)) {
         fetchBinanceCandles().then(candles => {
       setLiveData(candles);
       setSignal(prev => ({ ...prev, data: candles }));
