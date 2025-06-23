@@ -31,11 +31,7 @@ const AllSignalsPage = () => {
         {
           symbol: "ETH",
           action: "BUY",
-          entry: 3300,
-          sl: 3200,
-          tp: 3500,
-          source: "Fake",
-          note: "تم الإنشاء تلقائيًا لاختبار الشموع"
+          price: 3300
         }
       );
       alert("✅ تم إنشاء توصية وهمية بنجاح");
