@@ -5,7 +5,7 @@ const SignalSchema = new mongoose.Schema({
   action: { type: String, enum: ["buy", "sell", "neutral"], required: true },
   price: { type: Number },
 
-  // ✅ إضافة الشموع هنا
+  // ✅ الشموع
   data: [
     {
       time: String,
@@ -16,9 +16,11 @@ const SignalSchema = new mongoose.Schema({
     }
   ],
 
-  lines: [
-    { x1: Number, y1: Number, x2: Number, y2: Number }
-  ],
+  // ✅ الحقول المرنة لتحليل الفني
+  lines: {
+    type: Array,
+    default: [],
+  },
   zones: [
     { x: Number, y: Number, width: Number, height: Number }
   ],
@@ -36,6 +38,7 @@ const SignalSchema = new mongoose.Schema({
       price: Number
     }
   ],
+
   createdAt: { type: Date, default: Date.now }
 }, { collection: "signals" });
 
