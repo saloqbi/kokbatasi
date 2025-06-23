@@ -163,9 +163,12 @@ const CandlestickChart = ({
       </Stage>
 
       <svg
-        ref={svgRef}
-        style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
-      ></svg>
+  	ref={svgRef}
+  	width={width}
+  	height={height}
+  	style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
+	></svg>
+	
     </div>
   );
 };
