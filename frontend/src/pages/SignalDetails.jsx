@@ -104,7 +104,7 @@ setChannels(signalData.channels || []);
     fetchAll();
   }, [id]);
 
-  const combinedData = Array.isArray(signal?.data) && signal.data.length > 0 ? signal.data : liveData;
+  const combinedData = (Array.isArray(signal?.data) && signal.data.length > 0) ? signal.data : liveData;
 
   if (loading) return <div>⏳ جاري التحميل...</div>;
   if (error) return <div className='text-red-600'>{error}</div>;
