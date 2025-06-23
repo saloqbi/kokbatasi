@@ -11,7 +11,7 @@ import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
 import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
 import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
-import { subscribeToCandles } from "../utils/websocket";
+//import { subscribeToCandles } from "../utils/websocket";
 
 const SignalDetails = () => {
   const { id } = useParams();
