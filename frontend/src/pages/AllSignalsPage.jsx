@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const AllSignalsPage = () => {
   const [signals, setSignals] = useState([]);
@@ -23,6 +24,27 @@ const AllSignalsPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleGenerateFakeSignal = async () => {
+    try {
+      const response = await axios.post(
+        import.meta.env.VITE_REACT_APP_API_URL + "/api/signals",
+        {
+          symbol: "ETH",
+          action: "BUY",
+          entry: 3300,
+          sl: 3200,
+          tp: 3500,
+          source: "Fake",
+          note: "تم الإنشاء تلقائيًا لاختبار الشموع"
+        }
+      );
+      alert("✅ تم إنشاء توصية وهمية بنجاح");
+    } catch (error) {
+      console.error("❌ فشل في إنشاء التوصية الوهمية:", error);
+      alert("❌ فشل في إضافة التوصية. تحقق من الخادم.");
+    }
+  };
+
   const normalize = (text) => {
     if (!text) return "";
     const val = text.trim().toLowerCase();
@@ -34,7 +56,11 @@ const AllSignalsPage = () => {
   const filteredSignals =
     filter === "all"
       ? signals
-      : signals.filter((signal) => normalize(signal.action || signal.recommendation) === normalize(filter));
+      : signals.filter(
+          (signal) =>
+            normalize(signal.action || signal.recommendation) ===
+            normalize(filter)
+        );
 
   const getIcon = (rec) => {
     const norm = normalize(rec);
@@ -47,17 +73,28 @@ const AllSignalsPage = () => {
     <div className="p-4 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold flex items-center gap-2">
-          <span role="img" aria-label="satellite">📡</span> جميع التوصيات
+          <span role="img" aria-label="satellite">
+            📡
+          </span>{" "}
+          جميع التوصيات
         </h1>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="border rounded px-3 py-1 text-sm"
-        >
-          <option value="all">الكل</option>
-          <option value="buy">شراء</option>
-          <option value="sell">بيع</option>
-        </select>
+        <div className="flex items-center gap-4">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="border rounded px-3 py-1 text-sm"
+          >
+            <option value="all">الكل</option>
+            <option value="buy">شراء</option>
+            <option value="sell">بيع</option>
+          </select>
+          <button
+            onClick={handleGenerateFakeSignal}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm"
+          >
+            🚀 إنشاء توصية وهمية
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -92,7 +129,7 @@ const AllSignalsPage = () => {
                 📅 {new Date(signal.createdAt).toLocaleString("ar-EG")}
               </div>
             </Link>
-        ))}
+          ))}
       </div>
     </div>
   );
