@@ -82,8 +82,7 @@ const SignalDetails = () => {
         }
 
         setSignal(signalData);
-        const linesFromSignal =
-  	signalData.tools?.lines || signalData.lines || [];
+        const linesFromSignal = signalData.lines || signalData.tools?.lines || [];
 
 	setLines(linesFromSignal);
 
