@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const {
   getSignals,
   createSignal,
@@ -7,7 +8,7 @@ const {
   updateSignalDrawings
 } = require("../controllers/signalController");
 
-const { saveLines } = require("../controllers/signalToolsController"); // ✅ إضافة التحكم في الخطوط
+const { saveLines } = require("../controllers/signalToolsController"); // ✅ لحفظ الخطوط
 
 // ✅ توليد توصيات عشوائية
 router.get("/generate", generateRandomSignals);
@@ -23,7 +24,6 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ message: "Signal not found" });
     }
 
-    // ✅ تأكيد الاستجابة الصحيحة
     res.status(200).json(signal);
   } catch (err) {
     console.error("❌ Error fetching signal by ID:", err);
@@ -34,10 +34,10 @@ router.get("/:id", async (req, res) => {
 // ✅ إنشاء توصية جديدة
 router.post("/", createSignal);
 
-// ✅ تحديث أدوات الرسم
+// ✅ تحديث أدوات الرسم (خطوط، مناطق...)
 router.put("/:id/drawings", updateSignalDrawings);
 
-// ✅ حفظ خطوط الاتجاه
-router.post("/:id/tools/lines", saveLines); // ✅ جديد
+// ✅ حفظ خطوط الاتجاه (Trendlines)
+router.post("/:id/tools/lines", saveLines); // ✅ جاهز للاستقبال من الواجهة
 
 module.exports = router;
