@@ -6,7 +6,8 @@ const SignalSchema = new mongoose.Schema({
   price: { type: Number },
 
   // ✅ الشموع
-  data: [
+  data: {
+  type: [
     {
       time: String,
       open: Number,
@@ -15,6 +16,9 @@ const SignalSchema = new mongoose.Schema({
       close: Number
     }
   ],
+  default: []
+},
+
 
   // ✅ الحقول المرنة لتحليل الفني
   lines: {
