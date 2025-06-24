@@ -2,35 +2,35 @@ import React from "react";
 
 const Sidebar = ({ selectedTab, setSelectedTab }) => {
   return (
-    <aside className="w-64 bg-[#1a1a1a] text-white flex flex-col justify-between p-4 border-l border-gray-800">
+    <aside className="w-64 bg-[#121212] text-white flex flex-col justify-between p-5 border-l border-gray-800 shadow-lg rounded-r-2xl font-[Cairo]">
       <div>
-        <h1 className="text-2xl font-bold text-center mb-6">🌌 كوكبة</h1>
+        <h1 className="text-2xl font-bold text-center mb-6 tracking-wide">🌌 كوكبة</h1>
 
-        <nav className="space-y-3">
-          <div className="text-sm text-gray-400 uppercase mb-2">القائمة</div>
+        <nav className="space-y-4">
+          <div className="text-xs text-gray-400 uppercase mb-1">القائمة</div>
           <ul className="space-y-2">
-            <li className="hover:text-yellow-400 cursor-pointer">📈 الإشارات</li>
-            <li className="hover:text-yellow-400 cursor-pointer">➕ إضافة توصية</li>
-            <li className="hover:text-yellow-400 cursor-pointer">⚙️ لوحة التحكم</li>
-            <li className="hover:text-yellow-400 cursor-pointer">🔐 تسجيل الدخول</li>
+            <li className="hover:bg-[#1f1f1f] px-3 py-2 rounded-md cursor-pointer transition">📈 الإشارات</li>
+            <li className="hover:bg-[#1f1f1f] px-3 py-2 rounded-md cursor-pointer transition">➕ إضافة توصية</li>
+            <li className="hover:bg-[#1f1f1f] px-3 py-2 rounded-md cursor-pointer transition">⚙️ لوحة التحكم</li>
+            <li className="hover:bg-[#1f1f1f] px-3 py-2 rounded-md cursor-pointer transition">🔐 تسجيل الدخول</li>
           </ul>
 
-          <div className="mt-6 text-sm text-gray-400 uppercase mb-2">أدوات التحليل</div>
+          <div className="mt-6 text-xs text-gray-400 uppercase mb-1">أدوات التحليل</div>
           <ul className="space-y-2">
             <li
-              className={`cursor-pointer px-2 py-1 rounded-md ${selectedTab === "candles" ? "bg-[#333] text-yellow-300" : "hover:text-yellow-300"}`}
+              className={`cursor-pointer px-3 py-2 rounded-md transition ${selectedTab === "candles" ? "bg-[#2e2e2e] text-yellow-400" : "hover:text-yellow-300 hover:bg-[#1f1f1f]"}`}
               onClick={() => setSelectedTab("candles")}
             >
-              الشموع اليابانية
+              🕯️ الشموع اليابانية
             </li>
             <li
-              className={`cursor-pointer px-2 py-1 rounded-md ${selectedTab === "analysis" ? "bg-[#333] text-yellow-300" : "hover:text-yellow-300"}`}
+              className={`cursor-pointer px-3 py-2 rounded-md transition ${selectedTab === "analysis" ? "bg-[#2e2e2e] text-yellow-400" : "hover:text-yellow-300 hover:bg-[#1f1f1f]"}`}
               onClick={() => setSelectedTab("analysis")}
             >
               📊 تحليل فني
             </li>
             <li
-              className={`cursor-pointer px-2 py-1 rounded-md ${selectedTab === "draw" ? "bg-[#333] text-yellow-300" : "hover:text-yellow-300"}`}
+              className={`cursor-pointer px-3 py-2 rounded-md transition ${selectedTab === "draw" ? "bg-[#2e2e2e] text-yellow-400" : "hover:text-yellow-300 hover:bg-[#1f1f1f]"}`}
               onClick={() => setSelectedTab("draw")}
             >
               ✍️ أدوات الرسم
@@ -39,7 +39,7 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
         </nav>
       </div>
 
-      <div className="text-center text-xs text-gray-500 mt-6">جميع الحقوق محفوظة © 2025</div>
+      <div className="text-center text-[10px] text-gray-500 mt-6">جميع الحقوق محفوظة © 2025</div>
     </aside>
   );
 };
