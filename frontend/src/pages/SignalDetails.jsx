@@ -139,23 +139,49 @@ const SignalDetails = () => {
 
             <div className="bg-[#1a1a1a] rounded-xl p-4 shadow-lg">
               {(selectedTab === "candles" || selectedTab === "draw") && (
-                <CandlestickChart
-                  signalId={signal._id}
-                  data={combinedData}
-                  activeTool={activeTool}
-                  lines={lines}
-                  setLines={setLines}
-                  zones={zones}
-                  fractals={fractals}
-                  waves={waves}
-                  abcdPatterns={abcdPatterns}
-                  harmonicPatterns={harmonicPatterns}
-                  priceActions={priceActions}
-                  onReady={({ xScale, yScale }) => {
-                    setXScale(() => xScale);
-                    setYScale(() => yScale);
-                  }}
-                />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <CandlestickChart
+                    signalId={signal._id}
+                    data={combinedData}
+                    activeTool={activeTool}
+                    lines={lines}
+                    setLines={setLines}
+                    zones={zones}
+                    fractals={fractals}
+                    waves={waves}
+                    abcdPatterns={abcdPatterns}
+                    harmonicPatterns={harmonicPatterns}
+                    priceActions={priceActions}
+                    onReady={({ xScale, yScale }) => {
+                      setXScale(() => xScale);
+                      setYScale(() => yScale);
+                    }}
+                  />
+                  <div className="overflow-auto max-h-[500px]">
+                    <table className="w-full text-sm text-left rtl:text-right text-gray-400 border border-gray-700">
+                      <thead className="text-xs uppercase bg-[#222] text-gray-200">
+                        <tr>
+                          <th className="px-2 py-1">🕒</th>
+                          <th className="px-2 py-1">Open</th>
+                          <th className="px-2 py-1">High</th>
+                          <th className="px-2 py-1">Low</th>
+                          <th className="px-2 py-1">Close</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {combinedData.map((c, i) => (
+                          <tr key={i} className="bg-[#111] border-b border-gray-700">
+                            <td className="px-2 py-1">{new Date(c.time).toLocaleTimeString()}</td>
+                            <td className="px-2 py-1">{c.open}</td>
+                            <td className="px-2 py-1">{c.high}</td>
+                            <td className="px-2 py-1">{c.low}</td>
+                            <td className="px-2 py-1">{c.close}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
 
               {selectedTab === "analysis" && (
