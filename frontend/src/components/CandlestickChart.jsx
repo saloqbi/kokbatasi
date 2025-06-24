@@ -20,10 +20,8 @@ const CandlestickChart = ({
   const [tempPoints, setTempPoints] = useState([]);
   const width = 800;
   const height = 400;
-
   const { activeTool } = useContext(ToolContext);
 
-  // ✅ استخدام useRef لتخزين المقاييس
   const xScaleRef = useRef();
   const yScaleRef = useRef();
 
@@ -32,8 +30,7 @@ const CandlestickChart = ({
     svg.selectAll("*").remove();
 
     if (!data || data.length === 0) {
-      svg
-        .append("text")
+      svg.append("text")
         .attr("x", 50)
         .attr("y", 50)
         .text("⚠️ لا توجد بيانات للعرض")
@@ -46,31 +43,27 @@ const CandlestickChart = ({
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
-    // ✅ إعداد المقاييس وتخزينها في Ref
-    xScaleRef.current = d3
-      .scaleBand()
+    xScaleRef.current = d3.scaleBand()
       .domain(data.map((_, i) => i))
       .range([0, chartWidth])
-      .padding(0.3);
+      .padding(0.4); // تقليل padding لتصغير الشموع
 
-    const yMin = d3.min(data, (d) => d.low);
-    const yMax = d3.max(data, (d) => d.high);
-    yScaleRef.current = d3
-      .scaleLinear()
+    const yMin = d3.min(data, d => d.low);
+    const yMax = d3.max(data, d => d.high);
+    yScaleRef.current = d3.scaleLinear()
       .domain([yMin, yMax])
       .range([chartHeight, 0]);
 
     const g = svg
       .attr("width", width)
       .attr("height", height)
-      .style("background", "#1a1a1a")
+      .style("background", "#1a1a1a") // ✅ خلفية داكنة
       .on("dblclick", async function (event) {
         if (activeTool !== "line") return;
 
         const [x, y] = d3.pointer(event);
         const index = Math.round((x - margin.left) / xScaleRef.current.step());
         const price = yScaleRef.current.invert(y - margin.top);
-
         const nearestIndex = Math.max(0, Math.min(data.length - 1, index));
         const point = { index: nearestIndex, price };
 
@@ -82,14 +75,12 @@ const CandlestickChart = ({
           const newLines = [...lines, newLine];
           setLines(newLines);
           setTempPoints([]);
-
           try {
             await fetch(`/api/signals/${signalId}/tools/lines`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ lines: newLines }),
             });
-            console.log("✅ تم حفظ الخط في MongoDB");
           } catch (err) {
             console.error("❌ فشل الحفظ:", err);
           }
@@ -98,29 +89,30 @@ const CandlestickChart = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // ✅ رسم الشموع
+    // ✅ الشموع
+    const candleWidth = 6;
     g.selectAll(".candle")
       .data(data)
       .enter()
       .append("rect")
-      .attr("x", (_, i) => xScaleRef.current(i))
-      .attr("y", (d) => yScaleRef.current(Math.max(d.open, d.close)))
-      .attr("width", xScaleRef.current.bandwidth())
-      .attr("height", (d) => Math.abs(yScaleRef.current(d.open) - yScaleRef.current(d.close)))
-      .attr("fill", (d) => (d.close > d.open ? "green" : "red"));
+      .attr("x", (_, i) => xScaleRef.current(i) + xScaleRef.current.bandwidth() / 2 - candleWidth / 2)
+      .attr("y", d => yScaleRef.current(Math.max(d.open, d.close)))
+      .attr("width", candleWidth)
+      .attr("height", d => Math.abs(yScaleRef.current(d.open) - yScaleRef.current(d.close)))
+      .attr("fill", d => d.close > d.open ? "#4ade80" : "#f87171") // أخضر/أحمر حديث
 
-    // ✅ رسم الظلال
+    // ✅ الظلال
     g.selectAll(".wick")
       .data(data)
       .enter()
       .append("line")
       .attr("x1", (_, i) => xScaleRef.current(i) + xScaleRef.current.bandwidth() / 2)
       .attr("x2", (_, i) => xScaleRef.current(i) + xScaleRef.current.bandwidth() / 2)
-      .attr("y1", (d) => yScaleRef.current(d.high))
-      .attr("y2", (d) => yScaleRef.current(d.low))
+      .attr("y1", d => yScaleRef.current(d.high))
+      .attr("y2", d => yScaleRef.current(d.low))
       .attr("stroke", "#e0e0e0");
 
-    // ✅ رسم الخطوط السابقة
+    // ✅ خطوط الاتجاه
     lines.forEach((line) => {
       if (
         !line?.start || !line?.end ||
@@ -163,12 +155,11 @@ const CandlestickChart = ({
       </Stage>
 
       <svg
-  	ref={svgRef}
-  	width={width}
-  	height={height}
-  	style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
-	></svg>
-	
+        ref={svgRef}
+        width={width}
+        height={height}
+        style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
+      ></svg>
     </div>
   );
 };
