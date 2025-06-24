@@ -4,8 +4,8 @@ import axios from "axios";
 import CandlestickChart from "../components/CandlestickChart";
 import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import AllDrawingTools from "../tools/AllDrawingTools";
-import Tabs from "../components/Tabs";
 import ToolSelector from "../tools/ToolSelector";
+import Sidebar from "../components/Sidebar";
 import { ToolProvider } from "../context/ToolContext";
 import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
@@ -133,18 +133,7 @@ const SignalDetails = () => {
       <SignalContext.Provider value={{ selectedSignal: signal }}>
         <div className="flex h-screen text-white bg-[#0f0f0f]">
 
-          <div className="w-64 bg-[#1a1a1a] p-4 border-l border-gray-800">
-            <h2 className="text-lg font-bold mb-4 text-center">🔍 قائمة التبويبات</h2>
-            <Tabs
-              tabs={[
-                { key: "candles", label: "الشموع اليابانية" },
-                { key: "analysis", label: "📊 تحليل فني" },
-                { key: "draw", label: "✍️ أدوات الرسم" }
-              ]}
-              selected={selectedTab}
-              onChange={setSelectedTab}
-            />
-          </div>
+          <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
           <div className="flex-1 p-4 overflow-auto">
             <h2 className="text-xl font-bold text-center mb-4">
