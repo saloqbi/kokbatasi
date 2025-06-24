@@ -1,16 +1,17 @@
-// frontend/src/main.jsx
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 import './index.css';
-import { ToolProvider } from './context/ToolContext';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+function App() {
+  return (
+    <div className="p-8 text-center text-xl">
+      ✅ واجهة كوكبة تعمل بنجاح مع TailwindCSS وخط Cairo
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ToolProvider>
-      <App />
-    </ToolProvider>
+    <App />
   </React.StrictMode>
 );
