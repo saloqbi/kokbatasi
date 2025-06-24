@@ -63,7 +63,7 @@ const CandlestickChart = ({
     const g = svg
       .attr("width", width)
       .attr("height", height)
-      .style("background", "#fff")
+      .style("background", "#1a1a1a")
       .on("dblclick", async function (event) {
         if (activeTool !== "line") return;
 
