@@ -39,14 +39,14 @@ const CandlestickChart = ({
       return;
     }
 
-    const margin = { top: 20, right: 60, bottom: 30, left: 60 };
+    const margin = { top: 30, right: 60, bottom: 30, left: 60 };
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
     xScaleRef.current = d3.scaleBand()
       .domain(data.map((_, i) => i))
       .range([0, chartWidth])
-      .padding(0.4); // تقليل padding لتصغير الشموع
+      .padding(0.4); // شموع أنحف
 
     const yMin = d3.min(data, d => d.low);
     const yMax = d3.max(data, d => d.high);
@@ -57,7 +57,7 @@ const CandlestickChart = ({
     const g = svg
       .attr("width", width)
       .attr("height", height)
-      .style("background", "#1a1a1a") // ✅ خلفية داكنة
+      .style("background", "#1a1a1a")
       .on("dblclick", async function (event) {
         if (activeTool !== "line") return;
 
@@ -89,7 +89,7 @@ const CandlestickChart = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // ✅ الشموع
+    // 📉 رسم الشموع
     const candleWidth = 6;
     g.selectAll(".candle")
       .data(data)
@@ -99,9 +99,9 @@ const CandlestickChart = ({
       .attr("y", d => yScaleRef.current(Math.max(d.open, d.close)))
       .attr("width", candleWidth)
       .attr("height", d => Math.abs(yScaleRef.current(d.open) - yScaleRef.current(d.close)))
-      .attr("fill", d => d.close > d.open ? "#4ade80" : "#f87171") // أخضر/أحمر حديث
+      .attr("fill", d => d.close > d.open ? "#4ade80" : "#f87171");
 
-    // ✅ الظلال
+    // 🧵 رسم الظلال
     g.selectAll(".wick")
       .data(data)
       .enter()
@@ -112,7 +112,31 @@ const CandlestickChart = ({
       .attr("y2", d => yScaleRef.current(d.low))
       .attr("stroke", "#e0e0e0");
 
-    // ✅ خطوط الاتجاه
+    // 🕒 عرض الوقت أسفل الشموع
+    g.selectAll(".timestamp")
+      .data(data)
+      .enter()
+      .append("text")
+      .attr("x", (_, i) => xScaleRef.current(i) + xScaleRef.current.bandwidth() / 2)
+      .attr("y", chartHeight + 12)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "9px")
+      .attr("fill", "#aaa")
+      .text(d => {
+        const date = new Date(d.time);
+        return d3.timeFormat("%H:%M")(date);
+      });
+
+    // ⏱ الإطار الزمني في الزاوية
+    svg.append("text")
+      .attr("x", width - 20)
+      .attr("y", 20)
+      .text("⏱ الإطار الزمني: 1m")
+      .attr("fill", "#facc15")
+      .attr("font-size", "13px")
+      .attr("text-anchor", "end");
+
+    // 📐 خطوط الاتجاه
     lines.forEach((line) => {
       if (
         !line?.start || !line?.end ||
