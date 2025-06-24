@@ -118,7 +118,7 @@ const CandlestickChart = ({
       .attr("x2", (_, i) => xScaleRef.current(i) + xScaleRef.current.bandwidth() / 2)
       .attr("y1", (d) => yScaleRef.current(d.high))
       .attr("y2", (d) => yScaleRef.current(d.low))
-      .attr("stroke", "black");
+      .attr("stroke", "#e0e0e0");
 
     // ✅ رسم الخطوط السابقة
     lines.forEach((line) => {
