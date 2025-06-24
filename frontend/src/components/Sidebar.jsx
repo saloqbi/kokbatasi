@@ -4,7 +4,7 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
   return (
     <aside className="w-64 bg-[#121212] text-white flex flex-col justify-between p-5 border-l border-gray-800 shadow-lg rounded-r-2xl font-[Cairo]">
       <div>
-        <h1 className="text-2xl font-bold text-center mb-6 tracking-wide">🌌 كوكبة</h1>
+        <h1 className="text-2xl font-bold text-center mb-6 tracking-wide">🌌 كوكبة تاسي لتوصيات الذكية</h1>
 
         <nav className="space-y-4">
           <div className="text-xs text-gray-400 uppercase mb-1">القائمة</div>

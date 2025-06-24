@@ -6,19 +6,20 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "axios": "^1.10.0",
+    "d3": "^7.9.0",
+    "konva": "^9.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-konva": "^18.0.6",
+    "react-router-dom": "^6.22.3"
+  },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.6.0",
-    "autoprefixer": "^10.4.14",
+    "@vitejs/plugin-react": "^4.0.4",
+    "autoprefixer": "^10.4.16",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.0"
-  },
-  "dependencies": {
-    "d3": "^7.9.0",
-    "konva": "^9.3.20",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-konva": "^19.0.6",
-    "react-router-dom": "^7.6.2"
   }
 }
