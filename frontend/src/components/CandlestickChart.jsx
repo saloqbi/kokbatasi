@@ -1,3 +1,4 @@
+// ✅ النسخة النهائية كاملة محدثة
 import React, { useRef, useEffect, useState, useContext } from "react";
 import * as d3 from "d3";
 import { Stage } from "react-konva";
@@ -21,7 +22,6 @@ const CandlestickChart = ({
   const width = 800;
   const height = 400;
   const { activeTool } = useContext(ToolContext);
-
   const xScaleRef = useRef();
   const yScaleRef = useRef();
 
@@ -121,7 +121,6 @@ const CandlestickChart = ({
         return d3.timeFormat("%d/%m/%Y - %H:%M")(new Date(d.time));
       });
 
-    // ✅ عرض بيانات الشمعة الأخيرة أعلى الشارت
     const last = data[data.length - 1];
     svg.append("text")
       .attr("x", margin.left + 10)
@@ -132,7 +131,6 @@ const CandlestickChart = ({
       .attr("fill", "#f9f9f9")
       .attr("font-size", "12px");
 
-    // 🕒 الإطار الزمني
     svg.append("text")
       .attr("x", width - 20)
       .attr("y", 20)
