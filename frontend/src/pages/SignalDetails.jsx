@@ -173,7 +173,7 @@ const SignalDetails = () => {
                       <tbody>
                         {combinedData.map((c, i) => (
                           <tr key={i} className="bg-[#111] border-b border-gray-700">
-                            <td className="px-2 py-1">{new Date(c.time).toLocaleTimeString()}</td>
+                            <td className="px-2 py-1">{c.time ? new Date(c.time).toLocaleString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"}</td>
                             <td className="px-2 py-1">{c.open}</td>
                             <td className="px-2 py-1">{c.high}</td>
                             <td className="px-2 py-1">{c.low}</td>
