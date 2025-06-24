@@ -11,7 +11,6 @@ import { SignalContext } from "../context/SignalContext";
 import { detectABCDPatterns } from "../utils/patterns/ABCDPatternDetector";
 import { detectHarmonicPatterns } from "../utils/patterns/HarmonicDetector";
 import { detectPriceActionPatterns } from "../utils/patterns/PriceActionDetector";
-//import { subscribeToCandles } from "../utils/websocket";
 
 const SignalDetails = () => {
   const { id } = useParams();
@@ -28,7 +27,6 @@ const SignalDetails = () => {
   const [error, setError] = useState(null);
   const [liveData, setLiveData] = useState([]);
   const [activeTool, setActiveTool] = useState("line");
-
   const [xScale, setXScale] = useState(null);
   const [yScale, setYScale] = useState(null);
 
@@ -64,35 +62,33 @@ const SignalDetails = () => {
     return waves;
   };
 
-  
-    useEffect(() => {
-      const fetchBinanceCandles = async () => {
-        try {
-          const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${signal.symbol.toUpperCase()}USDT&interval=1m&limit=30`);
-          const data = await res.json();
-          const candles = data.map(d => ({
-            time: d[0],
-            open: parseFloat(d[1]),
-            high: parseFloat(d[2]),
-            low: parseFloat(d[3]),
-            close: parseFloat(d[4]),
-          }));
-          setLiveData(candles);
-        } catch (err) {
-          console.error('فشل في جلب بيانات Binance', err);
-        }
-      };
-
-      if (signal && (!Array.isArray(signal.data) || signal.data.length === 0)) {
-        fetchBinanceCandles().then(candles => {
-      setLiveData(candles);
-      setSignal(prev => ({ ...prev, data: candles }));
-    });
+  useEffect(() => {
+    const fetchBinanceCandles = async () => {
+      try {
+        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${signal.symbol.toUpperCase()}USDT&interval=1m&limit=30`);
+        const data = await res.json();
+        const candles = data.map(d => ({
+          time: d[0],
+          open: parseFloat(d[1]),
+          high: parseFloat(d[2]),
+          low: parseFloat(d[3]),
+          close: parseFloat(d[4]),
+        }));
+        setLiveData(candles);
+      } catch (err) {
+        console.error('فشل في جلب بيانات Binance', err);
       }
-    }, [signal]);
+    };
 
+    if (signal && (!Array.isArray(signal.data) || signal.data.length === 0)) {
+      fetchBinanceCandles().then(candles => {
+        setLiveData(candles);
+        setSignal(prev => ({ ...prev, data: candles }));
+      });
+    }
+  }, [signal]);
 
-useEffect(() => {
+  useEffect(() => {
     const fetchAll = async () => {
       try {
         const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
@@ -103,15 +99,8 @@ useEffect(() => {
         const hasData = Array.isArray(signalData.data) && signalData.data.length > 0;
         const candles = hasData ? signalData.data : liveData;
 
-        if (!hasData) {
-          // تم استبداله بجلب بيانات Binance
-        }
-
         setSignal(signalData);
-        const linesFromSignal = signalData.lines || signalData.tools?.lines || [];
-
-	setLines(linesFromSignal);
-
+        setLines(signalData.lines || signalData.tools?.lines || []);
         setZones(signalData.zones || []);
         setFractals(detectFractals(candles));
         setWaves(detectElliottWaves(detectFractals(candles)));
@@ -129,50 +118,34 @@ useEffect(() => {
 
   const combinedData = Array.isArray(signal?.data) && signal.data.length > 0 ? signal.data : liveData;
 
-  if (loading) return <div>⏳ جاري التحميل...</div>;
-  if (error) return <div className='text-red-600'>{error}</div>;
+  if (loading) return <div className="text-center p-8 text-gray-300">⏳ جاري التحميل...</div>;
+  if (error) return <div className="text-center text-red-500 p-4">{error}</div>;
 
   return (
     <ToolProvider>
       <SignalContext.Provider value={{ selectedSignal: signal }}>
-        <div className='p-4 space-y-4'>
-          <h2 className='text-xl font-bold text-center'>
-            تفاصيل التوصية: {signal.symbol} ({signal.action})
-          </h2>
+        <div className="flex h-screen text-white bg-[#0f0f0f]">
 
-          <Tabs
-            tabs={[
-              { key: "candles", label: "الشموع اليابانية" },
-              { key: "analysis", label: "📊 تحليل فني" },
-              { key: "draw", label: "✍️ أدوات الرسم" }
-            ]}
-            selected={selectedTab}
-            onChange={setSelectedTab}
-          />
+          <div className="w-64 bg-[#1a1a1a] p-4 border-l border-gray-800">
+            <h2 className="text-lg font-bold mb-4 text-center">🔍 قائمة التبويبات</h2>
+            <Tabs
+              tabs={[
+                { key: "candles", label: "الشموع اليابانية" },
+                { key: "analysis", label: "📊 تحليل فني" },
+                { key: "draw", label: "✍️ أدوات الرسم" }
+              ]}
+              selected={selectedTab}
+              onChange={setSelectedTab}
+            />
+          </div>
 
-          <div className='border rounded-xl p-3 shadow bg-white'>
-            {selectedTab === "candles" && (
-              <CandlestickChart
-                signalId={signal._id}
-                data={combinedData}
-                activeTool={activeTool}
-                lines={lines}
-                setLines={setLines}
-                zones={zones}
-                fractals={fractals}
-                waves={waves}
-                abcdPatterns={abcdPatterns}
-                harmonicPatterns={harmonicPatterns}
-                priceActions={priceActions}
-                onReady={({ xScale, yScale }) => {
-                  setXScale(() => xScale);
-                  setYScale(() => yScale);
-                }}
-              />
-            )}
+          <div className="flex-1 p-4 overflow-auto">
+            <h2 className="text-xl font-bold text-center mb-4">
+              تفاصيل التوصية: {signal.symbol} ({signal.action})
+            </h2>
 
-            {selectedTab === "analysis" && (
-              <>
+            <div className="bg-[#1a1a1a] rounded-xl p-4 shadow-lg">
+              {(selectedTab === "candles" || selectedTab === "analysis" || selectedTab === "draw") && (
                 <CandlestickChart
                   signalId={signal._id}
                   data={combinedData}
@@ -190,17 +163,18 @@ useEffect(() => {
                     setYScale(() => yScale);
                   }}
                 />
-                <TechnicalAnalysisTab lines={lines} zones={zones} />
-                <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-              </>
-            )}
+              )}
 
-            {selectedTab === "draw" && (
-              <>
-                <div style={{ position: "relative" }}>
-                  <CandlestickChart
-                    signalId={signal._id}
-                    data={combinedData}
+              {selectedTab === "analysis" && (
+                <>
+                  <TechnicalAnalysisTab lines={lines} zones={zones} />
+                  <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
+                </>
+              )}
+
+              {selectedTab === "draw" && (
+                <>
+                  <AllDrawingTools
                     activeTool={activeTool}
                     lines={lines}
                     setLines={setLines}
@@ -210,31 +184,13 @@ useEffect(() => {
                     abcdPatterns={abcdPatterns}
                     harmonicPatterns={harmonicPatterns}
                     priceActions={priceActions}
-                    onReady={({ xScale, yScale }) => {
-                      setXScale(() => xScale);
-                      setYScale(() => yScale);
-                    }}
                   />
-                 <AllDrawingTools
-  			activeTool={activeTool}
-  			lines={lines}
-  			setLines={setLines} // ✅ هذا السطر كان مفقود
- 		 	zones={zones}
-  			fractals={fractals}
-  			waves={waves}
-  			abcdPatterns={abcdPatterns}
-  			harmonicPatterns={harmonicPatterns}
-  			priceActions={priceActions}
-			/>
-
-
-                </div>
-
-                <div className="mt-4">
-                  <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                </div>
-              </>
-            )}
+                  <div className="mt-4">
+                    <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </SignalContext.Provider>
