@@ -140,23 +140,25 @@ const SignalDetails = () => {
             <div className="bg-[#1a1a1a] rounded-xl p-4 shadow-lg">
               {(selectedTab === "candles" || selectedTab === "draw") && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <CandlestickChart
-                    signalId={signal._id}
-                    data={combinedData}
-                    activeTool={activeTool}
-                    lines={lines}
-                    setLines={setLines}
-                    zones={zones}
-                    fractals={fractals}
-                    waves={waves}
-                    abcdPatterns={abcdPatterns}
-                    harmonicPatterns={harmonicPatterns}
-                    priceActions={priceActions}
-                    onReady={({ xScale, yScale }) => {
-                      setXScale(() => xScale);
-                      setYScale(() => yScale);
-                    }}
-                  />
+                  <div className="rounded-xl overflow-hidden">
+                    <CandlestickChart
+                      signalId={signal._id}
+                      data={combinedData}
+                      activeTool={activeTool}
+                      lines={lines}
+                      setLines={setLines}
+                      zones={zones}
+                      fractals={fractals}
+                      waves={waves}
+                      abcdPatterns={abcdPatterns}
+                      harmonicPatterns={harmonicPatterns}
+                      priceActions={priceActions}
+                      onReady={({ xScale, yScale }) => {
+                        setXScale(() => xScale);
+                        setYScale(() => yScale);
+                      }}
+                    />
+                  </div>
                   <div className="overflow-auto max-h-[500px]">
                     <table className="w-full text-sm text-left rtl:text-right text-gray-400 border border-gray-700">
                       <thead className="text-xs uppercase bg-[#222] text-gray-200">
