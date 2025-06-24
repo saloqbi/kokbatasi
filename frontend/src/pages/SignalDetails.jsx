@@ -140,7 +140,7 @@ const SignalDetails = () => {
             <div className="bg-[#1a1a1a] rounded-xl p-4 shadow-lg">
               {(selectedTab === "candles" || selectedTab === "draw") && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="rounded-xl overflow-hidden">
+                  <div className="rounded-xl overflow-hidden bg-[#0f0f0f] p-2">
                     <CandlestickChart
                       signalId={signal._id}
                       data={combinedData}
