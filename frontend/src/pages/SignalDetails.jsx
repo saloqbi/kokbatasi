@@ -131,11 +131,12 @@ const SignalDetails = () => {
   return (
     <ToolProvider>
       <SignalContext.Provider value={{ selectedSignal: signal }}>
-        <div className="flex h-screen text-white bg-[#0f0f0f]">
+        <div className="flex h-screen text-white bg-[#0f0f0f] flex-row-reverse">
+
 
           <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
-          <div className="flex-1 p-4 overflow-auto">
+          <div className="flex-1 p-4 overflow-auto mr-64">
             <h2 className="text-xl font-bold text-center mb-4">
               تفاصيل التوصية: {signal.symbol} ({signal.action})
             </h2>
