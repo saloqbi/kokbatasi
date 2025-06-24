@@ -39,14 +39,14 @@ const CandlestickChart = ({
       return;
     }
 
-    const margin = { top: 30, right: 60, bottom: 50, left: 60 };
+    const margin = { top: 40, right: 60, bottom: 50, left: 60 };
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
     xScaleRef.current = d3.scaleBand()
       .domain(data.map((_, i) => i))
       .range([0, chartWidth])
-      .padding(0.4); // شموع أنحف
+      .padding(0.4);
 
     const yMin = d3.min(data, d => d.low);
     const yMax = d3.max(data, d => d.high);
@@ -57,19 +57,16 @@ const CandlestickChart = ({
     const g = svg
       .attr("width", width)
       .attr("height", height)
-      .style("background", "#1a1a1a") // خلفية داكنة
+      .style("background", "#1a1a1a")
       .on("dblclick", async function (event) {
         if (activeTool !== "line") return;
-
         const [x, y] = d3.pointer(event);
         const index = Math.round((x - margin.left) / xScaleRef.current.step());
         const price = yScaleRef.current.invert(y - margin.top);
         const nearestIndex = Math.max(0, Math.min(data.length - 1, index));
         const point = { index: nearestIndex, price };
-
         const updated = [...tempPoints, point];
         setTempPoints(updated);
-
         if (updated.length === 2) {
           const newLine = { start: updated[0], end: updated[1] };
           const newLines = [...lines, newLine];
@@ -110,7 +107,6 @@ const CandlestickChart = ({
       .attr("y2", d => yScaleRef.current(d.low))
       .attr("stroke", "#e0e0e0");
 
-    // ✅ عرض التاريخ والوقت أسفل كل شمعة
     g.selectAll(".timestamp")
       .data(data)
       .enter()
@@ -125,7 +121,18 @@ const CandlestickChart = ({
         return d3.timeFormat("%d/%m/%Y - %H:%M")(new Date(d.time));
       });
 
-    // ⏱ الإطار الزمني في الزاوية العلوية اليمنى
+    // ✅ عرض بيانات الشمعة الأخيرة أعلى الشارت
+    const last = data[data.length - 1];
+    svg.append("text")
+      .attr("x", margin.left + 10)
+      .attr("y", 20)
+      .text(
+        `📅 ${d3.timeFormat("%d/%m/%Y - %H:%M")(new Date(last.time))} | O: ${last.open} | C: ${last.close} | H: ${last.high} | L: ${last.low}`
+      )
+      .attr("fill", "#f9f9f9")
+      .attr("font-size", "12px");
+
+    // 🕒 الإطار الزمني
     svg.append("text")
       .attr("x", width - 20)
       .attr("y", 20)
@@ -135,14 +142,7 @@ const CandlestickChart = ({
       .attr("text-anchor", "end");
 
     lines.forEach((line) => {
-      if (
-        !line?.start || !line?.end ||
-        typeof line.start.index !== "number" ||
-        typeof line.start.price !== "number" ||
-        typeof line.end.index !== "number" ||
-        typeof line.end.price !== "number"
-      ) return;
-
+      if (!line?.start || !line?.end) return;
       g.append("line")
         .attr("x1", xScaleRef.current(line.start.index))
         .attr("y1", yScaleRef.current(line.start.price))
@@ -158,13 +158,7 @@ const CandlestickChart = ({
       <Stage
         width={width}
         height={height}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          zIndex: 3,
-          pointerEvents: "auto",
-        }}
+        style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}
       >
         <AllDrawingTools
           signalId={signalId}
@@ -174,13 +168,12 @@ const CandlestickChart = ({
           yScale={yScaleRef.current}
         />
       </Stage>
-
       <svg
         ref={svgRef}
         width={width}
         height={height}
         style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
-      ></svg>
+      />
     </div>
   );
 };
