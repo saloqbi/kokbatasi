@@ -1,17 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-
-function App() {
-  return (
-    <div className="p-8 text-center text-xl">
-      ✅ واجهة كوكبة تعمل بنجاح مع TailwindCSS وخط Cairo
-    </div>
-  );
-}
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import SignalDetails from './pages/SignalDetails';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/signals/:id" element={<SignalDetails />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
