@@ -5,29 +5,37 @@ const SignalSchema = new mongoose.Schema({
   action: { type: String, enum: ["buy", "sell", "neutral"], required: true },
   price: { type: Number },
 
-  // ✅ الشموع
+  // ✅ الشموع اليابانية
   data: {
-  type: [
-    {
-      time: String,
-      open: Number,
-      high: Number,
-      low: Number,
-      close: Number
-    }
-  ],
-  default: []
-},
+    type: [
+      {
+        time: String,
+        open: Number,
+        high: Number,
+        low: Number,
+        close: Number
+      }
+    ],
+    default: [] // ✅ يجعل الحقل اختياري ويمنع فشل الحفظ
+  },
 
-
-  // ✅ الحقول المرنة لتحليل الفني
+  // ✅ الخطوط اليدوية (مثل خطوط الاتجاه)
   lines: {
     type: Array,
     default: [],
   },
+
+  // ✅ مناطق الدعم والمقاومة
   zones: [
-    { x: Number, y: Number, width: Number, height: Number }
+    {
+      x: Number,
+      y: Number,
+      width: Number,
+      height: Number
+    }
   ],
+
+  // ✅ نماذج الفراكتل
   fractals: [
     {
       index: Number,
@@ -35,6 +43,8 @@ const SignalSchema = new mongoose.Schema({
       price: Number
     }
   ],
+
+  // ✅ موجات إليوت
   waves: [
     {
       label: String,
