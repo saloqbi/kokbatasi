@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import CandlestickChart from "../components/CandlestickChart";
-import TechnicalAnalysisTab from "../components/TechnicalAnalysisTab";
 import AllDrawingTools from "../tools/AllDrawingTools";
 import ToolSelector from "../tools/ToolSelector";
 import Sidebar from "../components/Sidebar";
@@ -132,9 +131,7 @@ const SignalDetails = () => {
     <ToolProvider>
       <SignalContext.Provider value={{ selectedSignal: signal }}>
         <div className="flex h-screen text-white bg-[#0f0f0f] flex-row-reverse">
-
           <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-
           <div className="flex-1 p-4 overflow-auto mr-64">
             <h2 className="text-2xl font-bold text-center text-white bg-[#1a1a1a] py-4 rounded-lg shadow mb-4 tracking-widest">
               📊 تفاصيل التوصية: <span className="text-yellow-400">{signal.symbol}</span> ({signal.action})
@@ -163,7 +160,7 @@ const SignalDetails = () => {
 
               {selectedTab === "analysis" && (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
                     <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
                       <h3 className="text-yellow-300 font-bold mb-1">📏 خطوط الاتجاه</h3>
                       <p className="text-sm text-gray-300">{lines.length} خطوط</p>
@@ -175,6 +172,18 @@ const SignalDetails = () => {
                     <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
                       <h3 className="text-purple-300 font-bold mb-1">🔺 موجات إليوت</h3>
                       <p className="text-sm text-gray-300">{waves.length} نماذج</p>
+                    </div>
+                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
+                      <h3 className="text-blue-300 font-bold mb-1">🧬 نماذج ABCD</h3>
+                      <p className="text-sm text-gray-300">{abcdPatterns.length} نماذج</p>
+                    </div>
+                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
+                      <h3 className="text-yellow-300 font-bold mb-1">🎯 Price Action</h3>
+                      <p className="text-sm text-gray-300">{priceActions.length} أنماط</p>
+                    </div>
+                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
+                      <h3 className="text-pink-400 font-bold mb-1">🌀 نماذج Harmonic</h3>
+                      <p className="text-sm text-gray-300">{harmonicPatterns.length} نماذج</p>
                     </div>
                   </div>
 
