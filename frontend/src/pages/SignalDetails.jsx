@@ -65,7 +65,12 @@ const SignalDetails = () => {
   useEffect(() => {
     const fetchBinanceCandles = async () => {
       try {
-        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${signal.symbol.toUpperCase()}USDT&interval=1m&limit=30`);
+        if (!signal?.symbol || !signal.symbol.toUpperCase().includes("USDT")) {
+          console.warn("🚫 الرمز غير مدعوم في Binance: ", signal?.symbol);
+          return;
+        }
+
+        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${signal.symbol.toUpperCase()}&interval=1m&limit=30`);
         const data = await res.json();
         const candles = data.map(d => ({
           time: d[0],
@@ -82,8 +87,10 @@ const SignalDetails = () => {
 
     if (signal && (!Array.isArray(signal.data) || signal.data.length === 0)) {
       fetchBinanceCandles().then(candles => {
-        setLiveData(candles);
-        setSignal(prev => ({ ...prev, data: candles }));
+        if (candles && candles.length > 0) {
+          setLiveData(candles);
+          setSignal(prev => ({ ...prev, data: candles }));
+        }
       });
     }
   }, [signal]);
