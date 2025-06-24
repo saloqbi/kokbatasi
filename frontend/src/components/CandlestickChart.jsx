@@ -39,7 +39,7 @@ const CandlestickChart = ({
       return;
     }
 
-    const margin = { top: 30, right: 60, bottom: 30, left: 60 };
+    const margin = { top: 30, right: 60, bottom: 50, left: 60 };
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
@@ -57,7 +57,7 @@ const CandlestickChart = ({
     const g = svg
       .attr("width", width)
       .attr("height", height)
-      .style("background", "#1a1a1a")
+      .style("background", "#1a1a1a") // خلفية داكنة
       .on("dblclick", async function (event) {
         if (activeTool !== "line") return;
 
@@ -89,7 +89,6 @@ const CandlestickChart = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // 📉 رسم الشموع
     const candleWidth = 6;
     g.selectAll(".candle")
       .data(data)
@@ -98,10 +97,9 @@ const CandlestickChart = ({
       .attr("x", (_, i) => xScaleRef.current(i) + xScaleRef.current.bandwidth() / 2 - candleWidth / 2)
       .attr("y", d => yScaleRef.current(Math.max(d.open, d.close)))
       .attr("width", candleWidth)
-      .attr("height", d => Math.abs(yScaleRef.current(d.open) - yScaleRef.current(d.close)))
+      .attr("height", d => Math.max(1, Math.abs(yScaleRef.current(d.open) - yScaleRef.current(d.close))))
       .attr("fill", d => d.close > d.open ? "#4ade80" : "#f87171");
 
-    // 🧵 رسم الظلال
     g.selectAll(".wick")
       .data(data)
       .enter()
@@ -112,7 +110,7 @@ const CandlestickChart = ({
       .attr("y2", d => yScaleRef.current(d.low))
       .attr("stroke", "#e0e0e0");
 
-    // 🕒 عرض الوقت أسفل الشموع
+    // ✅ عرض التاريخ والوقت أسفل كل شمعة
     g.selectAll(".timestamp")
       .data(data)
       .enter()
@@ -123,11 +121,11 @@ const CandlestickChart = ({
       .attr("font-size", "9px")
       .attr("fill", "#aaa")
       .text(d => {
-        const date = new Date(d.time);
-        return d3.timeFormat("%H:%M")(date);
+        if (!d.time || isNaN(new Date(d.time))) return "-";
+        return d3.timeFormat("%d/%m/%Y - %H:%M")(new Date(d.time));
       });
 
-    // ⏱ الإطار الزمني في الزاوية
+    // ⏱ الإطار الزمني في الزاوية العلوية اليمنى
     svg.append("text")
       .attr("x", width - 20)
       .attr("y", 20)
@@ -136,7 +134,6 @@ const CandlestickChart = ({
       .attr("font-size", "13px")
       .attr("text-anchor", "end");
 
-    // 📐 خطوط الاتجاه
     lines.forEach((line) => {
       if (
         !line?.start || !line?.end ||
