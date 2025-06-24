@@ -133,16 +133,15 @@ const SignalDetails = () => {
       <SignalContext.Provider value={{ selectedSignal: signal }}>
         <div className="flex h-screen text-white bg-[#0f0f0f] flex-row-reverse">
 
-
           <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
           <div className="flex-1 p-4 overflow-auto mr-64">
-            <h2 className="text-xl font-bold text-center mb-4">
-              تفاصيل التوصية: {signal.symbol} ({signal.action})
+            <h2 className="text-2xl font-bold text-center text-white bg-[#1a1a1a] py-4 rounded-lg shadow mb-4 tracking-widest">
+              📊 تفاصيل التوصية: <span className="text-yellow-400">{signal.symbol}</span> ({signal.action})
             </h2>
 
             <div className="bg-[#1a1a1a] rounded-xl p-4 shadow-lg">
-              {(selectedTab === "candles" || selectedTab === "analysis" || selectedTab === "draw") && (
+              {(selectedTab === "candles" || selectedTab === "draw") && (
                 <CandlestickChart
                   signalId={signal._id}
                   data={combinedData}
@@ -164,7 +163,21 @@ const SignalDetails = () => {
 
               {selectedTab === "analysis" && (
                 <>
-                  <TechnicalAnalysisTab lines={lines} zones={zones} />
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
+                      <h3 className="text-yellow-300 font-bold mb-1">📏 خطوط الاتجاه</h3>
+                      <p className="text-sm text-gray-300">{lines.length} خطوط</p>
+                    </div>
+                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
+                      <h3 className="text-green-300 font-bold mb-1">📦 مناطق الدعم/المقاومة</h3>
+                      <p className="text-sm text-gray-300">{zones.length} مناطق</p>
+                    </div>
+                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
+                      <h3 className="text-purple-300 font-bold mb-1">🔺 موجات إليوت</h3>
+                      <p className="text-sm text-gray-300">{waves.length} نماذج</p>
+                    </div>
+                  </div>
+
                   <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
                 </>
               )}
