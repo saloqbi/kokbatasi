@@ -7,56 +7,53 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
   const [shapes, setShapes] = useState([]);
   const [currentShape, setCurrentShape] = useState(null);
 
-  // ✅ تحميل الأدوات من السيرفر مع فلترة
-  const fetchToolsFromServer = async () => {
-    try {
-      const res = await fetch(`https://kokbatasi.onrender.com/api/tools/${signalId}`);
-      const tools = await res.json();
-      const valid = tools.filter(t =>
-        t && typeof t.x1 === "number" && typeof t.y1 === "number" &&
-        typeof t.x2 === "number" && typeof t.y2 === "number" &&
-        !isNaN(t.x1) && !isNaN(t.y1) && !isNaN(t.x2) && !isNaN(t.y2)
-      );
-      setShapes(valid);
-    } catch (err) {
-      console.error("❌ فشل تحميل الأدوات:", err);
-    }
-  };
+  useEffect(() => {
+    const fetchTools = async () => {
+      try {
+        const res = await fetch(`https://kokbatasi.onrender.com/api/tools/${signalId}`);
+        if (!res.ok) throw new Error("❌ فشل في جلب الأدوات");
+        const tools = await res.json();
+        const validTools = tools.filter(t => t && t._id);
+        setShapes(validTools);
+      } catch (err) {
+        console.error("❌ Error fetching tools:", err.message);
+      }
+    };
+    if (signalId) fetchTools();
+  }, [signalId]);
 
-  // ✅ حفظ أداة جديدة
   const saveToolToServer = async (tool) => {
     try {
       const res = await fetch("https://kokbatasi.onrender.com/api/tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tool)
+        body: JSON.stringify(tool),
       });
-      const saved = await res.json();
-      return saved;
+      if (!res.ok) throw new Error("❌ فشل الحفظ");
+      return await res.json();
     } catch (err) {
-      console.error("❌ فشل حفظ الأداة:", err);
+      console.error("❌ Save tool error:", err.message);
     }
   };
 
-  // ✅ تحديث أداة
-  const updateToolOnServer = async (toolId, updatedTool) => {
+  const updateToolOnServer = async (id, tool) => {
     try {
-      await fetch(`https://kokbatasi.onrender.com/api/tools/${toolId}`, {
+      await fetch(`https://kokbatasi.onrender.com/api/tools/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedTool)
+        body: JSON.stringify(tool),
       });
     } catch (err) {
-      console.error("❌ فشل تحديث الأداة:", err);
+      console.error("❌ Update error:", err.message);
     }
   };
-
-  useEffect(() => { fetchToolsFromServer(); }, [signalId]);
 
   useEffect(() => {
     if (!data || data.length === 0) return;
+    d3.select(svgRef.current).selectAll("*").remove();
 
-    const parsedData = data.map(d => ({ ...d, date: new Date(d.timestamp) }))
+    const parsedData = data
+      .map(d => ({ ...d, date: new Date(d.timestamp) }))
       .filter(d => !isNaN(d.date.getTime()) && d.open && d.close && d.high && d.low);
 
     const margin = { top: 20, right: 50, bottom: 30, left: 50 };
@@ -72,13 +69,15 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
       .nice()
       .range([innerHeight, 0]);
 
-    const svg = d3.select(svgRef.current).attr("width", width).attr("height", height);
-    svg.selectAll("*").remove();
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const svg = d3.select(svgRef.current)
+      .attr("width", width)
+      .attr("height", height);
+
+    const g = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const candleWidth = innerWidth / parsedData.length * 0.7;
 
-    // 🕯️ رسم الشموع
     g.selectAll(".candle")
       .data(parsedData)
       .enter()
@@ -89,7 +88,6 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
       .attr("height", d => Math.abs(yScale(d.open) - yScale(d.close)))
       .attr("fill", d => (d.close > d.open ? "#4caf50" : "#f44336"));
 
-    // ظلال الشموع
     g.selectAll(".wick")
       .data(parsedData)
       .enter()
@@ -104,33 +102,24 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
     g.append("g")
       .attr("transform", `translate(0,${innerHeight})`)
       .call(d3.axisBottom(xScale).ticks(6).tickFormat(d3.timeFormat("%d/%m/%Y - %H:%M")));
+
     g.append("g").call(d3.axisLeft(yScale));
 
-    // 📐 رسم الأدوات
     const shapeGroup = g.append("g");
-    shapes.forEach((shape, index) => {
+
+    shapes.filter(s => s && s._id).forEach((shape, index) => {
       if (shape.type === "line") {
-        const x1 = xScale(new Date(shape.x1));
-        const y1 = yScale(shape.y1);
-        const x2 = xScale(new Date(shape.x2));
-        const y2 = yScale(shape.y2);
-
-        if ([x1, y1, x2, y2].some(v => isNaN(v))) {
-          console.warn("❌ تجاهل شكل بسبب NaN:", shape);
-          return;
-        }
-
         shapeGroup.append("line")
-          .attr("x1", x1)
-          .attr("y1", y1)
-          .attr("x2", x2)
-          .attr("y2", y2)
+          .attr("x1", xScale(new Date(shape.x1)))
+          .attr("y1", yScale(shape.y1))
+          .attr("x2", xScale(new Date(shape.x2)))
+          .attr("y2", yScale(shape.y2))
           .attr("stroke", "#2196f3")
           .attr("stroke-width", 2)
           .style("cursor", "move")
           .call(d3.drag().on("drag", (event) => {
-            const dx = xScale.invert(event.dx + x1).getTime() - shape.x1;
-            const dy = yScale.invert(y1 + event.dy) - shape.y1;
+            const dx = xScale.invert(event.dx + xScale(new Date(shape.x1))).getTime() - shape.x1;
+            const dy = yScale.invert(yScale(shape.y1) + event.dy) - shape.y1;
             const updated = {
               ...shape,
               x1: shape.x1 + dx,
@@ -146,9 +135,41 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
             });
           }));
       }
+
+      if (shape.type === "rect") {
+        const x = xScale(new Date(Math.min(shape.x1, shape.x2)));
+        const y = yScale(Math.max(shape.y1, shape.y2));
+        const w = Math.abs(xScale(new Date(shape.x2)) - xScale(new Date(shape.x1)));
+        const h = Math.abs(yScale(shape.y1) - yScale(shape.y2));
+
+        shapeGroup.append("rect")
+          .attr("x", x)
+          .attr("y", y)
+          .attr("width", w)
+          .attr("height", h)
+          .attr("fill", "rgba(255, 193, 7, 0.3)")
+          .attr("stroke", "#ffc107")
+          .style("cursor", "move")
+          .call(d3.drag().on("drag", (event) => {
+            const dx = xScale.invert(event.dx + x).getTime() - Math.min(shape.x1, shape.x2);
+            const dy = yScale.invert(y + event.dy) - Math.max(shape.y1, shape.y2);
+            const updated = {
+              ...shape,
+              x1: shape.x1 + dx,
+              x2: shape.x2 + dx,
+              y1: shape.y1 + dy,
+              y2: shape.y2 + dy,
+            };
+            setShapes(prev => {
+              const next = [...prev];
+              next[index] = updated;
+              updateToolOnServer(shape._id, updated);
+              return next;
+            });
+          }));
+      }
     });
 
-    // 🖱️ التفاعل مع الماوس للرسم
     g.append("rect")
       .attr("width", innerWidth)
       .attr("height", innerHeight)
@@ -176,13 +197,14 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
         setCurrentShape(null);
       });
 
-  }, [data, shapes, signalId, drawMode]);
+  }, [data, drawMode, shapes, currentShape, signalId]);
 
   return (
     <div>
       <div style={{ marginBottom: "10px" }}>
         ✏️ أداة الرسم:
         <button onClick={() => setDrawMode("line")}>رسم خط</button>
+        <button onClick={() => setDrawMode("rect")}>منطقة دعم</button>
       </div>
       <svg ref={svgRef}></svg>
     </div>
