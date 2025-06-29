@@ -68,7 +68,7 @@ const AllDrawingTools = ({
       setTempPoints([]);
 
       try {
-        fetch(`${API_BASE}/api/signals/${signalId}/tools/lines`, {
+        fetch(`${API_BASE}/api/tools`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ lines: newLines }),
