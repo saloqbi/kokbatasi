@@ -28,7 +28,7 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
       const res = await fetch("https://kokbatasi.onrender.com/api/tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tool)
+        body: JSON.stringify(tool),
       });
       const saved = await res.json();
       return saved;
@@ -43,7 +43,7 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
       await fetch(`https://kokbatasi.onrender.com/api/tools/${toolId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedTool)
+        body: JSON.stringify(updatedTool),
       });
     } catch (err) {
       console.error("❌ فشل تحديث الأداة:", err);

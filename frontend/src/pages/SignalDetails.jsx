@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import CandlestickChart from "../components/CandlestickChart";
+import CandlestickChart_TimeBased from "../components/charts/CandlestickChart_TimeBased";
 import AllDrawingTools from "../tools/AllDrawingTools";
 import ToolSelector from "../tools/ToolSelector";
 import Sidebar from "../components/Sidebar";
@@ -160,29 +161,13 @@ const SignalDetails = () => {
                       }}
                     />
                   </div>
-                  <div className="overflow-auto max-h-[500px]">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-400 border border-gray-700">
-                      <thead className="text-xs uppercase bg-[#222] text-gray-200">
-                        <tr>
-                          <th className="px-2 py-1">🕒</th>
-                          <th className="px-2 py-1">Open</th>
-                          <th className="px-2 py-1">High</th>
-                          <th className="px-2 py-1">Low</th>
-                          <th className="px-2 py-1">Close</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {combinedData.map((c, i) => (
-                          <tr key={i} className="bg-[#111] border-b border-gray-700">
-                            <td className="px-2 py-1">{dayjs(Number(c.time)).format("DD/MM/YYYY - HH:mm")}</td>
-                            <td className="px-2 py-1">{c.open}</td>
-                            <td className="px-2 py-1">{c.high}</td>
-                            <td className="px-2 py-1">{c.low}</td>
-                            <td className="px-2 py-1">{c.close}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="rounded-xl overflow-hidden bg-[#1a1a1a] p-2">
+                    <CandlestickChart_TimeBased
+                      signalId={signal._id}
+                      data={combinedData}
+                      width={900}
+                      height={420}
+                    />
                   </div>
                 </div>
               )}
