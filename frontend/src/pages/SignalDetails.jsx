@@ -174,7 +174,7 @@ const SignalDetails = () => {
                       <tbody>
                         {combinedData.map((c, i) => (
                           <tr key={i} className="bg-[#111] border-b border-gray-700">
-                            <td className="px-2 py-1">{dayjs(c.time).format("DD/MM/YYYY - HH:mm")}</td>
+                            <td className="px-2 py-1">{dayjs(Number(c.time)).format("DD/MM/YYYY - HH:mm")}</td>
                             <td className="px-2 py-1">{c.open}</td>
                             <td className="px-2 py-1">{c.high}</td>
                             <td className="px-2 py-1">{c.low}</td>
