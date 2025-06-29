@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import CandlestickChart from "../components/CandlestickChart";
+import CandlestickChart_TimeBased from "../components/charts/CandlestickChart_TimeBased";
 import AllDrawingTools from "../tools/AllDrawingTools";
 import ToolSelector from "../tools/ToolSelector";
 import Sidebar from "../components/Sidebar";
@@ -142,23 +142,16 @@ const SignalDetails = () => {
               {(selectedTab === "candles" || selectedTab === "draw") && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="rounded-xl overflow-hidden bg-[#1a1a1a] p-2">
-                    <CandlestickChart
-                      signalId={signal._id}
-                      data={combinedData}
-                      activeTool={activeTool}
-                      lines={lines}
-                      setLines={setLines}
-                      zones={zones}
-                      fractals={fractals}
-                      waves={waves}
-                      abcdPatterns={abcdPatterns}
-                      harmonicPatterns={harmonicPatterns}
-                      priceActions={priceActions}
-                      onReady={({ xScale, yScale }) => {
-                        setXScale(() => xScale);
-                        setYScale(() => yScale);
-                      }}
-                    />
+                    <CandlestickChart_TimeBased
+  data={combinedData.map(c => ({
+    timestamp: c.time,
+    open: c.open,
+    high: c.high,
+    low: c.low,
+    close: c.close,
+  }))}
+  signalId={signal._id}
+/>
                   </div>
                   <div className="overflow-auto max-h-[500px]">
                     <table className="w-full text-sm text-left rtl:text-right text-gray-400 border border-gray-700">
