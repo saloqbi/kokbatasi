@@ -145,7 +145,7 @@ const SignalDetails = () => {
                     {signal && signal._id && (
                       <CandlestickChart_TimeBased
                         data={combinedData.map(c => ({
-                          timestamp: c.time,
+                          timestamp: c.time || c.timestamp,
                           open: c.open,
                           high: c.high,
                           low: c.low,
