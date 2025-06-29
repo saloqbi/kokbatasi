@@ -1,135 +1,129 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useContext } from "react";
+import { Stage, Layer, Line } from "react-konva";
+import { ToolContext } from "../context/ToolContext";
 
-const AllSignalsPage = () => {
-  const [signals, setSignals] = useState([]);
-  const [filter, setFilter] = useState("all");
+const API_BASE = import.meta.env.VITE_REACT_APP_API_URL;
 
-  useEffect(() => {
-    const fetchSignals = async () => {
-      try {
-        const response = await fetch(
-          import.meta.env.VITE_REACT_APP_API_URL + "/api/signals"
-        );
-        const data = await response.json();
-        setSignals(data);
-      } catch (error) {
-        console.error("❌ فشل في جلب الإشارات:", error);
-      }
-    };
+const AllDrawingTools = ({
+  signalId,
+  savedLines,
+  onSaveLines,
+  xScale,
+  yScale,
+}) => {
+  const { activeTool } = useContext(ToolContext);
+  const [temp, setTemp] = useState([]);
 
-    fetchSignals();
-    const interval = setInterval(fetchSignals, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  const handleClick = (e) => {
+    const stage = e.target.getStage();
+    const pointer = stage.getPointerPosition();
 
-  const handleGenerateFakeSignal = async () => {
-    try {
-      const response = await axios.post(
-        import.meta.env.VITE_REACT_APP_API_URL + "/api/signals",
-        {
-          symbol: "ETH",
-          action: "BUY",
-          price: 3300,
-          data: []
-        }
-      );
-      alert("✅ تم إنشاء توصية وهمية بنجاح");
-    } catch (error) {
-      console.error("❌ فشل في إنشاء التوصية الوهمية:", error);
-      alert("❌ فشل في إضافة التوصية. تحقق من الخادم.");
+    if (!pointer || !xScale || !yScale) return;
+
+    const x = pointer.x;
+    const y = pointer.y;
+    const time = xScale.invert(x)?.getTime?.();
+    const price = yScale.invert(y);
+
+    if (!time || isNaN(price)) return;
+
+    if (temp.length === 0) {
+      setTemp([{ time, price }]);
+    } else if (temp.length === 1) {
+      const newLine = {
+        x1: temp[0].time,
+        y1: temp[0].price,
+        x2: time,
+        y2: price,
+        type: "line",
+        signalId,
+      };
+
+      fetch(`${API_BASE}/api/tools`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newLine),
+      })
+        .then((res) => res.json())
+        .then((saved) => {
+          onSaveLines((prev) => [...prev, { ...newLine, _id: saved._id }]);
+          setTemp([]);
+        });
     }
   };
 
-  const normalize = (text) => {
-    if (!text) return "";
-    const val = text.trim().toLowerCase();
-    if (val.includes("شراء") || val.includes("buy")) return "buy";
-    if (val.includes("بيع") || val.includes("sell")) return "sell";
-    return "";
-  };
-
-  const filteredSignals =
-    filter === "all"
-      ? signals
-      : signals.filter(
-          (signal) =>
-            normalize(signal.action || signal.recommendation) ===
-            normalize(filter)
-        );
-
-  const getIcon = (rec) => {
-    const norm = normalize(rec);
-    if (norm === "buy") return "⬆️";
-    if (norm === "sell") return "⬇️";
-    return "🔍";
-  };
-
   return (
-    <div className="p-4 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <span role="img" aria-label="satellite">
-            📡
-          </span>{" "}
-          جميع التوصيات
-        </h1>
-        <div className="flex items-center gap-4">
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="border rounded px-3 py-1 text-sm"
-          >
-            <option value="all">الكل</option>
-            <option value="buy">شراء</option>
-            <option value="sell">بيع</option>
-          </select>
-          <button
-            onClick={handleGenerateFakeSignal}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm"
-          >
-            🚀 إنشاء توصية وهمية
-          </button>
-        </div>
-      </div>
+    <Stage width={850} height={400} onClick={handleClick}>
+      <Layer>
+        {savedLines.map((line, i) => {
+          const x1 = xScale(new Date(line.x1));
+          const y1 = yScale(line.y1);
+          const x2 = xScale(new Date(line.x2));
+          const y2 = yScale(line.y2);
 
-      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredSignals
-          .filter((signal) => signal.symbol)
-          .map((signal) => (
-            <Link
-              key={signal._id}
-              to={`/signals/${signal._id}`}
-              className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-2xl shadow hover:shadow-lg transition duration-200 p-5 flex flex-col justify-between"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold truncate text-gray-800 dark:text-white">
-                  {getIcon(signal.action)} {signal.symbol}
-                </h2>
-                <span
-                  className={`text-xs font-bold px-2 py-1 rounded-full ${
-                    normalize(signal.action) === "buy"
-                      ? "bg-green-100 text-green-700"
-                      : normalize(signal.action) === "sell"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  {signal.action || "غير محددة"}
-                </span>
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-                💰 السعر: {signal.price || "غير متوفر"}
-              </div>
-              <div className="text-xs text-gray-400 dark:text-gray-500">
-                📅 {new Date(signal.createdAt).toLocaleString("ar-EG")}
-              </div>
-            </Link>
-          ))}
-      </div>
-    </div>
+          if (
+            [x1, y1, x2, y2].some((val) => isNaN(val) || val === undefined)
+          ) {
+            return null;
+          }
+
+          return (
+            <Line
+              key={i}
+              points={[x1, y1, x2, y2]}
+              stroke="#00e676"
+              strokeWidth={2}
+              lineCap="round"
+              tension={0}
+              draggable
+              onDragEnd={(e) => {
+                const dx = e.target.x() - x1;
+                const dy = e.target.y() - y1;
+                const newX1 = xScale.invert(x1 + dx).getTime();
+                const newY1 = yScale.invert(y1 + dy);
+                const newX2 = xScale.invert(x2 + dx).getTime();
+                const newY2 = yScale.invert(y2 + dy);
+
+                const updated = {
+                  ...line,
+                  x1: newX1,
+                  y1: newY1,
+                  x2: newX2,
+                  y2: newY2,
+                };
+
+                onSaveLines((prev) => {
+                  const copy = [...prev];
+                  copy[i] = updated;
+                  return copy;
+                });
+
+                fetch(`${API_BASE}/api/tools/${line._id}`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(updated),
+                });
+              }}
+            />
+          );
+        })}
+
+        {temp.length === 1 && (
+          <Line
+            points={[
+              xScale(new Date(temp[0].time)),
+              yScale(temp[0].price),
+              xScale(new Date(temp[0].time)) + 10,
+              yScale(temp[0].price),
+            ]}
+            stroke="#888"
+            strokeWidth={1}
+            dash={[4, 4]}
+          />
+        )}
+      </Layer>
+    </Stage>
   );
 };
 
-export default AllSignalsPage;
+export default AllDrawingTools;
