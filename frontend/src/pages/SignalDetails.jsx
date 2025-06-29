@@ -144,16 +144,16 @@ const SignalDetails = () => {
                   <div className="rounded-xl overflow-hidden bg-[#1a1a1a] p-2">
                     {signal && signal._id && (
   <CandlestickChart_TimeBased
-    data={combinedData.map(c => ({
+    data={Array.isArray(combinedData) ? combinedData.map(c => ({
       timestamp: c.time,
       open: c.open,
       high: c.high,
       low: c.low,
-      close: c.close,
-    }))}
+      close: c.close
+    })) : []}
     signalId={signal._id}
   />
-)}
+)}}
                   </div>
                   <div className="overflow-auto max-h-[500px]">
                     <table className="w-full text-sm text-left rtl:text-right text-gray-400 border border-gray-700">
