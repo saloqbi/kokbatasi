@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -143,17 +144,17 @@ const SignalDetails = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="rounded-xl overflow-hidden bg-[#1a1a1a] p-2">
                     {signal && signal._id && (
-  <CandlestickChart_TimeBased
-    data={Array.isArray(combinedData) ? combinedData.map(c => ({
-  timestamp: Number(c.time),
-  open: Number(c.open),
-  high: Number(c.high),
-  low: Number(c.low),
-  close: Number(c.close)
-})) : []}
-    signalId={signal._id}
-  />
-)}}
+                      <CandlestickChart_TimeBased
+                        data={Array.isArray(combinedData) ? combinedData.map(c => ({
+                          timestamp: Number(c.time),
+                          open: Number(c.open),
+                          high: Number(c.high),
+                          low: Number(c.low),
+                          close: Number(c.close)
+                        })) : []}
+                        signalId={signal._id}
+                      />
+                    )}
                   </div>
                   <div className="overflow-auto max-h-[500px]">
                     <table className="w-full text-sm text-left rtl:text-right text-gray-400 border border-gray-700">
@@ -180,57 +181,6 @@ const SignalDetails = () => {
                     </table>
                   </div>
                 </div>
-              )}
-
-              {selectedTab === "analysis" && (
-                <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-yellow-300 font-bold mb-1">📏 خطوط الاتجاه</h3>
-                      <p className="text-sm text-gray-300">{lines.length} خطوط</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-green-300 font-bold mb-1">📦 مناطق الدعم/المقاومة</h3>
-                      <p className="text-sm text-gray-300">{zones.length} مناطق</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-purple-300 font-bold mb-1">🔺 موجات إليوت</h3>
-                      <p className="text-sm text-gray-300">{waves.length} نماذج</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-blue-300 font-bold mb-1">🧬 نماذج ABCD</h3>
-                      <p className="text-sm text-gray-300">{abcdPatterns.length} نماذج</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-yellow-300 font-bold mb-1">🎯 Price Action</h3>
-                      <p className="text-sm text-gray-300">{priceActions.length} أنماط</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-pink-400 font-bold mb-1">🌀 نماذج Harmonic</h3>
-                      <p className="text-sm text-gray-300">{harmonicPatterns.length} نماذج</p>
-                    </div>
-                  </div>
-                  <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                </>
-              )}
-
-              {selectedTab === "draw" && (
-                <>
-                  <AllDrawingTools
-                    activeTool={activeTool}
-                    lines={lines}
-                    setLines={setLines}
-                    zones={zones}
-                    fractals={fractals}
-                    waves={waves}
-                    abcdPatterns={abcdPatterns}
-                    harmonicPatterns={harmonicPatterns}
-                    priceActions={priceActions}
-                  />
-                  <div className="mt-4">
-                    <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                  </div>
-                </>
               )}
             </div>
           </div>
