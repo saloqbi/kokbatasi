@@ -1,13 +1,14 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
-const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 }) => {
+const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400, onScalesReady }) => {
   const svgRef = useRef();
   const [drawMode, setDrawMode] = useState("line");
   const [shapes, setShapes] = useState([]);
   const [currentShape, setCurrentShape] = useState(null);
 
   useEffect(() => {
+    if (!Array.isArray(data) || data.length === 0) return;
     const fetchTools = async () => {
       try {
         const res = await fetch(`https://kokbatasi.onrender.com/api/tools/${signalId}`);
@@ -49,6 +50,7 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
   };
 
   useEffect(() => {
+    if (!Array.isArray(data) || data.length === 0) return;
     if (!data || data.length === 0) return;
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -68,6 +70,11 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
       .domain([d3.min(parsedData, d => d.low), d3.max(parsedData, d => d.high)])
       .nice()
       .range([innerHeight, 0]);
+
+    // 🟢 تمرير المقاييس بعد إنشائها
+    if (typeof onScalesReady === "function") {
+      onScalesReady({ xScale, yScale });
+    }
 
     const svg = d3.select(svgRef.current)
       .attr("width", width)
