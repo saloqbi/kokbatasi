@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
-const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 }) => {
+const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400, onScalesReady }) => {
   const svgRef = useRef();
   const [drawMode, setDrawMode] = useState("line");
   const [shapes, setShapes] = useState([]);
@@ -68,6 +68,11 @@ const CandlestickChart_TimeBased = ({ data, signalId, width = 800, height = 400 
       .domain([d3.min(parsedData, d => d.low), d3.max(parsedData, d => d.high)])
       .nice()
       .range([innerHeight, 0]);
+
+    // ✅ تمرير المحاور إلى الأعلى
+    if (typeof onScalesReady === "function") {
+      onScalesReady(xScale, yScale);
+    }
 
     const svg = d3.select(svgRef.current)
       .attr("width", width)

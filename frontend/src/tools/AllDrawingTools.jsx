@@ -1,130 +1,121 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Layer, Line, Rect } from "react-konva";
+// ✅ AllDrawingTools_FINAL_MERGED.jsx
+import React, { useState, useContext } from "react";
+import { Stage, Layer, Line, Rect } from "react-konva";
 import { ToolContext } from "../context/ToolContext";
-import SupportResistanceTool from "./SupportResistanceTool";
-import FibonacciTool from "./FibonacciTool";
-import GannTool from "./GannTool";
-import FractalTool from "./FractalTool";
-import ElliottWaveTool from "./ElliottWaveTool";
-import ICTTool from "./ICTTool";
-import ChannelTool from "./ChannelTool";
-import WyckoffTool from "./WyckoffTool";
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = import.meta.env.VITE_REACT_APP_API_URL;
 
 const AllDrawingTools = ({
   signalId,
-  savedLines = [],
-  onSaveLines = () => {},
+  savedLines,
+  onSaveLines,
   xScale,
   yScale,
 }) => {
   const { activeTool } = useContext(ToolContext);
-  const [tempPoints, setTempPoints] = useState([]);
-  const [lines, setLines] = useState(savedLines);
-
-  useEffect(() => {
-    setLines(savedLines);
-  }, [savedLines]);
+  const [temp, setTemp] = useState([]);
 
   const handleClick = (e) => {
-    if (activeTool !== "line") return;
-
     const stage = e.target.getStage();
     const pointer = stage.getPointerPosition();
-    const newPoint = { x: pointer.x, y: pointer.y };
-    const updated = [...tempPoints, newPoint];
-    setTempPoints(updated);
 
-    if (updated.length === 2) {
-      const getIndexFromX = (x) => {
-        if (!xScale) return 0;
-        const domain = xScale.domain();
-        const range = xScale.range();
-        const rangeWidth = range[1] - range[0] || 1;
-        const relative = (x - range[0]) / rangeWidth;
-        const index = Math.round(relative * domain.length);
-        if (isNaN(index)) return;
-        return index;
-      };
+    if (!pointer || !xScale || !yScale) return;
 
+    const x = pointer.x;
+    const y = pointer.y;
+    const time = xScale.invert(x).getTime();
+    const price = yScale.invert(y);
+
+    if (temp.length === 0) {
+      setTemp([{ time, price }]);
+    } else if (temp.length === 1) {
       const newLine = {
-        start: {
-          x: updated[0].x,
-          y: updated[0].y,
-          index: getIndexFromX(updated[0].x),
-          price: yScale ? yScale.invert(updated[0].y) : 0,
-        },
-        end: {
-          x: updated[1].x,
-          y: updated[1].y,
-          index: getIndexFromX(updated[1].x),
-          price: yScale ? yScale.invert(updated[1].y) : 0,
-        },
+        x1: temp[0].time,
+        y1: temp[0].price,
+        x2: time,
+        y2: price,
+        type: "line",
+        signalId,
       };
 
-      const newLines = [...lines, newLine];
-      setLines(newLines);
-      setTempPoints([]);
-
-      try {
-        fetch(`${API_BASE}/api/tools`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lines: newLines }),
-        }).then((res) => {
-          if (res.ok) {
-            console.log("✅ تم حفظ الخط في MongoDB");
-            onSaveLines(newLines);
-          } else {
-            console.warn("⚠️ فشل الحفظ", res.status);
-          }
+      fetch(`${API_BASE}/api/tools`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newLine),
+      })
+        .then((res) => res.json())
+        .then((saved) => {
+          onSaveLines((prev) => [...prev, { ...newLine, _id: saved._id }]);
+          setTemp([]);
         });
-      } catch (err) {
-        console.error("❌ فشل الحفظ:", err);
-      }
     }
   };
 
   return (
-    <Layer onClick={handleClick}>
-      <Rect x={0} y={0} width={1000} height={500} fill="transparent" listening={true} />
+    <Stage width={850} height={400} onClick={handleClick}>
+      <Layer>
+        {/* خطوط الاتجاه المحفوظة */}
+        {savedLines.map((line, i) => (
+          <Line
+            key={i}
+            points={[
+              xScale(new Date(line.x1)),
+              yScale(line.y1),
+              xScale(new Date(line.x2)),
+              yScale(line.y2),
+            ]}
+            stroke="#00e676"
+            strokeWidth={2}
+            lineCap="round"
+            tension={0}
+            draggable
+            onDragEnd={(e) => {
+              const dx = e.target.x() - xScale(new Date(line.x1));
+              const dy = e.target.y() - yScale(line.y1);
+              const newX1 = xScale.invert(xScale(new Date(line.x1)) + dx).getTime();
+              const newY1 = yScale.invert(yScale(line.y1) + dy);
+              const newX2 = xScale.invert(xScale(new Date(line.x2)) + dx).getTime();
+              const newY2 = yScale.invert(yScale(line.y2) + dy);
 
-      {activeTool === "line" &&
-        lines
-          .filter((line) =>
-            line?.start &&
-            line?.end &&
-            typeof line.start.index === "number" &&
-            typeof line.start.price === "number" &&
-            typeof line.end.index === "number" &&
-            typeof line.end.price === "number"
-          )
-          .map((line, index) => {
-            const x1 = xScale ? xScale(line.start.index) : line.start.x;
-            const y1 = yScale ? yScale(line.start.price) : line.start.y;
-            const x2 = xScale ? xScale(line.end.index) : line.end.x;
-            const y2 = yScale ? yScale(line.end.price) : line.end.y;
+              const updated = {
+                ...line,
+                x1: newX1,
+                y1: newY1,
+                x2: newX2,
+                y2: newY2,
+              };
 
-            return (
-              <Line
-                key={index}
-                points={[x1, y1, x2, y2]}
-                stroke="blue"
-                strokeWidth={2}
-              />
-            );
-          })}
+              onSaveLines((prev) => {
+                const copy = [...prev];
+                copy[i] = updated;
+                return copy;
+              });
 
-      {activeTool === "zone" && <SupportResistanceTool />}
-      {activeTool?.startsWith("fib") && <FibonacciTool />}
-      {activeTool?.startsWith("gann") && <GannTool />}
-      {activeTool === "fractal" && <FractalTool />}
-      {activeTool === "elliott" && <ElliottWaveTool />}
-      {activeTool === "ict" && <ICTTool />}
-      {activeTool === "channel" && <ChannelTool />}
-      {activeTool === "wyckoff" && <WyckoffTool />}
-    </Layer>
+              fetch(`${API_BASE}/api/tools/${line._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updated),
+              });
+            }}
+          />
+        ))}
+
+        {/* مؤقتًا: عرض الخط أثناء الرسم */}
+        {temp.length === 1 && (
+          <Line
+            points={[
+              xScale(new Date(temp[0].time)),
+              yScale(temp[0].price),
+              xScale.invert ? xScale.invert(0).getTime() : 0,
+              yScale.invert ? yScale.invert(0) : 0,
+            ]}
+            stroke="#888"
+            strokeWidth={1}
+            dash={[4, 4]}
+          />
+        )}
+      </Layer>
+    </Stage>
   );
 };
 

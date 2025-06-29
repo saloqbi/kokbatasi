@@ -1,3 +1,4 @@
+// ✅ SignalDetails.jsx - نسخة نهائية مدمجة بالكامل مع التحليل الفني + x/y scale
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -62,13 +63,15 @@ const SignalDetails = () => {
     return waves;
   };
 
+  const handleScalesReady = (x, y) => {
+    setXScale(() => x);
+    setYScale(() => y);
+  };
+
   useEffect(() => {
     const fetchBinanceCandles = async () => {
       try {
-        if (!signal?.symbol || !signal.symbol.toUpperCase().includes("USDT")) {
-          console.warn("🚫 الرمز غير مدعوم في Binance: ", signal?.symbol);
-          return;
-        }
+        if (!signal?.symbol || !signal.symbol.toUpperCase().includes("USDT")) return;
 
         const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${signal.symbol.toUpperCase()}&interval=1m&limit=30`);
         const data = await res.json();
@@ -100,9 +103,6 @@ const SignalDetails = () => {
       try {
         const signalRes = await axios.get(`${apiBase}/api/signals/${id}`);
         const signalData = signalRes.data;
-
-        if (!signalData || !signalData.symbol) throw new Error("❌ التوصية غير صالحة");
-
         const hasData = Array.isArray(signalData.data) && signalData.data.length > 0;
         const candles = hasData ? signalData.data : liveData;
 
@@ -135,91 +135,32 @@ const SignalDetails = () => {
           <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
           <div className="flex-1 p-4 overflow-auto mr-64">
             <h2 className="text-2xl font-bold text-center text-white bg-[#1a1a1a] py-4 rounded-lg shadow mb-4 tracking-widest">
-              📊 تفاصيل التوصية: <span className="text-yellow-400">{signal.symbol}</span> ({signal.action})
+              📊 تفاصيل التوصية: <span className="text-yellow-400">{signal?.symbol}</span> ({signal?.action})
             </h2>
 
             <div className="bg-[#1a1a1a] rounded-xl p-4 shadow-lg">
               {(selectedTab === "candles" || selectedTab === "draw") && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="rounded-xl overflow-hidden bg-[#1a1a1a] p-2">
-                    {signal && signal._id && (
-                      <CandlestickChart_TimeBased
-                        data={combinedData.map(c => ({
-                          timestamp: c.time || c.timestamp,
-                          open: c.open,
-                          high: c.high,
-                          low: c.low,
-                          close: c.close,
-                        }))}
-                        signalId={signal._id}
-                      />
-                    )}
-                  </div>
-                  <div className="overflow-auto max-h-[500px]">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-400 border border-gray-700">
-                      <thead className="text-xs uppercase bg-[#222] text-gray-200">
-                        <tr>
-                          <th className="px-2 py-1">🕒</th>
-                          <th className="px-2 py-1">Open</th>
-                          <th className="px-2 py-1">High</th>
-                          <th className="px-2 py-1">Low</th>
-                          <th className="px-2 py-1">Close</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {combinedData.map((c, i) => (
-                          <tr key={i} className="bg-[#111] border-b border-gray-700">
-                            <td className="px-2 py-1">{dayjs(c.time).format("DD/MM/YYYY - HH:mm")}</td>
-                            <td className="px-2 py-1">{c.open}</td>
-                            <td className="px-2 py-1">{c.high}</td>
-                            <td className="px-2 py-1">{c.low}</td>
-                            <td className="px-2 py-1">{c.close}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {selectedTab === "analysis" && (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-yellow-300 font-bold mb-1">📏 خطوط الاتجاه</h3>
-                      <p className="text-sm text-gray-300">{lines.length} خطوط</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-green-300 font-bold mb-1">📦 مناطق الدعم/المقاومة</h3>
-                      <p className="text-sm text-gray-300">{zones.length} مناطق</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-purple-300 font-bold mb-1">🔺 موجات إليوت</h3>
-                      <p className="text-sm text-gray-300">{waves.length} نماذج</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-blue-300 font-bold mb-1">🧬 نماذج ABCD</h3>
-                      <p className="text-sm text-gray-300">{abcdPatterns.length} نماذج</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-yellow-300 font-bold mb-1">🎯 Price Action</h3>
-                      <p className="text-sm text-gray-300">{priceActions.length} أنماط</p>
-                    </div>
-                    <div className="bg-[#1e1e1e] rounded-lg p-4 shadow hover:shadow-lg transition">
-                      <h3 className="text-pink-400 font-bold mb-1">🌀 نماذج Harmonic</h3>
-                      <p className="text-sm text-gray-300">{harmonicPatterns.length} نماذج</p>
-                    </div>
-                  </div>
-                  <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                </>
-              )}
-
-              {selectedTab === "draw" && (
-                <>
+                  {signal?._id && (
+                    <CandlestickChart_TimeBased
+                      data={combinedData.map(c => ({
+                        timestamp: c.time || c.timestamp,
+                        open: c.open,
+                        high: c.high,
+                        low: c.low,
+                        close: c.close,
+                      }))}
+                      signalId={signal._id}
+                      onScalesReady={handleScalesReady}
+                    />
+                  )}
                   <AllDrawingTools
+                    signalId={signal?._id}
+                    savedLines={lines}
+                    onSaveLines={setLines}
+                    xScale={xScale}
+                    yScale={yScale}
                     activeTool={activeTool}
-                    lines={lines}
-                    setLines={setLines}
                     zones={zones}
                     fractals={fractals}
                     waves={waves}
@@ -227,11 +168,40 @@ const SignalDetails = () => {
                     harmonicPatterns={harmonicPatterns}
                     priceActions={priceActions}
                   />
-                  <div className="mt-4">
-                    <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
-                  </div>
                 </>
               )}
+
+              {selectedTab === "analysis" && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                  <div className="bg-[#1e1e1e] rounded-lg p-4 shadow">
+                    <h3 className="text-yellow-300 font-bold mb-1">📏 خطوط الاتجاه</h3>
+                    <p>{lines.length} خطوط</p>
+                  </div>
+                  <div className="bg-[#1e1e1e] rounded-lg p-4 shadow">
+                    <h3 className="text-green-300 font-bold mb-1">📦 مناطق الدعم/المقاومة</h3>
+                    <p>{zones.length} مناطق</p>
+                  </div>
+                  <div className="bg-[#1e1e1e] rounded-lg p-4 shadow">
+                    <h3 className="text-purple-300 font-bold mb-1">🔺 موجات إليوت</h3>
+                    <p>{waves.length} نماذج</p>
+                  </div>
+                  <div className="bg-[#1e1e1e] rounded-lg p-4 shadow">
+                    <h3 className="text-blue-300 font-bold mb-1">🧬 نماذج ABCD</h3>
+                    <p>{abcdPatterns.length} نماذج</p>
+                  </div>
+                  <div className="bg-[#1e1e1e] rounded-lg p-4 shadow">
+                    <h3 className="text-yellow-300 font-bold mb-1">🎯 Price Action</h3>
+                    <p>{priceActions.length} أنماط</p>
+                  </div>
+                  <div className="bg-[#1e1e1e] rounded-lg p-4 shadow">
+                    <h3 className="text-pink-400 font-bold mb-1">🌀 Harmonic</h3>
+                    <p>{harmonicPatterns.length} نماذج</p>
+                  </div>
+                </div>
+              )}
+              <div className="mt-4">
+                <ToolSelector activeTool={activeTool} onToolChange={setActiveTool} />
+              </div>
             </div>
           </div>
         </div>
