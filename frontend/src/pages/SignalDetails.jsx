@@ -123,7 +123,9 @@ const SignalDetails = () => {
     fetchAll();
   }, [id]);
 
-  const combinedData = Array.isArray(signal?.data) && signal.data.length > 0 ? signal.data : liveData;
+const combinedData = Array.isArray(signal?.data) && signal.data.length > 0
+  ? signal.data
+  : (Array.isArray(liveData) ? liveData : []);
 
   if (loading) return <div className="text-center p-8 text-gray-300">⏳ جاري التحميل...</div>;
   if (error) return <div className="text-center text-red-500 p-4">{error}</div>;
