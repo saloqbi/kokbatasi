@@ -4,6 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 
 const signalRoutes = require("./routes/signals");
+const toolRoutes = require("./routes/tools");
 
 dotenv.config();
 
@@ -12,6 +13,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/signals", signalRoutes);
+app.use("/api/tools", toolRoutes);
+
 
 // ✅ الاتصال بقاعدة البيانات
 mongoose
